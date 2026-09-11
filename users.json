@@ -1,0 +1,42 @@
+[
+  {
+    "id": "usr-1",
+    "email": "jigal.prajapati@bytestechnolab.com",
+    "name": "Jigal Prajapati",
+    "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "role": "Super Admin",
+    "created_at": "2026-09-01 10:00:00"
+  },
+  {
+    "id": "usr-2",
+    "email": "admin@bytestechnolab.com",
+    "name": "Cloud Admin",
+    "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "role": "Administrator",
+    "created_at": "2026-09-05 12:00:00"
+  },
+  {
+    "id": "usr-aa89a4b3",
+    "email": "test@bytestechnolab.com",
+    "name": "Test User",
+    "password_hash": "89e01536ac207279409d4de1e5253e01f4a1769e696db0d6062ca9b8f56767c8",
+    "role": "Cloud Operator",
+    "created_at": "2026-09-10 18:39:39"
+  },
+  {
+    "id": "usr-2d3569d6",
+    "email": "jesal.mer@bytestechnolab.com",
+    "name": "Jesal",
+    "password_hash": "fa11fc629ec122de346576915397297ab508fe961790c7291fbba934e2bf6c2f",
+    "role": "Cloud Operator",
+    "created_at": "2026-09-10 18:41:28"
+  },
+  {
+    "id": "usr-3ea55be9",
+    "email": "jigar.prajapati@bytestechnolab.com",
+    "name": "Jigar",
+    "password_hash": "cf4b03c008f25b610f40e5818c7f28a991f67e91889590710b830d71e4256f7b",
+    "role": "Cloud Operator",
+    "created_at": "2026-09-10 18:44:41"
+  }
+]

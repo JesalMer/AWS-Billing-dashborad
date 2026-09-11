@@ -1,0 +1,9 @@
+{
+  "host": "",
+  "port": 587,
+  "username": "",
+  "password": "",
+  "sender_email": "",
+  "use_tls": true,
+  "configured": false
+}

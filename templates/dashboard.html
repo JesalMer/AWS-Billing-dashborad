@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Billing Dashboard PRO</title>
+
+    <!-- Google Font: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<!-- ============================== 3D WIREFRAME MESH BACKGROUND ============================== -->
+<canvas id="bg3dCanvas" class="bg-3d-canvas" aria-hidden="true"></canvas>
+
+<!-- Ambient Glow Orbs -->
+<div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+</div>
+
+
+<!-- ============================== AUTHENTICATION OVERLAY / LOGIN & SIGN UP PANEL ============================== -->
+<div class="auth-overlay" id="authOverlay">
+    <div class="auth-card card-3d">
+        <div class="auth-brand-header">
+            <div class="header-aws-avatar">
+                <span>AWS</span>
+            </div>
+            <h2>AWS Billing Dashboard <span class="badge-pro">PRO</span></h2>
+            <p class="auth-subtitle">Sign in or create an account to access real-time cloud financial ops.</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab-btn active" id="authTabSignInBtn" onclick="switchAuthTab('signin')">Sign In</button>
+            <button class="auth-tab-btn" id="authTabSignUpBtn" onclick="switchAuthTab('signup')">Create Account</button>
+            <button class="auth-tab-btn" id="authTabForgotBtn" onclick="switchAuthTab('forgot')">Reset Password</button>
+        </div>
+
+        <!-- Sign In Form -->
+        <form class="auth-form" id="signInForm" onsubmit="handleSignIn(event)">
+            <div class="form-group">
+                <label for="loginEmail">Email Address</label>
+                <input type="email" id="loginEmail" placeholder="e.g. jigal.prajapati@bytestechnolab.com" value="jigal.prajapati@bytestechnolab.com" required>
+            </div>
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" placeholder="••••••••" value="admin123" required>
+            </div>
+            <div class="auth-options-row">
+                <label class="remember-me-label">
+                    <input type="checkbox" id="rememberMe" checked>
+                    <span>Keep me logged in across page refresh</span>
+                </label>
+                <a href="javascript:void(0)" class="auth-link" onclick="switchAuthTab('forgot')">Forgot?</a>
+            </div>
+            <button type="submit" class="pill-cyan-btn btn-full" style="margin-top: 16px;">
+                <span>Sign In to Dashboard &rarr;</span>
+            </button>
+            <div class="auth-status-msg" id="signInStatus"></div>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form class="auth-form" id="signUpForm" style="display: none;" onsubmit="handleSignUp(event)">
+            <div class="form-group">
+                <label for="regName">Full Name</label>
+                <input type="text" id="regName" placeholder="e.g. Jigal Prajapati" required>
+            </div>
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="regEmail">Work Email</label>
+                <input type="email" id="regEmail" placeholder="name@company.com" required>
+            </div>
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="regPassword">Password</label>
+                <input type="password" id="regPassword" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="pill-cyan-btn btn-full" style="margin-top: 16px;">
+                <span>Create Free Account &rarr;</span>
+            </button>
+            <div class="auth-status-msg" id="signUpStatus"></div>
+        </form>
+
+        <!-- Forgot Password Form -->
+        <form class="auth-form" id="forgotForm" style="display: none;" onsubmit="handleForgotPassword(event)">
+            <div class="form-group">
+                <label for="forgotEmail">Registered Email</label>
+                <input type="email" id="forgotEmail" placeholder="name@company.com" required>
+            </div>
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="forgotNewPassword">New Password</label>
+                <input type="password" id="forgotNewPassword" placeholder="Enter new password" required>
+            </div>
+            <button type="submit" class="pill-cyan-btn btn-full" style="margin-top: 16px;">
+                <span>Reset &amp; Update Password &rarr;</span>
+            </button>
+            <div class="auth-status-msg" id="forgotStatus"></div>
+        </form>
+    </div>
+</div>
+
+
+<div class="app">
+
+    <!-- ============================== SIDEBAR ============================== -->
+    <aside class="sidebar" id="sidebar">
+
+        <!-- Logo / Brand Header -->
+        <div class="sidebar-brand-wrap">
+            <div class="brand-avatar" aria-hidden="true">
+                <span>AWS</span>
+            </div>
+            <div class="brand-text">
+                <span class="brand-title">AWS Billing <span class="badge-pro-mini">PRO</span></span>
+                <span class="brand-subtitle">FINTECH CLOUD OPS</span>
+            </div>
+        </div>
+
+        <!-- Action Pill Button -->
+        <div class="sidebar-action-wrap">
+            <button class="sidebar-cyan-btn" onclick="toggleConnectPanel()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                <span>Connect AWS</span>
+            </button>
+        </div>
+
+        <!-- Navigation Sections -->
+        <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
+            <div class="nav-section-title">WORKSPACE</div>
+            <a href="#section-overview" class="nav-item active" onclick="navActivate(this)">
+                <span class="nav-icon" style="color: var(--cyan-accent);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                </span>
+                <span class="nav-label">Dashboard</span>
+                <span class="nav-pill-badge" id="navServiceBadge">12</span>
+            </a>
+
+            <div class="nav-section-title">SERVICES</div>
+            <div class="nav-projects-list" id="sidebarServicesList">
+                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('Amazon Elastic Compute Cloud')">
+                    <span class="subitem-dot" style="background: #00c0f0;"></span>
+                    <span class="subitem-name">Elastic Compute</span>
+                    <span class="subitem-badge cyan-badge">$1,402</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('EC2 - Other')">
+                    <span class="subitem-dot" style="background: #7c83fd;"></span>
+                    <span class="subitem-name">EC2 - Other</span>
+                    <span class="subitem-badge blue-badge">$930</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('Amazon OpenSearch')">
+                    <span class="subitem-dot" style="background: #b085f5;"></span>
+                    <span class="subitem-name">OpenSearch Service</span>
+                    <span class="subitem-badge purple-badge">$458</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('Savings Plans')">
+                    <span class="subitem-dot" style="background: #f472b6;"></span>
+                    <span class="subitem-name">Savings Plans</span>
+                    <span class="subitem-badge pink-badge">$268</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('Amazon Simple Storage')">
+                    <span class="subitem-dot" style="background: #fb923c;"></span>
+                    <span class="subitem-name">Simple Storage (S3)</span>
+                    <span class="subitem-badge orange-badge">$185</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('Amazon Virtual Private')">
+                    <span class="subitem-dot" style="background: #34d399;"></span>
+                    <span class="subitem-name">VPC Networking</span>
+                    <span class="subitem-badge green-badge">$45</span>
+                </a>
+            </div>
+
+            <div class="nav-section-title">OPERATIONS</div>
+            <a href="#section-reports" class="nav-item" onclick="navActivate(this)">
+                <span class="nav-icon" style="color: #34d399;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </span>
+                <span class="nav-label">Report Center</span>
+            </a>
+        </nav>
+
+        <!-- ============================== SETTINGS & CONTROLS (ABOVE AWS PRODUCTION) ============================== -->
+        <div class="sidebar-admin-section">
+            <button class="admin-panel-btn card-3d" onclick="openSettingsModal()">
+                <div class="admin-btn-left">
+                    <span class="admin-icon-wrap">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </span>
+                    <div class="admin-btn-text">
+                        <span class="admin-main-title">Dashboard Settings</span>
+                        <span class="admin-sub-title">Account &bull; Crontab &bull; Share</span>
+                    </div>
+                </div>
+                <span class="admin-badge-pill">ACTIVE</span>
+            </button>
+        </div>
+
+        <!-- Sidebar Bottom User Card -->
+        <div class="sidebar-bottom-user">
+            <div class="user-avatar-circle" id="userAvatar">JP</div>
+            <div class="user-info">
+                <span class="user-name" id="displayAccountSidebar">Jigal Prajapati</span>
+                <span class="user-status-text">
+                    <span class="status-live-dot"></span>
+                    <span id="userRoleBadge">Super Admin</span>
+                </span>
+            </div>
+        </div>
+
+    </aside>
+
+
+    <!-- ============================== MAIN CONTENT ============================== -->
+    <main class="main-content">
+
+        <!-- ============================== TOP HEADER (MATCHING SCREENSHOT) ============================== -->
+        <header class="top-nav-bar">
+            
+            <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+
+            <!-- Brand & Connected Account display -->
+            <div class="header-brand-box">
+                <div class="header-aws-avatar">
+                    <span>AWS</span>
+                </div>
+                <div class="header-title-column">
+                    <div class="header-title-row">
+                        <h1 class="header-main-title">AWS Billing Dashboard</h1>
+                        <span class="badge-pro">PRO</span>
+                    </div>
+                    <p class="header-connected-account">
+                        Connected Account: <strong id="connectedEmailDisplay">jigal.prajapati@bytestechnolab.com</strong>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Top Right Action Controls -->
+            <div class="header-controls-group">
+                <!-- Reload / Refresh -->
+                <button class="icon-round-btn" onclick="onRefresh()" title="Refresh Cost Explorer data">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                </button>
+
+                <!-- 12 Colors / Theme Toggle pill -->
+                <button class="pill-badge-btn" onclick="toggleThemePalette()" title="Toggle visual theme palette">
+                    <span class="palette-swatch"></span>
+                    <span id="themeLabelText">12 Colors</span>
+                </button>
+
+                <!-- Connect AWS cyan button -->
+                <button class="pill-cyan-btn" onclick="toggleConnectPanel()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                    <span>Connect AWS</span>
+                </button>
+
+                <!-- Settings & Account Icon -->
+                <button class="icon-round-btn" onclick="openSettingsModal()" title="Settings & Account">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+            </div>
+
+        </header>
+
+
+        <!-- ============================== 4 TOP KPI CARDS ============================== -->
+        <section class="kpi-quad-grid" id="section-overview">
+
+            <!-- Card 1: MONTH TO DATE (MTD) -->
+            <div class="kpi-card card-3d">
+                <div class="kpi-card-header">
+                    <span class="kpi-card-label">MONTH TO DATE (MTD)</span>
+                    <div class="kpi-icon-box cyan-icon">
+                        <span>$</span>
+                    </div>
+                </div>
+                <div class="kpi-card-value" id="kpiCurrentCost">$268.42</div>
+                <div class="kpi-card-sub">Current cycle spend</div>
+                <div class="kpi-card-footer">
+                    <span class="kpi-pill-tag green-pill" id="kpiChangeTag">-71.16% vs last month</span>
+                </div>
+            </div>
+
+            <!-- Card 2: PREVIOUS MONTH -->
+            <div class="kpi-card card-3d">
+                <div class="kpi-card-header">
+                    <span class="kpi-card-label">PREVIOUS MONTH</span>
+                    <div class="kpi-icon-box emerald-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    </div>
+                </div>
+                <div class="kpi-card-value" id="kpiPreviousCost">$930.59</div>
+                <div class="kpi-card-sub">Full last cycle</div>
+                <div class="kpi-card-footer">
+                    <span class="kpi-sub-note">Closed Billing Cycle</span>
+                </div>
+            </div>
+
+            <!-- Card 3: FORECASTED SPEND -->
+            <div class="kpi-card card-3d">
+                <div class="kpi-card-header">
+                    <span class="kpi-card-label">FORECASTED SPEND</span>
+                    <div class="kpi-icon-box amber-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    </div>
+                </div>
+                <div class="kpi-card-value" id="kpiForecastCost">$268.42</div>
+                <div class="kpi-card-sub">End-of-month trajectory</div>
+                <div class="kpi-card-footer">
+                    <span class="kpi-sub-note">Real-time AWS estimate</span>
+                </div>
+            </div>
+
+            <!-- Card 4: ACTIVE SERVICES -->
+            <div class="kpi-card card-3d">
+                <div class="kpi-card-header">
+                    <span class="kpi-card-label">ACTIVE SERVICES</span>
+                    <div class="kpi-icon-box rose-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    </div>
+                </div>
+                <div class="kpi-card-value" id="kpiActiveServicesVal">$9.00</div>
+                <div class="kpi-card-sub">Billing dimensions active</div>
+                <div class="kpi-card-footer">
+                    <span class="kpi-sub-note" id="kpiServicesCountNote">12 active dimensions</span>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ============================== CONNECT AWS PANEL (COLLAPSIBLE) ============================== -->
+        <section class="connect-panel card-3d" id="connectPanel">
+            <div class="connect-header">
+                <div class="connect-icon-box">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+                </div>
+                <div>
+                    <h2>Connect AWS Cost Explorer</h2>
+                    <p>Enter your AWS credentials to stream live cost dimensions and aggregates.</p>
+                </div>
+                <span class="secure-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Secure AWS API
+                </span>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="accountName">Account Name / Alias</label>
+                    <input type="text" id="accountName" placeholder="e.g. Production AWS" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="region">AWS Region</label>
+                    <select id="region">
+                        <option value="us-east-1">US East (N. Virginia)</option>
+                        <option value="us-east-2">US East (Ohio)</option>
+                        <option value="us-west-2">US West (Oregon)</option>
+                        <option value="ap-south-1">Asia Pacific (Mumbai)</option>
+                        <option value="eu-west-1">Europe (Ireland)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="accessKey">AWS Access Key ID</label>
+                    <input type="text" id="accessKey" placeholder="AKIAIOSFODNN7EXAMPLE" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="secretKey">AWS Secret Access Key</label>
+                    <div class="input-wrap">
+                        <input type="password" id="secretKey" placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" autocomplete="off">
+                        <button type="button" class="input-toggle" onclick="toggleSecretKey()" title="Show/Hide">👁</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="connect-actions">
+                <button class="pill-cyan-btn" id="fetchButton" onclick="fetchBilling()">
+                    <span id="buttonIcon">↻</span>
+                    <span id="buttonText">Fetch Live Billing Data</span>
+                </button>
+                <div class="status-msg" id="status">Ready to connect AWS Cost Explorer.</div>
+            </div>
+        </section>
+
+
+        <!-- ============================== MAIN CHARTS ROW (MATCHING SCREENSHOT) ============================== -->
+        <div class="charts-duo-grid">
+
+            <!-- Left: Daily Spend Velocity (Cyan Area Curve) -->
+            <div class="chart-panel card-3d">
+                <div class="chart-panel-header">
+                    <div>
+                        <h2 class="chart-title">Daily Spend Velocity</h2>
+                        <p class="chart-subtitle">Granular daily Cost Explorer aggregates</p>
+                    </div>
+                    <div class="chart-header-badges">
+                        <button class="pill-badge-active" id="velocityPeriodPill" onclick="toggleVelocityPeriod()">Last 14 Days</button>
+                    </div>
+                </div>
+                <div class="chart-canvas-box">
+                    <canvas id="dailyVelocityChart" aria-label="Daily Spend Velocity Chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Right: Top AWS Services (Vibrant Multi-Color Horizontal Bars) -->
+            <div class="chart-panel card-3d">
+                <div class="chart-panel-header">
+                    <div>
+                        <h2 class="chart-title">Top AWS Services</h2>
+                        <p class="chart-subtitle">Click any service to inspect regional resources</p>
+                    </div>
+                </div>
+                <div class="chart-canvas-box">
+                    <canvas id="topServicesBarChart" aria-label="Top AWS Services Bar Chart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ============================== REPORT CENTER & ACTIONS ============================== -->
+        <section class="content-section-block" id="section-reports">
+            <div class="section-title-row">
+                <div>
+                    <h2 class="section-heading">Financial Reports &amp; Exports</h2>
+                    <p class="section-subheading">Generate colorful executive summaries, export spreadsheets, or print to PDF</p>
+                </div>
+                <button class="pill-cyan-btn" onclick="openSettingsTab('custom-reports')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>Custom Data Selection &amp; Share</span>
+                </button>
+            </div>
+
+            <div class="reports-cards-row">
+                <div class="report-action-card card-3d" onclick="generateReport('monthly')">
+                    <div class="rep-icon-circle cyan-grad">📊</div>
+                    <h3>Executive Monthly Report</h3>
+                    <p>Complete colorful financial analysis with MoM comparison and forecast.</p>
+                    <span class="action-link-text">View &amp; Print &rarr;</span>
+                </div>
+
+                <div class="report-action-card card-3d" onclick="downloadExecutiveHTMLReport()">
+                    <div class="rep-icon-circle green-grad">📑</div>
+                    <h3>Download Colored HTML</h3>
+                    <p>Standalone executive file with charts, badges, and print-ready styling.</p>
+                    <span class="action-link-text">Download HTML &rarr;</span>
+                </div>
+
+                <div class="report-action-card card-3d" onclick="downloadPDFReport()">
+                    <div class="rep-icon-circle purple-grad">🖨️</div>
+                    <h3>Print / Save as PDF</h3>
+                    <p>Full-color document formatted with exact print stylesheet.</p>
+                    <span class="action-link-text">Print Document &rarr;</span>
+                </div>
+
+                <div class="report-action-card card-3d" onclick="downloadCSV()">
+                    <div class="rep-icon-circle orange-grad">📄</div>
+                    <h3>Export CSV Spreadsheet</h3>
+                    <p>Raw service and regional dimension matrix for Excel and BI tools.</p>
+                    <span class="action-link-text">Download CSV &rarr;</span>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ============================== DETAILED DATA TABLES ============================== -->
+        <section class="content-section-block">
+            <div class="section-title-row">
+                <div>
+                    <h2 class="section-heading">Detailed Resource Dimensions</h2>
+                    <p class="section-subheading">Complete service and regional cost explorer tables</p>
+                </div>
+                <div class="table-search-wrap">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="search" id="tableFilterInput" placeholder="Filter dimensions…" oninput="filterActiveTable(this.value)">
+                </div>
+            </div>
+
+            <div class="table-card-wrap card-3d">
+                <div class="table-tab-row">
+                    <button class="tab-btn active" id="tabBtnServices" onclick="switchTableTab('services')">All AWS Services</button>
+                    <button class="tab-btn" id="tabBtnRegions" onclick="switchTableTab('regions')">All AWS Regions</button>
+                </div>
+
+                <div id="servicesTableWrap" class="table-scroller">
+                    <table id="servicesTableEl">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">#</th>
+                                <th class="sortable" onclick="sortTable('services','service')">Dimension / Service ↕</th>
+                                <th class="sortable" onclick="sortTable('services','cost')">Accrued Cost ↕</th>
+                                <th>Share</th>
+                                <th style="min-width: 120px;">Allocation Bar</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="servicesTable">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                    <div class="table-pagination" id="servicePagination"></div>
+                </div>
+
+                <div id="regionsTableWrap" class="table-scroller" style="display:none;">
+                    <table id="regionsTableEl">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">#</th>
+                                <th class="sortable" onclick="sortTable('regions','region')">Region Dimension ↕</th>
+                                <th class="sortable" onclick="sortTable('regions','cost')">Regional Cost ↕</th>
+                                <th>Share</th>
+                                <th style="min-width: 120px;">Allocation Bar</th>
+                                <th>Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="regionsTable">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                    <div class="table-pagination" id="regionPagination"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <span>AWS Billing Dashboard PRO &bull; Persistent Session Active</span>
+            <span>Real-time AWS Cost Explorer API Integration</span>
+        </footer>
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================================
+     SETTINGS & ACCOUNT CONTROL PANEL MODAL
+     Tab 1: Account Details, Password & Logout
+     Tab 2: Crontab Automation GUI (with Custom One-Time & Custom Timing)
+     Tab 3: Custom Data Range & Selectable Data Report (Download & Email Share)
+     Tab 4: SMTP Mail Server Configuration (Enables Live Real Emails)
+===================================================================== -->
+<div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+    <div class="modal-window modal-wide card-3d">
+        <div class="modal-header">
+            <div class="modal-header-left">
+                <span class="admin-badge-pill">DASHBOARD CONTROLS</span>
+                <h2 id="settingsModalTitle">Settings, Account &amp; Automation Hub</h2>
+            </div>
+            <div class="modal-header-actions">
+                <div class="admin-tab-nav">
+                    <button class="admin-tab-btn active" id="tabBtnAccount" onclick="switchSettingsTab('account')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Account Details
+                    </button>
+                    <button class="admin-tab-btn" id="tabBtnCron" onclick="switchSettingsTab('cron')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Crontab Automation
+                    </button>
+                    <button class="admin-tab-btn" id="tabBtnCustom" onclick="switchSettingsTab('custom-reports')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Custom Data &amp; Share
+                    </button>
+                    <button class="admin-tab-btn" id="tabBtnSmtp" onclick="switchSettingsTab('smtp')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                        SMTP Mail Server
+                    </button>
+                </div>
+                <button class="modal-close-btn" onclick="closeSettingsModal()" aria-label="Close">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="modal-body">
+            
+            <!-- TAB 1: ACCOUNT DETAILS, SECURITY & LOGOUT -->
+            <div id="settingsAccountContent" class="admin-tab-pane">
+                <div class="account-profile-box card-3d">
+                    <div class="profile-header-flex">
+                        <div class="profile-avatar-large" id="profileAvatarLarge">JP</div>
+                        <div class="profile-info-block">
+                            <h3 id="profileNameDisplay">Jigal Prajapati</h3>
+                            <p id="profileEmailDisplay">jigal.prajapati@bytestechnolab.com</p>
+                            <span class="role-badge" id="profileRoleDisplay">Super Administrator</span>
+                        </div>
+                        <button class="pill-btn pill-btn-danger" style="margin-left: auto;" onclick="handleLogout()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            <span>Logout of Dashboard</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Password Management Section -->
+                <div class="security-card card-3d" style="margin-top: 16px;">
+                    <h4 class="config-title">Security &bull; Change or Reset Password</h4>
+                    <p class="pane-subtext">Update your login credentials stored securely in the local authentication engine.</p>
+                    <form onsubmit="handleChangePassword(event)" style="margin-top: 14px;">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="newAccountPassword">New Password</label>
+                                <input type="password" id="newAccountPassword" placeholder="Enter new password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmAccountPassword">Confirm New Password</label>
+                                <input type="password" id="confirmAccountPassword" placeholder="Repeat new password" required>
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+                            <button type="submit" class="pill-cyan-btn">Update Password</button>
+                        </div>
+                        <div class="auth-status-msg" id="changePasswordStatus"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TAB 2: CRONTAB AUTOMATION (WITH CUSTOM ONE-TIME OPTION) -->
+            <div id="settingsCronContent" class="admin-tab-pane" style="display: none;">
+                <div class="admin-pane-intro">
+                    <div>
+                        <h3 class="pane-headline">Crontab Report Automation Engine</h3>
+                        <p class="pane-subtext">Schedule recurring or custom one-time AWS cost reports to be generated and emailed automatically.</p>
+                    </div>
+                    <button class="pill-cyan-btn" onclick="toggleAddCronForm()">
+                        <span>+ New Cron Automation</span>
+                    </button>
+                </div>
+
+                <!-- Add New Cron Job Form (With Custom One-Time & Custom Timing) -->
+                <div class="add-cron-form card-3d" id="addCronForm" style="display: none;">
+                    <h4 class="form-title">Configure Automated Schedule</h4>
+                    <div class="form-grid-3">
+                        <div class="form-group">
+                            <label for="newCronName">Automation Title</label>
+                            <input type="text" id="newCronName" placeholder="e.g. Weekly Executive Digest" value="Weekly Cost Digest">
+                        </div>
+                        <div class="form-group">
+                            <label for="newCronEmail">Recipient Email(s)</label>
+                            <input type="email" id="newCronEmail" placeholder="cto@company.com, finance@company.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="newCronSchedule">Frequency / Timing Mode</label>
+                            <select id="newCronSchedule" onchange="onCronScheduleChange(this.value)">
+                                <option value="daily">Daily Schedule</option>
+                                <option value="weekly" selected>Weekly Schedule</option>
+                                <option value="monthly">Monthly Schedule</option>
+                                <option value="one_time">Custom One-Time Run (Specific Date/Time)</option>
+                                <option value="custom">Custom Cron Expression</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Custom Timing Detail Row -->
+                    <div class="form-grid-3" style="margin-top: 12px;">
+                        <div class="form-group" id="cronTimeWrap">
+                            <label for="newCronTime">Execution Time (Enter Custom Time)</label>
+                            <input type="time" id="newCronTime" value="09:00">
+                        </div>
+                        <div class="form-group" id="cronOneTimeDateWrap" style="display: none;">
+                            <label for="newCronOneTimeDate">Run-On Date (One-Time)</label>
+                            <input type="date" id="newCronOneTimeDate">
+                        </div>
+                        <div class="form-group" id="cronCustomExprWrap" style="display: none;">
+                            <label for="newCronCustomExpr">Cron Syntax Expression</label>
+                            <input type="text" id="newCronCustomExpr" placeholder="e.g. 30 14 * * 1-5" value="0 9 * * 1">
+                        </div>
+                        <div class="form-group">
+                            <label for="newCronFormat">Report Format</label>
+                            <select id="newCronFormat">
+                                <option value="html">Rich Colorful Executive HTML</option>
+                                <option value="pdf">Print-Ready PDF</option>
+                                <option value="csv">Raw CSV Spreadsheet</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="justify-content: flex-end;">
+                            <label>&nbsp;</label>
+                            <button class="pill-cyan-btn" onclick="saveNewCronJob()">Save Schedule</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Crontab Jobs Table -->
+                <div class="cron-jobs-table-wrap">
+                    <table class="cron-table">
+                        <thead>
+                            <tr>
+                                <th>Schedule Title</th>
+                                <th>Target Email</th>
+                                <th>Timing / Schedule</th>
+                                <th>Format</th>
+                                <th>Status</th>
+                                <th>Last Dispatched</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cronJobsTableBody">
+                            <!-- Populated from GET /api/admin/cron -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="cron-footer-note">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <span>Crontab daemon dispatches automated AWS billing digests at specified times via the configured SMTP server.</span>
+                </div>
+            </div>
+
+            <!-- TAB 3: CUSTOM DATA RANGE REPORT & LIVE EMAIL DISPATCH -->
+            <div id="settingsCustomContent" class="admin-tab-pane" style="display: none;">
+                <div class="admin-pane-intro">
+                    <div>
+                        <h3 class="pane-headline">Custom Date Range &amp; Dimension Selector</h3>
+                        <p class="pane-subtext">Filter exact From &amp; To dates, choose specific AWS services, and download or dispatch directly to recipient email.</p>
+                    </div>
+                </div>
+
+                <div class="custom-report-builder-grid">
+                    <!-- Left: Configuration & Selectors -->
+                    <div class="custom-config-col">
+                        <div class="config-card card-3d">
+                            <h4 class="config-title">1. Select Date Range (From &rarr; To)</h4>
+                            <div class="form-grid" style="margin-top: 8px;">
+                                <div class="form-group">
+                                    <label for="customDateFrom">From Date</label>
+                                    <input type="date" id="customDateFrom" class="date-input-field">
+                                </div>
+                                <div class="form-group">
+                                    <label for="customDateTo">To Date</label>
+                                    <input type="date" id="customDateTo" class="date-input-field">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="config-card card-3d" style="margin-top: 14px;">
+                            <div class="config-title-row">
+                                <h4 class="config-title">2. Select AWS Services to Include</h4>
+                                <button class="link-btn" onclick="toggleSelectAllServices()">Toggle All</button>
+                            </div>
+                            <div class="service-checkbox-grid" id="customServicesChecklist">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Direct Download & Live Email Dispatch -->
+                    <div class="custom-actions-col">
+                        <!-- Email Dispatch Card -->
+                        <div class="config-card card-3d">
+                            <h4 class="config-title">3. Share Custom Report via Email</h4>
+                            <div class="form-group" style="margin-top: 10px;">
+                                <label for="customEmailRecipient">Recipient Email Address</label>
+                                <input type="email" id="customEmailRecipient" placeholder="e.g. cto@bytestechnolab.com">
+                            </div>
+                            <div class="form-group" style="margin-top: 8px;">
+                                <label for="customEmailSubject">Email Subject</label>
+                                <input type="text" id="customEmailSubject" placeholder="AWS Custom Cost Report">
+                            </div>
+                            <div class="form-group" style="margin-top: 8px;">
+                                <label for="customEmailNotes">Notes / Message (Optional)</label>
+                                <textarea id="customEmailNotes" rows="2" placeholder="Attached is the custom billing breakdown for the selected period."></textarea>
+                            </div>
+                            
+                            <button class="pill-cyan-btn btn-full" style="margin-top: 12px;" onclick="sendCustomReportEmail()">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                <span>Send Selected Report via Email</span>
+                            </button>
+                            
+                            <div id="emailSendResultBox" class="email-result-box" style="display:none;"></div>
+                        </div>
+
+                        <!-- Direct Download Card -->
+                        <div class="config-card card-3d" style="margin-top: 14px;">
+                            <h4 class="config-title">4. Download Selected Data</h4>
+                            <div class="download-btn-group" style="margin-top: 10px;">
+                                <button class="pill-btn pill-btn-dark btn-full" onclick="downloadCustomReport('html')">
+                                    <span>📥 Download Custom Colored HTML</span>
+                                </button>
+                                <button class="pill-btn pill-btn-dark btn-full" style="background:#7c83fd; color:#fff;" onclick="downloadCustomReport('pdf')">
+                                    <span>🖨️ Print / Save Selected as PDF</span>
+                                </button>
+                                <button class="pill-btn pill-btn-clear btn-full" onclick="downloadCustomReport('csv')">
+                                    <span>📊 Export Selected to CSV</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: SMTP MAIL SERVER CONFIGURATION -->
+            <div id="settingsSmtpContent" class="admin-tab-pane" style="display: none;">
+                <div class="admin-pane-intro">
+                    <div>
+                        <h3 class="pane-headline">SMTP Mail Server Configuration</h3>
+                        <p class="pane-subtext">Configure your outgoing email server (Gmail App Password, AWS SES, or Outlook) so reports are delivered directly into inboxes.</p>
+                    </div>
+                </div>
+
+                <div class="card-3d" style="padding: 20px;">
+                    <form onsubmit="handleSaveSmtp(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="smtpHost">SMTP Host Server</label>
+                                <input type="text" id="smtpHost" placeholder="e.g. smtp.gmail.com or email-smtp.us-east-1.amazonaws.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="smtpPort">SMTP Port</label>
+                                <input type="number" id="smtpPort" placeholder="587 (TLS) or 465 (SSL)" value="587">
+                            </div>
+                            <div class="form-group">
+                                <label for="smtpUsername">Username / Sender Email</label>
+                                <input type="text" id="smtpUsername" placeholder="your-email@gmail.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="smtpPassword">Password / App Password</label>
+                                <input type="password" id="smtpPassword" placeholder="Gmail App Password or SES Secret">
+                            </div>
+                        </div>
+
+                        <div class="smtp-options-flex" style="margin-top: 14px;">
+                            <label class="remember-me-label">
+                                <input type="checkbox" id="smtpUseTls" checked>
+                                <span>Use STARTTLS / SSL Secure Transmission</span>
+                            </label>
+                            <button type="submit" class="pill-cyan-btn">Save SMTP Settings</button>
+                        </div>
+                    </form>
+
+                    <!-- Test Connection Box -->
+                    <div style="border-top: 1px solid var(--border); margin-top: 18px; padding-top: 16px;">
+                        <h4 style="font-size: 13px; font-weight: 700; color: var(--text-1);">Test SMTP Live Email Delivery</h4>
+                        <div style="display: flex; gap: 10px; margin-top: 8px;">
+                            <input type="email" id="testEmailTarget" placeholder="Enter recipient email to verify" style="flex:1;">
+                            <button class="pill-btn pill-btn-dark" onclick="runSmtpTest()">Send Test Email</button>
+                        </div>
+                        <div id="smtpTestStatus" style="font-size: 12px; margin-top: 8px;"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button class="pill-btn pill-btn-clear" onclick="closeSettingsModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================== EXECUTIVE REPORT MODAL ============================== -->
+<div class="modal-overlay" id="reportModal" role="dialog" aria-modal="true">
+    <div class="modal-window card-3d">
+        <div class="modal-header">
+            <div>
+                <span class="admin-badge-pill">EXECUTIVE REPORT</span>
+                <h2 id="reportModalTitle">AWS Billing &amp; Cost Analysis Report</h2>
+            </div>
+            <div class="modal-header-actions">
+                <button class="modal-close-btn" onclick="closeReportModal()">✕</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div id="visualReportContainer" class="visual-report-wrap"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="pill-btn pill-btn-clear" onclick="closeReportModal()">Close</button>
+            <button class="pill-btn pill-btn-dark" onclick="downloadExecutiveHTMLReport()">Download HTML</button>
+            <button class="pill-cyan-btn" onclick="downloadPDFReport()">Print / PDF</button>
+        </div>
+    </div>
+</div>
+
+<!-- Core Dashboard JavaScript -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
