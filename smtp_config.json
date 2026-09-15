@@ -1,9 +1,9 @@
 {
-  "host": "",
+  "host": "smtp.gmail.com",
   "port": 587,
-  "username": "",
-  "password": "",
-  "sender_email": "",
+  "username": "jesal.mer@bytestechnolab.com",
+  "password": "bzsm xxxj hwnz buzm",
+  "sender_email": "jesal.mer@bytestechnolab.com",
   "use_tls": true,
-  "configured": false
+  "configured": true
 }

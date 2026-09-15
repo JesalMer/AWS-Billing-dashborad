@@ -1,216 +1,176 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWS Billing Dashboard PRO</title>
+    <title>AWS Billing Dashboard</title>
 
-    <!-- Google Font: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <!-- Three.js 3D WebGL Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <!-- Dashboard CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-<!-- ============================== 3D WIREFRAME MESH BACKGROUND ============================== -->
-<canvas id="bg3dCanvas" class="bg-3d-canvas" aria-hidden="true"></canvas>
-
-<!-- Ambient Glow Orbs -->
-<div class="bg-orbs" aria-hidden="true">
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-</div>
-
-
-<!-- ============================== AUTHENTICATION OVERLAY / LOGIN & SIGN UP PANEL ============================== -->
+<!-- ============================== AUTHENTICATION MODAL OVERLAY ============================== -->
 <div class="auth-overlay" id="authOverlay">
-    <div class="auth-card card-3d">
+    <div class="auth-card">
         <div class="auth-brand-header">
-            <div class="header-aws-avatar">
-                <span>AWS</span>
+            <div class="brand-avatar-terracotta">
+                <span>aws</span>
             </div>
-            <h2>AWS Billing Dashboard <span class="badge-pro">PRO</span></h2>
-            <p class="auth-subtitle">Sign in or create an account to access real-time cloud financial ops.</p>
+            <h2>AWS Billing Dashboard <span class="badge-tag">v1.1</span></h2>
+            <p class="auth-subtitle">Sign in to manage cloud expenses &amp; automation suites</p>
         </div>
 
         <div class="auth-tabs">
-            <button class="auth-tab-btn active" id="authTabSignInBtn" onclick="switchAuthTab('signin')">Sign In</button>
-            <button class="auth-tab-btn" id="authTabSignUpBtn" onclick="switchAuthTab('signup')">Create Account</button>
-            <button class="auth-tab-btn" id="authTabForgotBtn" onclick="switchAuthTab('forgot')">Reset Password</button>
+            <button class="auth-tab-btn active" id="authTabLoginBtn" onclick="switchAuthTab('login')">Login</button>
+            <button class="auth-tab-btn" id="authTabSignInBtn" onclick="switchAuthTab('signin')">Sign In</button>
         </div>
 
-        <!-- Sign In Form -->
-        <form class="auth-form" id="signInForm" onsubmit="handleSignIn(event)">
+        <!-- Login Form (For existing / older users to login directly) -->
+        <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
             <div class="form-group">
                 <label for="loginEmail">Email Address</label>
-                <input type="email" id="loginEmail" placeholder="e.g. jigal.prajapati@bytestechnolab.com" value="jigal.prajapati@bytestechnolab.com" required>
+                <input type="email" id="loginEmail" placeholder="jigal.prajapati@bytestechnolab.com" value="jigal.prajapati@bytestechnolab.com" required>
             </div>
-            <div class="form-group" style="margin-top: 10px;">
+            <div class="form-group" style="margin-top: 12px;">
                 <label for="loginPassword">Password</label>
                 <input type="password" id="loginPassword" placeholder="••••••••" value="admin123" required>
             </div>
             <div class="auth-options-row">
                 <label class="remember-me-label">
                     <input type="checkbox" id="rememberMe" checked>
-                    <span>Keep me logged in across page refresh</span>
+                    <span>Keep me logged in</span>
                 </label>
-                <a href="javascript:void(0)" class="auth-link" onclick="switchAuthTab('forgot')">Forgot?</a>
             </div>
-            <button type="submit" class="pill-cyan-btn btn-full" style="margin-top: 16px;">
-                <span>Sign In to Dashboard &rarr;</span>
+            <button type="submit" class="pill-terracotta-btn btn-full" style="margin-top: 16px;">
+                <span>Login to Dashboard &rarr;</span>
             </button>
-            <div class="auth-status-msg" id="signInStatus"></div>
+            <div class="auth-status-msg" id="loginStatus"></div>
         </form>
 
-        <!-- Sign Up Form -->
-        <form class="auth-form" id="signUpForm" style="display: none;" onsubmit="handleSignUp(event)">
+        <!-- Sign In Form (For new users to create account & initialize clean dashboard) -->
+        <form class="auth-form" id="signInForm" style="display: none;" onsubmit="handleNewUserSignIn(event)">
             <div class="form-group">
                 <label for="regName">Full Name</label>
-                <input type="text" id="regName" placeholder="e.g. Jigal Prajapati" required>
+                <input type="text" id="regName" placeholder="e.g. Alex Rivera" required>
             </div>
-            <div class="form-group" style="margin-top: 10px;">
+            <div class="form-group" style="margin-top: 12px;">
                 <label for="regEmail">Work Email</label>
                 <input type="email" id="regEmail" placeholder="name@company.com" required>
             </div>
-            <div class="form-group" style="margin-top: 10px;">
+            <div class="form-group" style="margin-top: 12px;">
                 <label for="regPassword">Password</label>
                 <input type="password" id="regPassword" placeholder="••••••••" required>
             </div>
-            <button type="submit" class="pill-cyan-btn btn-full" style="margin-top: 16px;">
-                <span>Create Free Account &rarr;</span>
+            <button type="submit" class="pill-terracotta-btn btn-full" style="margin-top: 16px;">
+                <span>Sign In &amp; Create Account &rarr;</span>
             </button>
-            <div class="auth-status-msg" id="signUpStatus"></div>
-        </form>
-
-        <!-- Forgot Password Form -->
-        <form class="auth-form" id="forgotForm" style="display: none;" onsubmit="handleForgotPassword(event)">
-            <div class="form-group">
-                <label for="forgotEmail">Registered Email</label>
-                <input type="email" id="forgotEmail" placeholder="name@company.com" required>
-            </div>
-            <div class="form-group" style="margin-top: 10px;">
-                <label for="forgotNewPassword">New Password</label>
-                <input type="password" id="forgotNewPassword" placeholder="Enter new password" required>
-            </div>
-            <button type="submit" class="pill-cyan-btn btn-full" style="margin-top: 16px;">
-                <span>Reset &amp; Update Password &rarr;</span>
-            </button>
-            <div class="auth-status-msg" id="forgotStatus"></div>
+            <div class="auth-status-msg" id="signInStatus"></div>
         </form>
     </div>
 </div>
 
 
+<!-- ============================== APP CONTAINER ============================== -->
 <div class="app">
 
     <!-- ============================== SIDEBAR ============================== -->
     <aside class="sidebar" id="sidebar">
 
-        <!-- Logo / Brand Header -->
+        <!-- Logo & Header -->
         <div class="sidebar-brand-wrap">
-            <div class="brand-avatar" aria-hidden="true">
-                <span>AWS</span>
+            <div class="brand-avatar-terracotta">
+                <span>aws</span>
             </div>
             <div class="brand-text">
-                <span class="brand-title">AWS Billing <span class="badge-pro-mini">PRO</span></span>
-                <span class="brand-subtitle">FINTECH CLOUD OPS</span>
+                <span class="brand-title">AWS Billing</span>
+                <span class="brand-subtitle">BILLING DASHBOARD</span>
             </div>
         </div>
 
-        <!-- Action Pill Button -->
-        <div class="sidebar-action-wrap">
-            <button class="sidebar-cyan-btn" onclick="toggleConnectPanel()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                <span>Connect AWS</span>
-            </button>
-        </div>
-
-        <!-- Navigation Sections -->
-        <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
-            <div class="nav-section-title">WORKSPACE</div>
-            <a href="#section-overview" class="nav-item active" onclick="navActivate(this)">
-                <span class="nav-icon" style="color: var(--cyan-accent);">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <!-- Sidebar Navigation -->
+        <div class="sidebar-nav">
+            
+            <!-- Section: OVERVIEW -->
+            <div class="nav-section-title">OVERVIEW</div>
+            <button class="nav-item active" id="navBtnDashboard" onclick="switchMainView('dashboard')">
+                <span class="nav-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
                 </span>
                 <span class="nav-label">Dashboard</span>
-                <span class="nav-pill-badge" id="navServiceBadge">12</span>
-            </a>
-
-            <div class="nav-section-title">SERVICES</div>
-            <div class="nav-projects-list" id="sidebarServicesList">
-                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('Amazon Elastic Compute Cloud')">
-                    <span class="subitem-dot" style="background: #00c0f0;"></span>
-                    <span class="subitem-name">Elastic Compute</span>
-                    <span class="subitem-badge cyan-badge">$1,402</span>
-                </a>
-                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('EC2 - Other')">
-                    <span class="subitem-dot" style="background: #7c83fd;"></span>
-                    <span class="subitem-name">EC2 - Other</span>
-                    <span class="subitem-badge blue-badge">$930</span>
-                </a>
-                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('Amazon OpenSearch')">
-                    <span class="subitem-dot" style="background: #b085f5;"></span>
-                    <span class="subitem-name">OpenSearch Service</span>
-                    <span class="subitem-badge purple-badge">$458</span>
-                </a>
-                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('Savings Plans')">
-                    <span class="subitem-dot" style="background: #f472b6;"></span>
-                    <span class="subitem-name">Savings Plans</span>
-                    <span class="subitem-badge pink-badge">$268</span>
-                </a>
-                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('Amazon Simple Storage')">
-                    <span class="subitem-dot" style="background: #fb923c;"></span>
-                    <span class="subitem-name">Simple Storage (S3)</span>
-                    <span class="subitem-badge orange-badge">$185</span>
-                </a>
-                <a href="javascript:void(0)" class="nav-subitem" onclick="filterByServiceName('Amazon Virtual Private')">
-                    <span class="subitem-dot" style="background: #34d399;"></span>
-                    <span class="subitem-name">VPC Networking</span>
-                    <span class="subitem-badge green-badge">$45</span>
-                </a>
-            </div>
-
-            <div class="nav-section-title">OPERATIONS</div>
-            <a href="#section-reports" class="nav-item" onclick="navActivate(this)">
-                <span class="nav-icon" style="color: #34d399;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                </span>
-                <span class="nav-label">Report Center</span>
-            </a>
-        </nav>
-
-        <!-- ============================== SETTINGS & CONTROLS (ABOVE AWS PRODUCTION) ============================== -->
-        <div class="sidebar-admin-section">
-            <button class="admin-panel-btn card-3d" onclick="openSettingsModal()">
-                <div class="admin-btn-left">
-                    <span class="admin-icon-wrap">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    </span>
-                    <div class="admin-btn-text">
-                        <span class="admin-main-title">Dashboard Settings</span>
-                        <span class="admin-sub-title">Account &bull; Crontab &bull; Share</span>
-                    </div>
-                </div>
-                <span class="admin-badge-pill">ACTIVE</span>
             </button>
+
+            <button class="nav-item" id="navBtnBilling" onclick="switchMainView('billing')">
+                <span class="nav-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                </span>
+                <span class="nav-label">Cost Explorer</span>
+            </button>
+
+            <!-- Section: MANAGE (Keeps ONLY Services, Regions, Connect AWS, and Admin Panel) -->
+            <div class="nav-section-title" style="margin-top: 22px;">MANAGE</div>
+            
+            <!-- Services Navigation Option -->
+            <button class="nav-item" id="navBtnServices" onclick="showServicesView()">
+                <span class="nav-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                </span>
+                <span class="nav-label">Services</span>
+                <span class="nav-badge-pill" id="navServicesCountBadge">12</span>
+            </button>
+
+            <!-- AWS Account + Add Option (Replaces Connect AWS) -->
+            <button class="nav-item nav-item-add-account" id="navBtnAddAccount" onclick="openAddAccountModal(true)" title="Add a new AWS account">
+                <span class="nav-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </span>
+                <span class="nav-label">AWS Account</span>
+                <span class="nav-badge-pill" style="background: var(--terracotta); color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px;">+ Add</span>
+            </button>
+
+            <!-- Section: AWS ACCOUNTS (Multi-account switching) -->
+            <div class="sidebar-section-header" style="margin-top: 20px; margin-bottom: 8px; padding: 0 10px;">
+                <span class="nav-section-title" style="margin: 0; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em; color: var(--text-3);">LINKED ACCOUNTS</span>
+            </div>
+            
+            <div class="sidebar-accounts-list" id="sidebarAccountsList">
+                <!-- Dynamically populated via renderSidebarAccounts() in JS -->
+            </div>
         </div>
 
-        <!-- Sidebar Bottom User Card -->
-        <div class="sidebar-bottom-user">
-            <div class="user-avatar-circle" id="userAvatar">JP</div>
-            <div class="user-info">
-                <span class="user-name" id="displayAccountSidebar">Jigal Prajapati</span>
-                <span class="user-status-text">
-                    <span class="status-live-dot"></span>
-                    <span id="userRoleBadge">Super Admin</span>
-                </span>
+        <!-- ============================== BOTTOM ADMIN PANEL CTA BUTTON ============================== -->
+        <div class="sidebar-bottom-wrap">
+            <div class="sidebar-sync-status">
+                <span class="sync-dot"></span>
+                <span>Synced &bull; <span id="sidebarSyncTime">13:07</span></span>
             </div>
+
+            <!-- Prominent Admin Panel Button -->
+            <button class="admin-sidebar-pill-btn" onclick="openAdminPanelModal('cron')" title="Open Admin Control Panel: Crontab, Custom Data Share &amp; SMTP">
+                <div class="admin-btn-left">
+                    <span class="admin-icon-box">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </span>
+                    <div class="admin-label-stack">
+                        <span class="admin-btn-main">Admin Panel</span>
+                        <span class="admin-btn-sub">Crontab &bull; Share &bull; SMTP</span>
+                    </div>
+                </div>
+                <span class="admin-chip">ADMIN</span>
+            </button>
+
+            <div class="sidebar-cron-subtext">Crontab Automation &bull; Custom Time Schedule</div>
         </div>
 
     </aside>
@@ -219,666 +179,1203 @@
     <!-- ============================== MAIN CONTENT ============================== -->
     <main class="main-content">
 
-        <!-- ============================== TOP HEADER (MATCHING SCREENSHOT) ============================== -->
+        <!-- ==================== TOP NAVIGATION BAR ==================== -->
         <header class="top-nav-bar">
-            
-            <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            </button>
 
-            <!-- Brand & Connected Account display -->
-            <div class="header-brand-box">
-                <div class="header-aws-avatar">
-                    <span>AWS</span>
-                </div>
-                <div class="header-title-column">
-                    <div class="header-title-row">
-                        <h1 class="header-main-title">AWS Billing Dashboard</h1>
-                        <span class="badge-pro">PRO</span>
-                    </div>
-                    <p class="header-connected-account">
-                        Connected Account: <strong id="connectedEmailDisplay">jigal.prajapati@bytestechnolab.com</strong>
-                    </p>
-                </div>
-            </div>
-
-            <!-- Top Right Action Controls -->
+            <!-- Right Controls: Date Range, Reload, Admin, Profile -->
             <div class="header-controls-group">
-                <!-- Reload / Refresh -->
-                <button class="icon-round-btn" onclick="onRefresh()" title="Refresh Cost Explorer data">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                <!-- Date Range Selector -->
+                <div class="header-date-range-box">
+                    <input type="date" id="headerDateFrom" class="header-date-input">
+                    <span class="date-arrow">&rarr;</span>
+                    <input type="date" id="headerDateTo" class="header-date-input">
+                    <button type="button" class="btn-apply-header-date" id="btnApplyHeaderDate" onclick="applyHeaderDateFilter()">Apply</button>
+                </div>
+
+                <!-- Dark / Light Theme Toggle Button -->
+                <button class="icon-round-btn theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">
+                    <svg class="theme-icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="theme-icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
                 </button>
 
-                <!-- 12 Colors / Theme Toggle pill -->
-                <button class="pill-badge-btn" onclick="toggleThemePalette()" title="Toggle visual theme palette">
-                    <span class="palette-swatch"></span>
-                    <span id="themeLabelText">12 Colors</span>
+                <!-- Sync Reload Icon Button -->
+                <button class="icon-round-btn" id="syncLiveBtn" onclick="onRefresh()" title="Sync live billing data">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" id="syncIcon"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
                 </button>
 
-                <!-- Connect AWS cyan button -->
-                <button class="pill-cyan-btn" onclick="toggleConnectPanel()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                    <span>Connect AWS</span>
+                <!-- Admin Panel Icon Button -->
+                <button class="icon-round-btn" onclick="openAdminPanelModal('cron')" title="Open Admin Panel &amp; Crontab Schedules">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </button>
 
-                <!-- Settings & Account Icon -->
-                <button class="icon-round-btn" onclick="openSettingsModal()" title="Settings & Account">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <!-- Profile Avatar Circle Button -->
+                <button class="profile-circle-btn" onclick="openAccountModal()" title="User Account Profile">
+                    <span id="userAvatar">PM</span>
                 </button>
             </div>
-
         </header>
 
 
-        <!-- ============================== 4 TOP KPI CARDS ============================== -->
-        <section class="kpi-quad-grid" id="section-overview">
+        <!-- =========================================================================
+             VIEW 1: DASHBOARD OVERVIEW
+             4 KPI CARDS:
+             1. Current Month Usage
+             2. Previous Month Usage
+             3. Forecast
+             4. Total Active Services
+             ========================================================================= -->
+        <section class="main-view-pane active" id="viewDashboard">
 
-            <!-- Card 1: MONTH TO DATE (MTD) -->
-            <div class="kpi-card card-3d">
-                <div class="kpi-card-header">
-                    <span class="kpi-card-label">MONTH TO DATE (MTD)</span>
-                    <div class="kpi-icon-box cyan-icon">
-                        <span>$</span>
-                    </div>
-                </div>
-                <div class="kpi-card-value" id="kpiCurrentCost">$268.42</div>
-                <div class="kpi-card-sub">Current cycle spend</div>
-                <div class="kpi-card-footer">
-                    <span class="kpi-pill-tag green-pill" id="kpiChangeTag">-71.16% vs last month</span>
-                </div>
-            </div>
-
-            <!-- Card 2: PREVIOUS MONTH -->
-            <div class="kpi-card card-3d">
-                <div class="kpi-card-header">
-                    <span class="kpi-card-label">PREVIOUS MONTH</span>
-                    <div class="kpi-icon-box emerald-icon">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    </div>
-                </div>
-                <div class="kpi-card-value" id="kpiPreviousCost">$930.59</div>
-                <div class="kpi-card-sub">Full last cycle</div>
-                <div class="kpi-card-footer">
-                    <span class="kpi-sub-note">Closed Billing Cycle</span>
-                </div>
-            </div>
-
-            <!-- Card 3: FORECASTED SPEND -->
-            <div class="kpi-card card-3d">
-                <div class="kpi-card-header">
-                    <span class="kpi-card-label">FORECASTED SPEND</span>
-                    <div class="kpi-icon-box amber-icon">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                    </div>
-                </div>
-                <div class="kpi-card-value" id="kpiForecastCost">$268.42</div>
-                <div class="kpi-card-sub">End-of-month trajectory</div>
-                <div class="kpi-card-footer">
-                    <span class="kpi-sub-note">Real-time AWS estimate</span>
-                </div>
-            </div>
-
-            <!-- Card 4: ACTIVE SERVICES -->
-            <div class="kpi-card card-3d">
-                <div class="kpi-card-header">
-                    <span class="kpi-card-label">ACTIVE SERVICES</span>
-                    <div class="kpi-icon-box rose-icon">
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                    </div>
-                </div>
-                <div class="kpi-card-value" id="kpiActiveServicesVal">$9.00</div>
-                <div class="kpi-card-sub">Billing dimensions active</div>
-                <div class="kpi-card-footer">
-                    <span class="kpi-sub-note" id="kpiServicesCountNote">12 active dimensions</span>
-                </div>
-            </div>
-
-        </section>
-
-
-        <!-- ============================== CONNECT AWS PANEL (COLLAPSIBLE) ============================== -->
-        <section class="connect-panel card-3d" id="connectPanel">
-            <div class="connect-header">
-                <div class="connect-icon-box">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
-                </div>
+            <!-- View Header Row -->
+            <div class="dashboard-header-flex">
                 <div>
-                    <h2>Connect AWS Cost Explorer</h2>
-                    <p>Enter your AWS credentials to stream live cost dimensions and aggregates.</p>
+                    <h1 class="dashboard-headline">AWS Billing Dashboard</h1>
+                    <p class="dashboard-subtext" id="dashboardSubtextPeriod">Cost intelligence across <strong>linked accounts</strong> &bull; <span id="dashboardDatePeriodLabel">Current Month &bull; Month-to-Date</span></p>
                 </div>
-                <span class="secure-badge">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    Secure AWS API
-                </span>
             </div>
 
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="accountName">Account Name / Alias</label>
-                    <input type="text" id="accountName" placeholder="e.g. Production AWS" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label for="region">AWS Region</label>
-                    <select id="region">
-                        <option value="us-east-1">US East (N. Virginia)</option>
-                        <option value="us-east-2">US East (Ohio)</option>
-                        <option value="us-west-2">US West (Oregon)</option>
-                        <option value="ap-south-1">Asia Pacific (Mumbai)</option>
-                        <option value="eu-west-1">Europe (Ireland)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="accessKey">AWS Access Key ID</label>
-                    <input type="text" id="accessKey" placeholder="AKIAIOSFODNN7EXAMPLE" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label for="secretKey">AWS Secret Access Key</label>
-                    <div class="input-wrap">
-                        <input type="password" id="secretKey" placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" autocomplete="off">
-                        <button type="button" class="input-toggle" onclick="toggleSecretKey()" title="Show/Hide">👁</button>
+            <!-- ============================== 4 TOP KPI CARDS (CURRENT, PREVIOUS, FORECAST, TOTAL ACTIVE) ============================== -->
+            <div class="kpi-quad-grid">
+                
+                <!-- Card 1: CURRENT USAGE -->
+                <div class="kpi-card" id="kpiCardCurrent">
+                    <div class="kpi-card-top">
+                        <span class="kpi-label" id="kpiLabelCurrent">CURRENT USAGE</span>
+                        <div class="kpi-icon-box box-peach">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="kpiCurrentCost">$1,246.20</div>
+                    <div class="kpi-footer">
+                        <span class="badge-pill pill-green" id="kpiPillCurrent">+3.4% vs last period</span>
+                        <svg class="sparkline-svg" viewBox="0 0 80 20"><path d="M0 15 Q20 18 40 10 T80 5" fill="none" stroke="#c85a32" stroke-width="2"/></svg>
                     </div>
                 </div>
+
+                <!-- Card 2: PREVIOUS USAGE -->
+                <div class="kpi-card" id="kpiCardPrevious">
+                    <div class="kpi-card-top">
+                        <span class="kpi-label" id="kpiLabelPrevious">PREVIOUS USAGE</span>
+                        <div class="kpi-icon-box box-blue">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="kpiPreviousCost">$1,180.50</div>
+                    <div class="kpi-footer">
+                        <span class="badge-pill pill-blue" id="kpiPillPrevious">Prior comparison cycle</span>
+                        <svg class="sparkline-svg" viewBox="0 0 80 20"><path d="M0 16 Q30 14 50 8 T80 3" fill="none" stroke="#3b82f6" stroke-width="2"/></svg>
+                    </div>
+                </div>
+
+                <!-- Card 3: FORECAST (Suppressed when viewing previous/custom periods) -->
+                <div class="kpi-card" id="kpiCardForecast">
+                    <div class="kpi-card-top">
+                        <span class="kpi-label">FORECAST</span>
+                        <div class="kpi-icon-box box-amber">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value text-amber" id="kpiForecastCost">$1,390.00</div>
+                    <div class="kpi-footer">
+                        <span class="badge-pill pill-amber">End-of-month projection</span>
+                        <svg class="sparkline-svg" viewBox="0 0 80 20"><path d="M0 12 Q30 9 50 6 T80 2" fill="none" stroke="#d97706" stroke-width="2"/></svg>
+                    </div>
+                </div>
+
+                <!-- Card 4: TOTAL ACTIVE SERVICES -->
+                <div class="kpi-card">
+                    <div class="kpi-card-top">
+                        <span class="kpi-label">TOTAL ACTIVE SERVICES</span>
+                        <div class="kpi-icon-box box-green">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value text-green" id="kpiActiveServicesVal">12</div>
+                    <div class="kpi-footer">
+                        <span class="badge-pill pill-green">Across all regions</span>
+                        <svg class="sparkline-svg" viewBox="0 0 80 20"><path d="M0 18 Q30 14 50 9 T80 4" fill="none" stroke="#10b981" stroke-width="2"/></svg>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="connect-actions">
-                <button class="pill-cyan-btn" id="fetchButton" onclick="fetchBilling()">
-                    <span id="buttonIcon">↻</span>
-                    <span id="buttonText">Fetch Live Billing Data</span>
-                </button>
-                <div class="status-msg" id="status">Ready to connect AWS Cost Explorer.</div>
+
+            <!-- ============================== CHARTS ROW: SPEND TREND & DISTRIBUTION ============================== -->
+            <div class="charts-duo-grid">
+                
+                <!-- Left: Spend Trend Chart Card -->
+                <div class="card-white chart-card-main">
+                    <div class="card-header-flex">
+                        <div>
+                            <h2 class="card-title">Spend Trend</h2>
+                            <p class="card-subtitle">Daily unblended cost vs previous period</p>
+                        </div>
+                        <div class="trend-meta-flex">
+                            <div class="trend-legend">
+                                <span class="legend-box cur"></span> Current
+                                <span class="legend-box prev" style="margin-left: 10px;"></span> Previous
+                            </div>
+                            <div class="trend-period-spend">
+                                <span class="spend-label">PERIOD SPEND</span>
+                                <span class="spend-val" id="kpiPeriodSpendVal">$1,246.20</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-box">
+                        <canvas id="dailyVelocityChart" aria-label="Spend Trend Spline Chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Right: Distribution Donut Card -->
+                <div class="card-white chart-card-donut">
+                    <div class="card-header-flex">
+                        <div>
+                            <h2 class="card-title">Distribution</h2>
+                            <p class="card-subtitle">Cost by category this period</p>
+                        </div>
+                    </div>
+                    
+                    <div class="donut-center-wrap">
+                        <div class="donut-canvas-box">
+                            <canvas id="categoryDonutChart" aria-label="Cost Distribution Donut"></canvas>
+                            <div class="donut-center-text">
+                                <span class="dct-sub">PERIOD TOTAL</span>
+                                <span class="dct-val" id="donutTotalVal">$1,253.45</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Distribution Breakdown List -->
+                    <div class="donut-breakdown-list">
+                        <div class="dist-row">
+                            <span class="dist-legend-dot" style="background:#22c55e;"></span>
+                            <span class="dist-name">Database</span>
+                            <span class="dist-pct">20.1%</span>
+                            <span class="dist-val">$251.70</span>
+                        </div>
+                        <div class="dist-row">
+                            <span class="dist-legend-dot" style="background:#3b82f6;"></span>
+                            <span class="dist-name">Data Transfer</span>
+                            <span class="dist-pct">11.0%</span>
+                            <span class="dist-val">$138.40</span>
+                        </div>
+                        <div class="dist-row">
+                            <span class="dist-legend-dot" style="background:#f59e0b;"></span>
+                            <span class="dist-name">Storage</span>
+                            <span class="dist-pct">10.7%</span>
+                            <span class="dist-val">$134.50</span>
+                        </div>
+                        <div class="dist-row">
+                            <span class="dist-legend-dot" style="background:#8b5cf6;"></span>
+                            <span class="dist-name">Other</span>
+                            <span class="dist-pct">4.7%</span>
+                            <span class="dist-val">$58.70</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+
+
+            <!-- ============================== SERVICE BREAKDOWN & TOP OPPORTUNITIES ROW ============================== -->
+            <div class="breakdown-split-grid">
+                
+                <!-- Left: Service Breakdown Table Card with Quick Search -->
+                <div class="card-white service-breakdown-card">
+                    <div class="card-header-flex">
+                        <div>
+                            <h2 class="card-title">Service Breakdown</h2>
+                            <p class="card-subtitle">12 services &bull; click a row for detail</p>
+                        </div>
+                    </div>
+
+                    <!-- Filter & Real-Time Search Row -->
+                    <div class="service-filter-row">
+                        <div class="filter-pill-group">
+                            <button class="s-filter-btn active" onclick="filterServiceBreakdown('all', this)">All</button>
+                            <button class="s-filter-btn" onclick="filterServiceBreakdown('Healthy', this)">Healthy</button>
+                            <button class="s-filter-btn" onclick="filterServiceBreakdown('Review', this)">Review</button>
+                            <button class="s-filter-btn" onclick="filterServiceBreakdown('Critical', this)">Critical</button>
+                        </div>
+                        
+                        <!-- Real-time Service Search Input in Breakdown -->
+                        <div class="service-quick-search-box">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text" id="breakdownSearchInput" placeholder="Filter service..." oninput="filterServiceBreakdownSearch(this.value)">
+                        </div>
+
+                        <div class="sort-select-wrap">
+                            <select id="serviceSortSelect" onchange="sortServiceBreakdown(this.value)">
+                                <option value="cost_desc">Cost: High &rarr; Low</option>
+                                <option value="cost_asc">Cost: Low &rarr; High</option>
+                                <option value="name">Service Name</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Services List Rows -->
+                    <div class="service-rows-container" id="serviceBreakdownList">
+                        <!-- Populated dynamically via JS matching uploaded photo rows -->
+                    </div>
+
+                    <div class="service-breakdown-footer">
+                        <span>Total this period</span>
+                        <strong id="serviceBreakdownTotal">$1,253.45</strong>
+                    </div>
+                </div>
+
+                <!-- Right: Top Opportunities Card -->
+                <div class="card-white top-opps-card">
+                    <div class="card-header-flex">
+                        <h2 class="card-title">Top Opportunities</h2>
+                        <a href="javascript:void(0)" class="card-link" onclick="switchMainView('billing')">View all &rarr;</a>
+                    </div>
+
+                    <div class="opps-items-list">
+                        <div class="opp-card">
+                            <div class="opp-icon-box box-green">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            </div>
+                            <div class="opp-info">
+                                <h4>Purchase Compute Savings Plans</h4>
+                                <p>EKS &bull; Commitment</p>
+                            </div>
+                            <span class="opp-savings text-green">+$386/mo</span>
+                        </div>
+
+                        <div class="opp-card">
+                            <div class="opp-icon-box box-peach">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg>
+                            </div>
+                            <div class="opp-info">
+                                <h4>Terminate Idle EC2 Instances</h4>
+                                <p>EC2 &bull; Rightsizing</p>
+                            </div>
+                            <span class="opp-savings text-green">+$212/mo</span>
+                        </div>
+
+                        <div class="opp-card">
+                            <div class="opp-icon-box box-blue">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            </div>
+                            <div class="opp-info">
+                                <h4>RDS Graviton Migration</h4>
+                                <p>RDS &bull; Modernization</p>
+                            </div>
+                            <span class="opp-savings text-green">+$96/mo</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="dashboard-bottom-legal">
+                AWS Billing Dashboard v1.1 &bull; Data via AWS Cost Explorer API &bull; All figures USD, unblended &bull; Times UTC
+            </div>
+
         </section>
 
 
-        <!-- ============================== MAIN CHARTS ROW (MATCHING SCREENSHOT) ============================== -->
-        <div class="charts-duo-grid">
+        <!-- =========================================================================
+             VIEW 2: COST EXPLORER (DETAILED LEDGER WITH REAL-TIME SERVICE SEARCH)
+             ========================================================================= -->
+        <section class="main-view-pane" id="viewBilling">
+            <div class="dashboard-header-flex">
+                <div>
+                    <div class="finops-breadcrumb">COST EXPLORER &bull; RESOURCE LEDGER</div>
+                    <h1 class="dashboard-headline">Detailed Ledger</h1>
+                    <p class="dashboard-subtext">Search service names, inspect usage metrics, and export granular cost records</p>
+                </div>
+                <div class="dashboard-top-actions">
+                    <button class="btn-outline" onclick="downloadCSV()">Export CSV</button>
+                    <button class="btn-terracotta" onclick="openAdminPanelModal('custom-reports')">Custom Date &amp; Share</button>
+                </div>
+            </div>
 
-            <!-- Left: Daily Spend Velocity (Cyan Area Curve) -->
-            <div class="chart-panel card-3d">
-                <div class="chart-panel-header">
+            <!-- Cost Explorer Comparison Graph Card (Replaces 3D with 2D Graph UI) -->
+            <div class="card-white cost-graph-card" id="costExplorerGraphCard" style="margin-bottom: 20px; padding: 22px;">
+                <div class="cost-graph-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 18px;">
                     <div>
-                        <h2 class="chart-title">Daily Spend Velocity</h2>
-                        <p class="chart-subtitle">Granular daily Cost Explorer aggregates</p>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                            <span class="badge-tag" style="background: rgba(200,90,50,0.12); color: var(--terracotta); font-weight: 700; font-size: 10.5px; padding: 2px 8px; border-radius: 6px;">COMPARATIVE ANALYTICS</span>
+                            <span style="font-size: 12px; color: var(--text-3); font-weight: 600;">Cloud Cost Ledger Graph</span>
+                        </div>
+                        <h3 style="font-size: 16px; font-weight: 800; color: var(--text-1); margin: 0;">Monthly Usage &amp; Spend Comparison</h3>
+                        <p style="font-size: 12.5px; color: var(--text-2); margin: 3px 0 0 0;">Interactive graph comparing Current Month spend trajectory against Previous Month cloud ledger</p>
                     </div>
-                    <div class="chart-header-badges">
-                        <button class="pill-badge-active" id="velocityPeriodPill" onclick="toggleVelocityPeriod()">Last 14 Days</button>
+
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <!-- Graph Type Toggle -->
+                        <div class="chart-type-tabs" style="display: flex; background: var(--bg-cream); border: 1px solid var(--border); border-radius: 20px; padding: 3px;">
+                            <button type="button" class="btn-chart-type active" id="btnCostGraphLine" onclick="setCostExplorerGraphType('line')" style="padding: 5px 14px; font-size: 12px; border-radius: 16px; border: none; background: transparent; color: var(--text-2); font-weight: 600; cursor: pointer;">
+                                Area / Line
+                            </button>
+                            <button type="button" class="btn-chart-type" id="btnCostGraphBar" onclick="setCostExplorerGraphType('bar')" style="padding: 5px 14px; font-size: 12px; border-radius: 16px; border: none; background: transparent; color: var(--text-2); font-weight: 600; cursor: pointer;">
+                                Comparative Bar
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="chart-canvas-box">
-                    <canvas id="dailyVelocityChart" aria-label="Daily Spend Velocity Chart"></canvas>
-                </div>
-            </div>
 
-            <!-- Right: Top AWS Services (Vibrant Multi-Color Horizontal Bars) -->
-            <div class="chart-panel card-3d">
-                <div class="chart-panel-header">
-                    <div>
-                        <h2 class="chart-title">Top AWS Services</h2>
-                        <p class="chart-subtitle">Click any service to inspect regional resources</p>
+                <!-- HUD KPI Metrics Summary Strip -->
+                <div class="cost-graph-hud-row" style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px;">
+                    <div class="cost-graph-kpi-pill" style="flex: 1; min-width: 160px; padding: 12px 16px; background: var(--bg-cream); border: 1px solid var(--border); border-radius: 10px;">
+                        <span style="display: block; font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em;">Previous Month Spend</span>
+                        <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px;">
+                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #3b82f6;"></span>
+                            <span style="font-size: 18px; font-weight: 800; color: var(--text-1);" id="graphPrevCost">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="cost-graph-kpi-pill" style="flex: 1; min-width: 160px; padding: 12px 16px; background: var(--bg-cream); border: 1px solid var(--border); border-radius: 10px;">
+                        <span style="display: block; font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em;">Current Month Spend</span>
+                        <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 4px;">
+                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--terracotta);"></span>
+                            <span style="font-size: 18px; font-weight: 800; color: var(--text-1);" id="graphCurrCost">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="cost-graph-kpi-pill" style="flex: 1; min-width: 160px; padding: 12px 16px; background: var(--bg-cream); border: 1px solid var(--border); border-radius: 10px;">
+                        <span style="display: block; font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em;">Month-over-Month Change</span>
+                        <div style="margin-top: 4px;">
+                            <span class="badge-pill pill-green" id="graphDeltaBadge" style="font-size: 13px; font-weight: 700;">▲ +$0.00 (0%)</span>
+                        </div>
+                    </div>
+
+                    <div class="cost-graph-kpi-pill" style="flex: 1; min-width: 160px; padding: 12px 16px; background: var(--bg-cream); border: 1px solid var(--border); border-radius: 10px;">
+                        <span style="display: block; font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em;">Daily Run Rate</span>
+                        <div style="margin-top: 4px;">
+                            <span style="font-size: 18px; font-weight: 800; color: var(--text-1);" id="graphDailyRunRate">$0.00/day</span>
+                        </div>
                     </div>
                 </div>
-                <div class="chart-canvas-box">
-                    <canvas id="topServicesBarChart" aria-label="Top AWS Services Bar Chart"></canvas>
+
+                <!-- Canvas Chart Container -->
+                <div class="cost-graph-chart-wrap" style="position: relative; width: 100%; height: 320px;">
+                    <canvas id="costExplorerComparisonChart"></canvas>
                 </div>
             </div>
 
-        </div>
+            <!-- Enhanced Ledger Filter & Search Bar -->
+            <div class="card-white" style="padding: 16px 20px; margin-bottom: 16px;">
+                <div class="ledger-filter-row">
+                    <!-- Service Name Search Input Box -->
+                    <div class="ledger-search-box">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="ledgerSearchInput" placeholder="Search service name (e.g. EC2, S3, RDS, Lambda)..." oninput="filterLedgerTable(this.value)">
+                        <button type="button" class="search-clear-btn" id="ledgerSearchClear" onclick="clearLedgerSearch()" style="display:none;">✕</button>
+                    </div>
 
+                    <div class="filter-select-box">
+                        <select id="ledgerCategorySelect" onchange="filterLedgerTable()">
+                            <option value="">All Categories</option>
+                            <option value="Compute">Compute</option>
+                            <option value="Storage">Storage</option>
+                            <option value="Database">Database</option>
+                            <option value="Data Transfer">Data Transfer</option>
+                            <option value="Networking">Networking</option>
+                            <option value="Analytics">Analytics</option>
+                        </select>
+                    </div>
 
-        <!-- ============================== REPORT CENTER & ACTIONS ============================== -->
-        <section class="content-section-block" id="section-reports">
-            <div class="section-title-row">
-                <div>
-                    <h2 class="section-heading">Financial Reports &amp; Exports</h2>
-                    <p class="section-subheading">Generate colorful executive summaries, export spreadsheets, or print to PDF</p>
-                </div>
-                <button class="pill-cyan-btn" onclick="openSettingsTab('custom-reports')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    <span>Custom Data Selection &amp; Share</span>
-                </button>
-            </div>
+                    <div class="filter-select-box">
+                        <select id="ledgerStatusSelect" onchange="filterLedgerTable()">
+                            <option value="">All Status</option>
+                            <option value="Healthy">Healthy</option>
+                            <option value="Needs Review">Needs Review</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
 
-            <div class="reports-cards-row">
-                <div class="report-action-card card-3d" onclick="generateReport('monthly')">
-                    <div class="rep-icon-circle cyan-grad">📊</div>
-                    <h3>Executive Monthly Report</h3>
-                    <p>Complete colorful financial analysis with MoM comparison and forecast.</p>
-                    <span class="action-link-text">View &amp; Print &rarr;</span>
-                </div>
-
-                <div class="report-action-card card-3d" onclick="downloadExecutiveHTMLReport()">
-                    <div class="rep-icon-circle green-grad">📑</div>
-                    <h3>Download Colored HTML</h3>
-                    <p>Standalone executive file with charts, badges, and print-ready styling.</p>
-                    <span class="action-link-text">Download HTML &rarr;</span>
-                </div>
-
-                <div class="report-action-card card-3d" onclick="downloadPDFReport()">
-                    <div class="rep-icon-circle purple-grad">🖨️</div>
-                    <h3>Print / Save as PDF</h3>
-                    <p>Full-color document formatted with exact print stylesheet.</p>
-                    <span class="action-link-text">Print Document &rarr;</span>
-                </div>
-
-                <div class="report-action-card card-3d" onclick="downloadCSV()">
-                    <div class="rep-icon-circle orange-grad">📄</div>
-                    <h3>Export CSV Spreadsheet</h3>
-                    <p>Raw service and regional dimension matrix for Excel and BI tools.</p>
-                    <span class="action-link-text">Download CSV &rarr;</span>
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ============================== DETAILED DATA TABLES ============================== -->
-        <section class="content-section-block">
-            <div class="section-title-row">
-                <div>
-                    <h2 class="section-heading">Detailed Resource Dimensions</h2>
-                    <p class="section-subheading">Complete service and regional cost explorer tables</p>
-                </div>
-                <div class="table-search-wrap">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    <input type="search" id="tableFilterInput" placeholder="Filter dimensions…" oninput="filterActiveTable(this.value)">
+                    <div class="ledger-match-count" id="ledgerMatchCount">10 services loaded</div>
                 </div>
             </div>
 
-            <div class="table-card-wrap card-3d">
+            <!-- Tables Card -->
+            <div class="card-white" style="padding: 0; overflow: hidden;">
                 <div class="table-tab-row">
                     <button class="tab-btn active" id="tabBtnServices" onclick="switchTableTab('services')">All AWS Services</button>
                     <button class="tab-btn" id="tabBtnRegions" onclick="switchTableTab('regions')">All AWS Regions</button>
                 </div>
 
                 <div id="servicesTableWrap" class="table-scroller">
-                    <table id="servicesTableEl">
+                    <table class="finops-table" id="servicesTableEl">
                         <thead>
                             <tr>
-                                <th style="width: 40px;">#</th>
-                                <th class="sortable" onclick="sortTable('services','service')">Dimension / Service ↕</th>
-                                <th class="sortable" onclick="sortTable('services','cost')">Accrued Cost ↕</th>
-                                <th>Share</th>
-                                <th style="min-width: 120px;">Allocation Bar</th>
-                                <th>Status</th>
+                                <th>SERVICE NAME</th>
+                                <th>CATEGORY</th>
+                                <th>REGION</th>
+                                <th>USAGE METRIC</th>
+                                <th class="sortable" onclick="sortTable('services','cost')">ACCRUED COST ↕</th>
+                                <th>STATUS</th>
                             </tr>
                         </thead>
                         <tbody id="servicesTable">
-                            <!-- Populated dynamically -->
+                            <!-- Populated via JS -->
                         </tbody>
                     </table>
-                    <div class="table-pagination" id="servicePagination"></div>
                 </div>
 
-                <div id="regionsTableWrap" class="table-scroller" style="display:none;">
-                    <table id="regionsTableEl">
+                <div id="regionsTableWrap" class="table-scroller" style="display: none;">
+                    <table class="finops-table" id="regionsTableEl">
                         <thead>
                             <tr>
-                                <th style="width: 40px;">#</th>
-                                <th class="sortable" onclick="sortTable('regions','region')">Region Dimension ↕</th>
-                                <th class="sortable" onclick="sortTable('regions','cost')">Regional Cost ↕</th>
-                                <th>Share</th>
-                                <th style="min-width: 120px;">Allocation Bar</th>
-                                <th>Level</th>
+                                <th>REGION DIMENSION</th>
+                                <th>ACCRUED COST</th>
+                                <th>SHARE</th>
+                                <th style="min-width: 140px;">ALLOCATION BAR</th>
+                                <th>STATUS</th>
                             </tr>
                         </thead>
                         <tbody id="regionsTable">
-                            <!-- Populated dynamically -->
+                            <!-- Populated via JS -->
                         </tbody>
                     </table>
-                    <div class="table-pagination" id="regionPagination"></div>
                 </div>
             </div>
         </section>
 
-        <!-- Footer -->
-        <footer class="dashboard-footer">
-            <span>AWS Billing Dashboard PRO &bull; Persistent Session Active</span>
-            <span>Real-time AWS Cost Explorer API Integration</span>
-        </footer>
+
+        <!-- =========================================================================
+             VIEW 3: CONNECT AWS (RENAMED FROM BUDGETS)
+             ========================================================================= -->
+        <section class="main-view-pane" id="viewAccounts">
+            <div class="dashboard-header-flex">
+                <div>
+                    <div class="finops-breadcrumb">CLOUD CONNECTIVITY &bull; CREDENTIALS</div>
+                    <h1 class="dashboard-headline">Connect AWS Cost Explorer</h1>
+                    <p class="dashboard-subtext">Manage live AWS Cost Explorer IAM credentials and threshold alerts</p>
+                </div>
+            </div>
+
+            <div class="breakdown-split-grid">
+                <!-- Connect AWS Form -->
+                <div class="card-white" style="padding: 24px;">
+                    <div class="card-header-flex">
+                        <div>
+                            <h2 class="card-title">Enter AWS Credentials</h2>
+                            <p class="card-subtitle">Stream live Cost &amp; Usage Dimensions from AWS APIs</p>
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="margin-top: 16px;">
+                        <div class="form-group">
+                            <label for="accountName">Account Alias</label>
+                            <input type="text" id="accountName" value="Production AWS" placeholder="e.g. Production AWS">
+                        </div>
+                        <div class="form-group">
+                            <label for="region">Default Region</label>
+                            <select id="region">
+                                <option value="us-east-1">US East (N. Virginia)</option>
+                                <option value="us-east-2">US East (Ohio)</option>
+                                <option value="us-west-2">US West (Oregon)</option>
+                                <option value="ap-south-1">Asia Pacific (Mumbai)</option>
+                                <option value="eu-west-1">Europe (Ireland)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="accessKey">AWS Access Key ID</label>
+                            <input type="text" id="accessKey" placeholder="AKIAIOSFODNN7EXAMPLE">
+                        </div>
+                        <div class="form-group">
+                            <label for="secretKey">AWS Secret Access Key</label>
+                            <div class="input-wrap">
+                                <input type="password" id="secretKey" placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY">
+                                <button type="button" class="input-toggle" onclick="toggleSecretKey()">👁</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; display: flex; align-items: center; gap: 16px;">
+                        <button class="btn-terracotta" id="fetchButton" onclick="fetchBilling()">
+                            <span id="buttonIcon">↻</span>
+                            <span id="buttonText">Fetch Live Billing Data</span>
+                        </button>
+                        <span id="status" style="font-size: 12px; color: var(--text-2);">Ready to connect AWS Cost Explorer.</span>
+                    </div>
+                </div>
+
+                <!-- Active Connections Telemetry -->
+                <div class="card-white" style="padding: 24px;">
+                    <div class="card-header-flex">
+                        <div>
+                            <h2 class="card-title">Active Cloud Connection</h2>
+                            <p class="card-subtitle">Linked tenant profile</p>
+                        </div>
+                        <span class="badge-pill pill-green">● Connected</span>
+                    </div>
+
+                    <div style="background: var(--bg-cream); border-radius: 12px; padding: 18px; margin-top: 14px;">
+                        <h4 style="font-size: 15px; font-weight: 700; color: var(--text-1);" id="displayConnectedName">Production AWS</h4>
+                        <p style="font-size: 12px; color: var(--text-3); font-family: 'JetBrains Mono', monospace;" id="displayConnectedEmail">jigal.prajapati@bytestechnolab.com</p>
+                        <div style="margin-top: 12px; display: flex; gap: 20px; font-size: 12px; color: var(--text-2);">
+                            <span>Region: <strong id="displayConnectedRegion">us-east-1</strong></span>
+                            <span>Last Synced: <strong id="displayLastSynced">13:07 UTC</strong></span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 18px; padding: 14px; background: #fff8f5; border: 1px solid rgba(200, 90, 50, 0.15); border-radius: 10px; font-size: 12px; color: var(--text-2);">
+                        <strong style="color: var(--terracotta);">Security Best Practice:</strong>
+                        <p style="margin-top: 2px;">Ensure your IAM policy grants read-only permission for <code>ce:GetCostAndUsage</code>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
     </main>
-
 </div>
 
 
-<!-- =====================================================================
-     SETTINGS & ACCOUNT CONTROL PANEL MODAL
-     Tab 1: Account Details, Password & Logout
-     Tab 2: Crontab Automation GUI (with Custom One-Time & Custom Timing)
-     Tab 3: Custom Data Range & Selectable Data Report (Download & Email Share)
-     Tab 4: SMTP Mail Server Configuration (Enables Live Real Emails)
-===================================================================== -->
-<div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
-    <div class="modal-window modal-wide card-3d">
-        <div class="modal-header">
-            <div class="modal-header-left">
-                <span class="admin-badge-pill">DASHBOARD CONTROLS</span>
-                <h2 id="settingsModalTitle">Settings, Account &amp; Automation Hub</h2>
-            </div>
-            <div class="modal-header-actions">
-                <div class="admin-tab-nav">
-                    <button class="admin-tab-btn active" id="tabBtnAccount" onclick="switchSettingsTab('account')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        Account Details
-                    </button>
-                    <button class="admin-tab-btn" id="tabBtnCron" onclick="switchSettingsTab('cron')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        Crontab Automation
-                    </button>
-                    <button class="admin-tab-btn" id="tabBtnCustom" onclick="switchSettingsTab('custom-reports')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Custom Data &amp; Share
-                    </button>
-                    <button class="admin-tab-btn" id="tabBtnSmtp" onclick="switchSettingsTab('smtp')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                        SMTP Mail Server
-                    </button>
+<!-- =========================================================================
+     ADMIN PANEL MODAL (OPENED VIA LEFT SIDEBAR BUTTON & MANAGE OPTION)
+     Features:
+     1. Crontab Automation (Custom time, Run Now email send, Pause, Delete)
+     2. Custom Date Selection & Share / Download (From & To date, service picker, email dispatch, CSV/HTML/PDF)
+     3. SMTP Mail Server Configuration (Host, Port, User, Pass, Live Delivery Test)
+     ========================================================================= -->
+<div class="auth-overlay" id="adminPanelModal" role="dialog" aria-modal="true">
+    <div class="auth-card modal-wide">
+        
+        <!-- Modal Top Header -->
+        <div class="modal-header-flex">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div class="admin-modal-hero-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
-                <button class="modal-close-btn" onclick="closeSettingsModal()" aria-label="Close">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
+                <div>
+                    <div class="admin-badge-tag">ADMIN CONTROL HUB</div>
+                    <h2 class="admin-modal-title">Automation &amp; Email Report Center</h2>
+                    <p class="admin-modal-subtitle">Auto-scheduled Crontabs &bull; Custom Date Reports &bull; SMTP Outbox Engine</p>
+                </div>
             </div>
+            <button class="modal-close-btn" onclick="closeAdminPanelModal()" aria-label="Close">✕</button>
         </div>
 
-        <div class="modal-body">
-            
-            <!-- TAB 1: ACCOUNT DETAILS, SECURITY & LOGOUT -->
-            <div id="settingsAccountContent" class="admin-tab-pane">
-                <div class="account-profile-box card-3d">
-                    <div class="profile-header-flex">
-                        <div class="profile-avatar-large" id="profileAvatarLarge">JP</div>
-                        <div class="profile-info-block">
-                            <h3 id="profileNameDisplay">Jigal Prajapati</h3>
-                            <p id="profileEmailDisplay">jigal.prajapati@bytestechnolab.com</p>
-                            <span class="role-badge" id="profileRoleDisplay">Super Administrator</span>
-                        </div>
-                        <button class="pill-btn pill-btn-danger" style="margin-left: auto;" onclick="handleLogout()">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                            <span>Logout of Dashboard</span>
-                        </button>
-                    </div>
+        <!-- Big User-Friendly Nav Cards -->
+        <div class="admin-big-tab-row">
+            <button type="button" class="admin-big-tab active" id="modalTabBtnCron" onclick="switchAdminModalTab('cron')">
+                <div class="abt-icon-wrap icon-peach">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
+                <div class="abt-text-wrap">
+                    <span class="abt-title">Crontab Automation</span>
+                    <span class="abt-sub">Timed auto-dispatch (<span id="adminActiveCronCountBadge">1 Active</span>)</span>
+                </div>
+            </button>
 
-                <!-- Password Management Section -->
-                <div class="security-card card-3d" style="margin-top: 16px;">
-                    <h4 class="config-title">Security &bull; Change or Reset Password</h4>
-                    <p class="pane-subtext">Update your login credentials stored securely in the local authentication engine.</p>
-                    <form onsubmit="handleChangePassword(event)" style="margin-top: 14px;">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label for="newAccountPassword">New Password</label>
-                                <input type="password" id="newAccountPassword" placeholder="Enter new password" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="confirmAccountPassword">Confirm New Password</label>
-                                <input type="password" id="confirmAccountPassword" placeholder="Repeat new password" required>
-                            </div>
-                        </div>
-                        <div style="display:flex; justify-content:flex-end; margin-top:12px;">
-                            <button type="submit" class="pill-cyan-btn">Update Password</button>
-                        </div>
-                        <div class="auth-status-msg" id="changePasswordStatus"></div>
-                    </form>
+            <button type="button" class="admin-big-tab" id="modalTabBtnCustom" onclick="switchAdminModalTab('custom-reports')">
+                <div class="abt-icon-wrap icon-blue">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="abt-text-wrap">
+                    <span class="abt-title">Custom Date &amp; Share</span>
+                    <span class="abt-sub">Select dates, services &amp; export</span>
+                </div>
+            </button>
+
+            <button type="button" class="admin-big-tab" id="modalTabBtnSmtp" onclick="switchAdminModalTab('smtp')">
+                <div class="abt-icon-wrap icon-green">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <div class="abt-text-wrap">
+                    <span class="abt-title">SMTP Mail Server</span>
+                    <span class="abt-sub"><span id="adminSmtpStatusDot" class="status-indicator-dot dot-amber"></span> <span id="adminSmtpStatusText">Checking credentials...</span></span>
+                </div>
+            </button>
+        </div>
+
+        <!-- Live Real Email Outbox Status Banner -->
+        <div id="adminSmtpAlertBanner" class="admin-smtp-banner banner-warning">
+            <div class="asb-left">
+                <div class="asb-icon-box" id="asbIconBox">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div>
+                    <div class="asb-headline" id="asbHeadline">Outbound SMTP Mail Server is Not Connected</div>
+                    <div class="asb-desc" id="asbDesc">Crontab reports are currently archived locally. To automatically deliver reports into your real email inbox (<strong>jesalmer1912@gmail.com</strong>), please configure your Gmail App Password or SMTP server.</div>
                 </div>
             </div>
+            <button type="button" class="asb-action-btn" id="asbActionBtn" onclick="switchAdminModalTab('smtp')">Connect Gmail / SMTP &rarr;</button>
+        </div>
 
-            <!-- TAB 2: CRONTAB AUTOMATION (WITH CUSTOM ONE-TIME OPTION) -->
-            <div id="settingsCronContent" class="admin-tab-pane" style="display: none;">
-                <div class="admin-pane-intro">
-                    <div>
-                        <h3 class="pane-headline">Crontab Report Automation Engine</h3>
-                        <p class="pane-subtext">Schedule recurring or custom one-time AWS cost reports to be generated and emailed automatically.</p>
+        <div class="modal-tab-body">
+            
+            <!-- TAB 1: CRONTAB AUTOMATION -->
+            <div id="adminModalCronPane" class="admin-pane-content">
+                
+                <!-- Action Header Row -->
+                <div class="cron-action-header-row">
+                    <div class="cron-daemon-badge">
+                        <span class="pulse-green-dot"></span>
+                        <span>Auto-Daemon Active: Checks every 5 seconds</span>
                     </div>
-                    <button class="pill-cyan-btn" onclick="toggleAddCronForm()">
-                        <span>+ New Cron Automation</span>
+                    <button type="button" class="btn-terracotta btn-big-cta" onclick="toggleAddCronForm()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <span>+ Schedule New Automation</span>
                     </button>
                 </div>
 
-                <!-- Add New Cron Job Form (With Custom One-Time & Custom Timing) -->
-                <div class="add-cron-form card-3d" id="addCronForm" style="display: none;">
-                    <h4 class="form-title">Configure Automated Schedule</h4>
-                    <div class="form-grid-3">
-                        <div class="form-group">
-                            <label for="newCronName">Automation Title</label>
-                            <input type="text" id="newCronName" placeholder="e.g. Weekly Executive Digest" value="Weekly Cost Digest">
-                        </div>
-                        <div class="form-group">
-                            <label for="newCronEmail">Recipient Email(s)</label>
-                            <input type="email" id="newCronEmail" placeholder="cto@company.com, finance@company.com">
-                        </div>
-                        <div class="form-group">
-                            <label for="newCronSchedule">Frequency / Timing Mode</label>
-                            <select id="newCronSchedule" onchange="onCronScheduleChange(this.value)">
-                                <option value="daily">Daily Schedule</option>
-                                <option value="weekly" selected>Weekly Schedule</option>
-                                <option value="monthly">Monthly Schedule</option>
-                                <option value="one_time">Custom One-Time Run (Specific Date/Time)</option>
-                                <option value="custom">Custom Cron Expression</option>
-                            </select>
-                        </div>
+                <!-- Add Automation Form Card -->
+                <div class="add-cron-form-card" id="addCronForm" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <h4 style="font-size: 14.5px; font-weight: 800; color: var(--text-1);">Configure Automated Schedule</h4>
+                        <button type="button" class="link-btn" onclick="toggleAddCronForm()">Cancel</button>
                     </div>
 
-                    <!-- Custom Timing Detail Row -->
-                    <div class="form-grid-3" style="margin-top: 12px;">
-                        <div class="form-group" id="cronTimeWrap">
-                            <label for="newCronTime">Execution Time (Enter Custom Time)</label>
-                            <input type="time" id="newCronTime" value="09:00">
+                    <!-- Frequency Mode Choice Cards -->
+                    <label style="font-size: 11.5px; font-weight: 700; color: var(--text-2); display: block; margin-bottom: 6px;">1. Select Automation Frequency</label>
+                    <div class="cron-freq-grid">
+                        <button type="button" class="cron-freq-card active" onclick="selectCronFrequency('daily', this)">
+                            <div class="cfc-icon">☀️</div>
+                            <div class="cfc-title">Daily</div>
+                            <div class="cfc-sub">At set time every day</div>
+                        </button>
+                        <button type="button" class="cron-freq-card" onclick="selectCronFrequency('weekly', this)">
+                            <div class="cfc-icon">📅</div>
+                            <div class="cfc-title">Weekly</div>
+                            <div class="cfc-sub">Every Mon at set time</div>
+                        </button>
+                        <button type="button" class="cron-freq-card" onclick="selectCronFrequency('interval', this)">
+                            <div class="cfc-icon">⏱️</div>
+                            <div class="cfc-title">Interval</div>
+                            <div class="cfc-sub">Every X min (Auto-test)</div>
+                        </button>
+                        <button type="button" class="cron-freq-card" onclick="selectCronFrequency('one_time', this)">
+                            <div class="cfc-icon">📌</div>
+                            <div class="cfc-title">One-Time</div>
+                            <div class="cfc-sub">Specific date &amp; time</div>
+                        </button>
+                    </div>
+                    <input type="hidden" id="newCronSchedule" value="daily">
+
+                    <!-- Form Inputs Grid -->
+                    <div class="form-grid-3" style="margin-top: 14px;">
+                        <div class="form-group">
+                            <label for="newCronName">Automation Title</label>
+                            <input type="text" id="newCronName" value="Daily AWS Billing Summary">
                         </div>
-                        <div class="form-group" id="cronOneTimeDateWrap" style="display: none;">
-                            <label for="newCronOneTimeDate">Run-On Date (One-Time)</label>
-                            <input type="date" id="newCronOneTimeDate">
-                        </div>
-                        <div class="form-group" id="cronCustomExprWrap" style="display: none;">
-                            <label for="newCronCustomExpr">Cron Syntax Expression</label>
-                            <input type="text" id="newCronCustomExpr" placeholder="e.g. 30 14 * * 1-5" value="0 9 * * 1">
+                        <div class="form-group">
+                            <label for="newCronEmail">Recipient Email Address</label>
+                            <input type="email" id="newCronEmail" value="jesalmer1912@gmail.com">
                         </div>
                         <div class="form-group">
                             <label for="newCronFormat">Report Format</label>
                             <select id="newCronFormat">
-                                <option value="html">Rich Colorful Executive HTML</option>
-                                <option value="pdf">Print-Ready PDF</option>
+                                <option value="pdf">Print-Ready PDF Document</option>
+                                <option value="html">Rich Visual HTML Digest</option>
                                 <option value="csv">Raw CSV Spreadsheet</option>
                             </select>
                         </div>
-                        <div class="form-group" style="justify-content: flex-end;">
-                            <label>&nbsp;</label>
-                            <button class="pill-cyan-btn" onclick="saveNewCronJob()">Save Schedule</button>
+                    </div>
+
+                    <!-- Custom Timing Grid -->
+                    <div class="cron-timing-setup-box" style="margin-top: 12px;">
+                        <div class="form-group" id="cronTimeWrap">
+                            <label for="newCronTime">Execution Time (24-Hour Clock &bull; Runs automatically at this time)</label>
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                                <input type="time" id="newCronTime" value="14:55" style="width: 130px; font-weight: 700; font-family:'JetBrains Mono',monospace;">
+                                <div class="time-presets-row">
+                                    <button type="button" class="t-preset-btn" onclick="setQuickTime(1)">⚡ +1 min (Test)</button>
+                                    <button type="button" class="t-preset-btn" onclick="setQuickTime(5)">+5 min</button>
+                                    <button type="button" class="t-preset-btn" onclick="setQuickTime('09:00')">09:00 AM</button>
+                                    <button type="button" class="t-preset-btn" onclick="setQuickTime('14:00')">02:00 PM</button>
+                                    <button type="button" class="t-preset-btn" onclick="setQuickTime('18:00')">06:00 PM</button>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Interval Minutes Selector -->
+                        <div class="form-group" id="cronIntervalWrap" style="display: none;">
+                            <label for="newCronInterval">Repeat Frequency</label>
+                            <select id="newCronInterval">
+                                <option value="2">Every 2 Minutes (Instant Test Automation)</option>
+                                <option value="5">Every 5 Minutes</option>
+                                <option value="15" selected>Every 15 Minutes</option>
+                                <option value="30">Every 30 Minutes</option>
+                                <option value="60">Every 1 Hour</option>
+                            </select>
+                        </div>
+
+                        <!-- One-Time Date Selector -->
+                        <div class="form-group" id="cronOneTimeDateWrap" style="display: none;">
+                            <label for="newCronOneTimeDate">Execution Date</label>
+                            <input type="date" id="newCronOneTimeDate">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 14px; display: flex; justify-content: flex-end; gap: 10px;">
+                        <button type="button" class="btn-outline" onclick="toggleAddCronForm()">Cancel</button>
+                        <button type="button" class="btn-terracotta" onclick="saveNewCronJob()">Save &amp; Activate Schedule</button>
                     </div>
                 </div>
 
-                <!-- Active Crontab Jobs Table -->
-                <div class="cron-jobs-table-wrap">
-                    <table class="cron-table">
-                        <thead>
-                            <tr>
-                                <th>Schedule Title</th>
-                                <th>Target Email</th>
-                                <th>Timing / Schedule</th>
-                                <th>Format</th>
-                                <th>Status</th>
-                                <th>Last Dispatched</th>
-                                <th style="text-align: right;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cronJobsTableBody">
-                            <!-- Populated from GET /api/admin/cron -->
-                        </tbody>
-                    </table>
+                <!-- Modern Automation Cards Container -->
+                <div class="cron-cards-container" id="cronCardsContainer">
+                    <!-- Populated dynamically via JS with big, clean schedule cards -->
                 </div>
 
-                <div class="cron-footer-note">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    <span>Crontab daemon dispatches automated AWS billing digests at specified times via the configured SMTP server.</span>
+                <div class="cron-status-tip" style="margin-top: 14px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span><strong>100% Automated Background Dispatch:</strong> The system automatically fires at the set time and delivers the report without any user intervention.</span>
                 </div>
             </div>
 
-            <!-- TAB 3: CUSTOM DATA RANGE REPORT & LIVE EMAIL DISPATCH -->
-            <div id="settingsCustomContent" class="admin-tab-pane" style="display: none;">
-                <div class="admin-pane-intro">
-                    <div>
-                        <h3 class="pane-headline">Custom Date Range &amp; Dimension Selector</h3>
-                        <p class="pane-subtext">Filter exact From &amp; To dates, choose specific AWS services, and download or dispatch directly to recipient email.</p>
-                    </div>
-                </div>
+            <!-- TAB 2: CUSTOM DATE RANGE SELECTION & SHARE / DOWNLOAD -->
+            <div id="adminModalCustomPane" class="admin-pane-content" style="display: none;">
+                <div class="breakdown-split-grid" style="margin-bottom: 0;">
+                    
+                    <!-- Left: Date Range & Service Picker -->
+                    <div style="background: var(--bg-cream-light); padding: 20px; border-radius: 14px; border: 1px solid var(--border);">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                            <span style="font-size: 18px;">📅</span>
+                            <h4 style="font-size: 14px; font-weight: 800; color: var(--text-1);">1. Select Date Range &amp; Services</h4>
+                        </div>
+                        
+                        <div style="display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;">
+                            <button type="button" class="t-preset-btn" onclick="setCustomDatePreset('7d')">Last 7 Days</button>
+                            <button type="button" class="t-preset-btn" onclick="setCustomDatePreset('30d')">Last 30 Days</button>
+                            <button type="button" class="t-preset-btn" onclick="setCustomDatePreset('this_month')">This Month</button>
+                            <button type="button" class="t-preset-btn" onclick="setCustomDatePreset('last_month')">Previous Month</button>
+                        </div>
 
-                <div class="custom-report-builder-grid">
-                    <!-- Left: Configuration & Selectors -->
-                    <div class="custom-config-col">
-                        <div class="config-card card-3d">
-                            <h4 class="config-title">1. Select Date Range (From &rarr; To)</h4>
-                            <div class="form-grid" style="margin-top: 8px;">
-                                <div class="form-group">
-                                    <label for="customDateFrom">From Date</label>
-                                    <input type="date" id="customDateFrom" class="date-input-field">
-                                </div>
-                                <div class="form-group">
-                                    <label for="customDateTo">To Date</label>
-                                    <input type="date" id="customDateTo" class="date-input-field">
-                                </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="customDateFrom">From Date</label>
+                                <input type="date" id="customDateFrom">
+                            </div>
+                            <div class="form-group">
+                                <label for="customDateTo">To Date</label>
+                                <input type="date" id="customDateTo">
                             </div>
                         </div>
 
-                        <div class="config-card card-3d" style="margin-top: 14px;">
-                            <div class="config-title-row">
-                                <h4 class="config-title">2. Select AWS Services to Include</h4>
-                                <button class="link-btn" onclick="toggleSelectAllServices()">Toggle All</button>
-                            </div>
-                            <div class="service-checkbox-grid" id="customServicesChecklist">
-                                <!-- Populated dynamically -->
-                            </div>
+                        <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+                            <label style="font-size: 11.5px; font-weight: 700; color: var(--text-2);">Select Services to Include</label>
+                            <button type="button" class="link-btn" onclick="toggleSelectAllServices()">Toggle All</button>
+                        </div>
+                        <div class="service-checkbox-grid" id="customServicesChecklist">
+                            <!-- Populated dynamically -->
                         </div>
                     </div>
 
                     <!-- Right: Direct Download & Live Email Dispatch -->
-                    <div class="custom-actions-col">
-                        <!-- Email Dispatch Card -->
-                        <div class="config-card card-3d">
-                            <h4 class="config-title">3. Share Custom Report via Email</h4>
-                            <div class="form-group" style="margin-top: 10px;">
-                                <label for="customEmailRecipient">Recipient Email Address</label>
-                                <input type="email" id="customEmailRecipient" placeholder="e.g. cto@bytestechnolab.com">
-                            </div>
-                            <div class="form-group" style="margin-top: 8px;">
-                                <label for="customEmailSubject">Email Subject</label>
-                                <input type="text" id="customEmailSubject" placeholder="AWS Custom Cost Report">
-                            </div>
-                            <div class="form-group" style="margin-top: 8px;">
-                                <label for="customEmailNotes">Notes / Message (Optional)</label>
-                                <textarea id="customEmailNotes" rows="2" placeholder="Attached is the custom billing breakdown for the selected period."></textarea>
-                            </div>
-                            
-                            <button class="pill-cyan-btn btn-full" style="margin-top: 12px;" onclick="sendCustomReportEmail()">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                                <span>Send Selected Report via Email</span>
-                            </button>
-                            
-                            <div id="emailSendResultBox" class="email-result-box" style="display:none;"></div>
+                    <div style="background: var(--bg-cream-light); padding: 20px; border-radius: 14px; border: 1px solid var(--border);">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                            <span style="font-size: 18px;">✉️</span>
+                            <h4 style="font-size: 14px; font-weight: 800; color: var(--text-1);">2. Deliver to Email or Download</h4>
                         </div>
 
-                        <!-- Direct Download Card -->
-                        <div class="config-card card-3d" style="margin-top: 14px;">
-                            <h4 class="config-title">4. Download Selected Data</h4>
-                            <div class="download-btn-group" style="margin-top: 10px;">
-                                <button class="pill-btn pill-btn-dark btn-full" onclick="downloadCustomReport('html')">
-                                    <span>📥 Download Custom Colored HTML</span>
-                                </button>
-                                <button class="pill-btn pill-btn-dark btn-full" style="background:#7c83fd; color:#fff;" onclick="downloadCustomReport('pdf')">
-                                    <span>🖨️ Print / Save Selected as PDF</span>
-                                </button>
-                                <button class="pill-btn pill-btn-clear btn-full" onclick="downloadCustomReport('csv')">
-                                    <span>📊 Export Selected to CSV</span>
-                                </button>
-                            </div>
+                        <div class="form-group">
+                            <label for="customEmailRecipient">Recipient Email Address</label>
+                            <input type="email" id="customEmailRecipient" placeholder="e.g. jesalmer1912@gmail.com" value="jesalmer1912@gmail.com">
+                        </div>
+                        <div class="form-group" style="margin-top: 8px;">
+                            <label for="customEmailSubject">Subject Line</label>
+                            <input type="text" id="customEmailSubject" value="AWS Custom Cost &amp; Ledger Report">
+                        </div>
+                        <div class="form-group" style="margin-top: 8px;">
+                            <label for="customEmailNotes">Notes / Message</label>
+                            <textarea id="customEmailNotes" rows="2" placeholder="Attached is the custom AWS billing report for the selected dates."></textarea>
+                        </div>
+
+                        <button type="button" class="btn-terracotta btn-full" style="margin-top: 12px; padding: 12px;" onclick="sendCustomReportEmail()">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            <span>Send Custom Report to Email</span>
+                        </button>
+                        <div id="emailSendResultBox" style="display: none; margin-top: 10px; padding: 10px; border-radius: 8px; font-size: 12px;"></div>
+
+                        <!-- Download Options -->
+                        <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; gap: 8px;">
+                            <button type="button" class="btn-outline" style="flex:1;" onclick="downloadCustomReport('html')">📥 Download HTML</button>
+                            <button type="button" class="btn-outline" style="flex:1;" onclick="downloadCustomReport('csv')">📊 Export CSV</button>
+                            <button type="button" class="btn-outline" style="flex:1;" onclick="downloadCustomReport('pdf')">🖨️ Print PDF</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- TAB 4: SMTP MAIL SERVER CONFIGURATION -->
-            <div id="settingsSmtpContent" class="admin-tab-pane" style="display: none;">
-                <div class="admin-pane-intro">
-                    <div>
-                        <h3 class="pane-headline">SMTP Mail Server Configuration</h3>
-                        <p class="pane-subtext">Configure your outgoing email server (Gmail App Password, AWS SES, or Outlook) so reports are delivered directly into inboxes.</p>
+            <!-- TAB 3: SMTP MAIL SERVER SETTINGS -->
+            <div id="adminModalSmtpPane" class="admin-pane-content" style="display: none;">
+                <div class="smtp-config-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h4 style="font-size: 15px; font-weight: 800; color: var(--text-1);">Connect Email Provider (SMTP)</h4>
+                            <p style="font-size: 12px; color: var(--text-3); margin-top: 2px;">Deliver automated reports directly to real inboxes like <strong>jesalmer1912@gmail.com</strong>.</p>
+                        </div>
+                        <span class="badge-tag" id="smtpLiveStatusBadge">Checking status...</span>
                     </div>
-                </div>
 
-                <div class="card-3d" style="padding: 20px;">
-                    <form onsubmit="handleSaveSmtp(event)">
+                    <!-- Big 1-Click Provider Preset Cards -->
+                    <div class="smtp-providers-grid" style="margin-top: 16px;">
+                        <button type="button" class="smtp-prov-card active" onclick="applySmtpPreset('gmail', this)">
+                            <div class="spc-icon icon-red">G</div>
+                            <div class="spc-info">
+                                <span class="spc-title">Google Gmail</span>
+                                <span class="spc-sub">smtp.gmail.com:587</span>
+                            </div>
+                        </button>
+                        <button type="button" class="smtp-prov-card" onclick="applySmtpPreset('outlook', this)">
+                            <div class="spc-icon icon-blue">O</div>
+                            <div class="spc-info">
+                                <span class="spc-title">Outlook / Office365</span>
+                                <span class="spc-sub">smtp.office365.com:587</span>
+                            </div>
+                        </button>
+                        <button type="button" class="smtp-prov-card" onclick="applySmtpPreset('ses', this)">
+                            <div class="spc-icon icon-amber">AWS</div>
+                            <div class="spc-info">
+                                <span class="spc-title">Amazon SES</span>
+                                <span class="spc-sub">email-smtp.us-east-1...</span>
+                            </div>
+                        </button>
+                        <button type="button" class="smtp-prov-card" onclick="applySmtpPreset('custom', this)">
+                            <div class="spc-icon icon-gray">⚙️</div>
+                            <div class="spc-info">
+                                <span class="spc-title">Custom SMTP</span>
+                                <span class="spc-sub">Your custom server</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Gmail 3-Step Quick Guide -->
+                    <div class="gmail-help-card" id="gmailHelpCard">
+                        <div class="ghc-title">🔑 Quick Setup: How to send emails using your Gmail account</div>
+                        <ol class="ghc-steps">
+                            <li>Open <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">Google Account &rarr; Security &rarr; App Passwords</a>.</li>
+                            <li>Create a new App Password named <strong>"AWS Billing"</strong>.</li>
+                            <li>Paste the 16-character password into the <strong>Password</strong> field below and click <strong>Save &amp; Test</strong>.</li>
+                        </ol>
+                    </div>
+
+                    <!-- Form -->
+                    <form onsubmit="handleSaveSmtp(event)" style="margin-top: 16px;">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="smtpHost">SMTP Host Server</label>
-                                <input type="text" id="smtpHost" placeholder="e.g. smtp.gmail.com or email-smtp.us-east-1.amazonaws.com">
+                                <label for="smtpHost">SMTP Server Host</label>
+                                <input type="text" id="smtpHost" placeholder="smtp.gmail.com" value="smtp.gmail.com" required>
                             </div>
                             <div class="form-group">
                                 <label for="smtpPort">SMTP Port</label>
-                                <input type="number" id="smtpPort" placeholder="587 (TLS) or 465 (SSL)" value="587">
+                                <input type="number" id="smtpPort" value="587" required>
                             </div>
                             <div class="form-group">
-                                <label for="smtpUsername">Username / Sender Email</label>
-                                <input type="text" id="smtpUsername" placeholder="your-email@gmail.com">
+                                <label for="smtpUsername">Sender Email / Username</label>
+                                <input type="text" id="smtpUsername" placeholder="jesalmer1912@gmail.com" value="jesalmer1912@gmail.com" required>
                             </div>
                             <div class="form-group">
                                 <label for="smtpPassword">Password / App Password</label>
-                                <input type="password" id="smtpPassword" placeholder="Gmail App Password or SES Secret">
+                                <input type="password" id="smtpPassword" placeholder="Paste 16-character Google App Password" required>
                             </div>
                         </div>
 
-                        <div class="smtp-options-flex" style="margin-top: 14px;">
+                        <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
                             <label class="remember-me-label">
                                 <input type="checkbox" id="smtpUseTls" checked>
-                                <span>Use STARTTLS / SSL Secure Transmission</span>
+                                <span>Use STARTTLS Encrypted Transmission (Recommended)</span>
                             </label>
-                            <button type="submit" class="pill-cyan-btn">Save SMTP Settings</button>
+                            <button type="submit" class="btn-terracotta" id="saveSmtpBtn">Save SMTP Settings</button>
                         </div>
                     </form>
 
-                    <!-- Test Connection Box -->
-                    <div style="border-top: 1px solid var(--border); margin-top: 18px; padding-top: 16px;">
-                        <h4 style="font-size: 13px; font-weight: 700; color: var(--text-1);">Test SMTP Live Email Delivery</h4>
-                        <div style="display: flex; gap: 10px; margin-top: 8px;">
-                            <input type="email" id="testEmailTarget" placeholder="Enter recipient email to verify" style="flex:1;">
-                            <button class="pill-btn pill-btn-dark" onclick="runSmtpTest()">Send Test Email</button>
+                    <!-- Live Delivery Test Box -->
+                    <div class="smtp-test-box" style="margin-top: 20px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h5 style="font-size: 13px; font-weight: 800; color: var(--text-1);">Test Outbound Email Delivery</h5>
+                            <span style="font-size: 11px; color: var(--text-3);">Sends a verification test email</span>
                         </div>
-                        <div id="smtpTestStatus" style="font-size: 12px; margin-top: 8px;"></div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <input type="email" id="testEmailTarget" placeholder="Enter recipient email (e.g. jesalmer1912@gmail.com)" style="flex: 1;" value="jesalmer1912@gmail.com">
+                            <button type="button" class="btn-outline" id="smtpTestBtn" onclick="runSmtpTest()">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                <span>Send Test Email</span>
+                            </button>
+                        </div>
+                        <div id="smtpTestStatus" style="font-size: 12px; margin-top: 10px; padding: 10px; border-radius: 8px; display: none;"></div>
                     </div>
+
                 </div>
             </div>
 
         </div>
 
-        <div class="modal-footer">
-            <button class="pill-btn pill-btn-clear" onclick="closeSettingsModal()">Close</button>
+        <div class="modal-footer-flex">
+            <button type="button" class="btn-outline" onclick="closeAdminPanelModal()">Close</button>
         </div>
     </div>
 </div>
 
 
-<!-- ============================== EXECUTIVE REPORT MODAL ============================== -->
-<div class="modal-overlay" id="reportModal" role="dialog" aria-modal="true">
-    <div class="modal-window card-3d">
-        <div class="modal-header">
+<!-- ============================== EDIT CRON SCHEDULE MODAL ============================== -->
+<div class="auth-overlay" id="editCronModal" role="dialog" aria-modal="true" style="z-index: 100000;">
+    <div class="auth-card modal-wide" style="max-width: 680px;">
+        <div class="modal-header-flex">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="admin-modal-hero-icon" style="background: rgba(200,90,50,0.12); color: var(--terracotta);">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                </div>
+                <div>
+                    <div class="admin-badge-tag">EDIT AUTOMATION TASK</div>
+                    <h3 class="admin-modal-title" style="font-size: 17px;">Modify Crontab Schedule</h3>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="closeEditCronModal()" aria-label="Close">✕</button>
+        </div>
+
+        <form id="editCronForm" onsubmit="handleEditCronSubmit(event)" style="padding-top: 14px;">
+            <input type="hidden" id="editCronJobId">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="editCronName">Automation Title</label>
+                    <input type="text" id="editCronName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCronEmail">Recipient Email Address</label>
+                    <input type="email" id="editCronEmail" required>
+                </div>
+            </div>
+
+            <div class="form-grid" style="margin-top: 12px;">
+                <div class="form-group">
+                    <label for="editCronFrequency">Schedule Frequency</label>
+                    <select id="editCronFrequency" onchange="onEditCronFrequencyChange()">
+                        <option value="daily">Daily (At specific time)</option>
+                        <option value="weekly">Weekly (Every Monday)</option>
+                        <option value="interval">Interval (Every X minutes)</option>
+                        <option value="one_time">One-Time (Scheduled run)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editCronFormat">Report Format</label>
+                    <select id="editCronFormat">
+                        <option value="pdf">Print-Ready PDF Document</option>
+                        <option value="html">Rich Visual HTML Digest</option>
+                        <option value="csv">Raw CSV Spreadsheet</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-grid" style="margin-top: 12px;">
+                <div class="form-group" id="editCronTimeGroup">
+                    <label for="editCronTime">Execution Time (24h format)</label>
+                    <input type="time" id="editCronTime" style="font-family:'JetBrains Mono',monospace;">
+                </div>
+                <div class="form-group" id="editCronIntervalGroup" style="display: none;">
+                    <label for="editCronInterval">Interval Minutes</label>
+                    <select id="editCronInterval">
+                        <option value="2">Every 2 Minutes</option>
+                        <option value="5">Every 5 Minutes</option>
+                        <option value="15">Every 15 Minutes</option>
+                        <option value="30">Every 30 Minutes</option>
+                        <option value="60">Every 60 Minutes</option>
+                    </select>
+                </div>
+                <div class="form-group" id="editCronDateGroup" style="display: none;">
+                    <label for="editCronDate">Execution Date</label>
+                    <input type="date" id="editCronDate">
+                </div>
+                <div class="form-group">
+                    <label for="editCronActiveState">Task State</label>
+                    <select id="editCronActiveState">
+                        <option value="active">Active (Scheduled)</option>
+                        <option value="paused">Paused (Suspended)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn-outline" onclick="closeEditCronModal()">Cancel</button>
+                <button type="submit" class="btn-terracotta">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- ============================== OUTBOX ARCHIVED REPORT VIEWER MODAL ============================== -->
+<div class="auth-overlay" id="outboxViewerModal" role="dialog" aria-modal="true" style="z-index: 100000;">
+    <div class="auth-card modal-wide" style="max-width: 860px; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="modal-header-flex">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="admin-modal-hero-icon" style="background: rgba(59,130,246,0.12); color: #3b82f6;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div>
+                    <div class="admin-badge-tag" style="background: rgba(59,130,246,0.1); color: #3b82f6;">OUTBOX PREVIEW</div>
+                    <h3 class="admin-modal-title" style="font-size: 17px;" id="outboxModalTitle">Archived Email Report Preview</h3>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="closeOutboxViewerModal()" aria-label="Close">✕</button>
+        </div>
+        <div style="flex: 1; min-height: 450px; margin-top: 14px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #fff;">
+            <iframe id="outboxPreviewFrame" style="width: 100%; height: 100%; min-height: 450px; border: none;" src="about:blank"></iframe>
+        </div>
+        <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 12px; color: var(--text-3);" id="outboxFileInfoText">Report compiled by Background Cron Daemon</span>
+            <button type="button" class="btn-outline" onclick="closeOutboxViewerModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+
+<!-- ============================== USER PROFILE MODAL ============================== -->
+<div class="auth-overlay" id="accountModal">
+    <div class="auth-card" style="max-width: 500px;">
+        <div class="card-header-flex" style="margin-bottom: 16px;">
+            <h3 style="font-size: 17px; font-weight: 700; color: var(--text-1);">User Account &amp; Profile</h3>
+            <button class="modal-close-btn" onclick="closeAccountModal()">✕</button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 14px; padding: 14px; background: var(--bg-cream); border-radius: 12px;">
+            <div class="profile-circle-btn" style="width: 44px; height: 44px; font-size: 15px;">PM</div>
             <div>
-                <span class="admin-badge-pill">EXECUTIVE REPORT</span>
-                <h2 id="reportModalTitle">AWS Billing &amp; Cost Analysis Report</h2>
+                <h4 style="font-size: 14.5px; font-weight: 700; color: var(--text-1);" id="profileNameDisplay">Jigal Prajapati</h4>
+                <p style="font-size: 12px; color: var(--text-3);" id="profileEmailDisplay">jigal.prajapati@bytestechnolab.com</p>
             </div>
-            <div class="modal-header-actions">
-                <button class="modal-close-btn" onclick="closeReportModal()">✕</button>
+            <button class="btn-outline" style="margin-left: auto; color: #ef4444;" onclick="handleLogout()">Sign Out</button>
+        </div>
+
+        <form onsubmit="handleChangePassword(event)" style="margin-top: 16px;">
+            <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 10px;">Security &bull; Change Password</h4>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="newAccountPassword">New Password</label>
+                    <input type="password" id="newAccountPassword" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmAccountPassword">Confirm Password</label>
+                    <input type="password" id="confirmAccountPassword" placeholder="••••••••" required>
+                </div>
             </div>
+            <div style="margin-top: 12px; text-align: right;">
+                <button type="submit" class="btn-terracotta">Update Password</button>
+            </div>
+            <div class="auth-status-msg" id="changePasswordStatus"></div>
+        </form>
+    </div>
+</div>
+
+
+<!-- ============================== EXECUTIVE REPORT PREVIEW MODAL ============================== -->
+<div class="auth-overlay" id="reportModal">
+    <div class="auth-card" style="max-width: 800px; width: 90%;">
+        <div class="card-header-flex" style="margin-bottom: 16px;">
+            <h3 style="font-size: 17px; font-weight: 700; color: var(--text-1);">AWS Executive Billing Summary</h3>
+            <button class="modal-close-btn" onclick="closeReportModal()">✕</button>
         </div>
-        <div class="modal-body">
-            <div id="visualReportContainer" class="visual-report-wrap"></div>
-        </div>
-        <div class="modal-footer">
-            <button class="pill-btn pill-btn-clear" onclick="closeReportModal()">Close</button>
-            <button class="pill-btn pill-btn-dark" onclick="downloadExecutiveHTMLReport()">Download HTML</button>
-            <button class="pill-cyan-btn" onclick="downloadPDFReport()">Print / PDF</button>
+        <div id="visualReportContainer" style="max-height: 60vh; overflow-y: auto;"></div>
+        <div style="margin-top: 18px; display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn-outline" onclick="closeReportModal()">Close</button>
+            <button class="btn-outline" onclick="downloadExecutiveHTMLReport()">Download HTML</button>
+            <button class="btn-terracotta" onclick="downloadPDFReport()">Print / PDF</button>
         </div>
     </div>
 </div>
 
-<!-- Core Dashboard JavaScript -->
-<script src="{{ url_for('static', filename='script.js') }}"></script>
 
+<!-- ============================== SERVICE DETAILS & RESOURCES MODAL ============================== -->
+<div class="auth-overlay" id="serviceDetailModal" role="dialog" aria-modal="true">
+    <div class="auth-card service-detail-modal-card" style="max-width: 880px; width: 94%; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; padding: 0;">
+        
+        <!-- Header -->
+        <div class="svc-detail-header">
+            <div class="svc-header-left">
+                <div class="svc-avatar-pill" id="sdmAvatar" style="background: #fdf0ea; color: #c85a32; width: 44px; height: 44px; font-size: 15px;">
+                    EC2
+                </div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <h3 class="svc-modal-title" id="sdmTitle">Amazon Elastic Compute Cloud</h3>
+                        <span class="status-capsule sc-healthy" id="sdmStatusCapsule">
+                            <span class="sc-dot" id="sdmStatusDot"></span>
+                            <span id="sdmStatusText">Healthy</span>
+                        </span>
+                    </div>
+                    <div class="svc-header-meta" id="sdmMeta">
+                        <span id="sdmCategoryTag">Compute</span> &bull; 
+                        <span id="sdmRegionsSummary">3 Active Regions</span> &bull; 
+                        <span id="sdmResourcesSummary">5 Resources Provisioned</span>
+                    </div>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="closeServiceDetailModal()" aria-label="Close">✕</button>
+        </div>
+
+        <!-- Scrollable Modal Content -->
+        <div class="svc-detail-body" id="sdmBody" style="overflow-y: auto; padding: 22px 26px; flex: 1;">
+            <!-- Injected via openServiceDetailModal() in JS -->
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="modal-footer-flex" style="padding: 14px 24px; border-top: 1px solid var(--border); background: var(--bg-sand);">
+            <button type="button" class="btn-outline" id="sdmViewLedgerBtn" onclick="jumpToLedgerForService()">
+                View in Detailed Ledger
+            </button>
+            <button type="button" class="btn-terracotta" onclick="closeServiceDetailModal()">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================== ADD AWS ACCOUNT MODAL ============================== -->
+<div class="auth-overlay" id="addAccountModal" role="dialog" aria-modal="true" style="z-index: 100000;">
+    <div class="auth-card" style="max-width: 520px; width: 92%; padding: 26px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px;">
+            <div>
+                <div class="badge-tag" style="background: rgba(200,90,50,0.12); color: var(--terracotta); font-weight: 700; font-size: 10.5px; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px;">
+                    IAM CREDENTIALS
+                </div>
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--text-1); margin: 0;">Add AWS Account</h3>
+                <p style="font-size: 12.5px; color: var(--text-2); margin: 4px 0 0 0;">Add an AWS account to stream live Cost Explorer billing data</p>
+            </div>
+            <button class="modal-close-btn" onclick="closeAddAccountModal()" aria-label="Close">✕</button>
+        </div>
+
+        <form id="addAccountForm" onsubmit="handleSaveNewAccount(event)">
+            <div class="form-group">
+                <label for="modalAccName">Account Name / Alias</label>
+                <input type="text" id="modalAccName" placeholder="e.g. Production AWS, Dev, or Staging" required>
+            </div>
+
+            <div class="form-group" style="margin-top: 12px;">
+                <label for="modalAccRegion">Default Region</label>
+                <select id="modalAccRegion" required>
+                    <option value="us-east-1" selected>US East (N. Virginia) &bull; us-east-1</option>
+                    <option value="us-east-2">US East (Ohio) &bull; us-east-2</option>
+                    <option value="us-west-2">US West (Oregon) &bull; us-west-2</option>
+                    <option value="ap-south-1">Asia Pacific (Mumbai) &bull; ap-south-1</option>
+                    <option value="eu-west-1">Europe (Ireland) &bull; eu-west-1</option>
+                    <option value="ap-southeast-1">Asia Pacific (Singapore) &bull; ap-southeast-1</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-top: 12px;">
+                <label for="modalAccAccessKey">AWS Access Key ID</label>
+                <input type="text" id="modalAccAccessKey" placeholder="AKIAIOSFODNN7EXAMPLE" required autocomplete="off">
+            </div>
+
+            <div class="form-group" style="margin-top: 12px;">
+                <label for="modalAccSecretKey">AWS Secret Access Key</label>
+                <div class="input-wrap">
+                    <input type="password" id="modalAccSecretKey" placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" required autocomplete="off">
+                    <button type="button" class="input-toggle" onclick="toggleModalSecretKey()">👁</button>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 14px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="modalAccSetDefault" checked style="width: auto; margin: 0; cursor: pointer;">
+                <label for="modalAccSetDefault" style="margin: 0; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text-2);">Set as active account and fetch billing immediately</label>
+            </div>
+
+            <div style="margin-top: 22px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn-outline" onclick="closeAddAccountModal()">Cancel</button>
+                <button type="submit" class="btn-terracotta" id="btnSaveAccount">Add &amp; Fetch Data</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/static/script.js"></script>
 </body>
 </html>
