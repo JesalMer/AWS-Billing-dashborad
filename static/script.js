@@ -361,7 +361,8 @@ function switchMainView(viewName) {
     const views = {
         dashboard: document.getElementById("viewDashboard"),
         billing: document.getElementById("viewBilling"),
-        accounts: document.getElementById("viewAccounts")
+        accounts: document.getElementById("viewAccounts"),
+        costOptimizer: document.getElementById("viewCostOptimizer")
     };
 
     const navBtns = {
@@ -369,7 +370,8 @@ function switchMainView(viewName) {
         billing: document.getElementById("navBtnBilling"),
         services: document.getElementById("navBtnServices"),
         regions: document.getElementById("navBtnRegions"),
-        accounts: document.getElementById("navBtnAccounts")
+        accounts: document.getElementById("navBtnAccounts"),
+        costOptimizer: document.getElementById("navBtnCostOptimizer")
     };
 
     Object.values(views).forEach(v => { if (v) v.classList.remove("active"); });
@@ -388,6 +390,14 @@ function switchMainView(viewName) {
     } else if (viewName === "billing") {
         setTimeout(() => {
             if (costExplorerComparisonChart) costExplorerComparisonChart.resize();
+        }, 80);
+    } else if (viewName === "costOptimizer") {
+        if (!_optData) {
+            loadCostOptimizerData(false);
+        }
+        setTimeout(() => {
+            if (optTrendChart) optTrendChart.resize();
+            if (optComparisonChart) optComparisonChart.resize();
         }, 80);
     }
 }
@@ -3934,6 +3944,10 @@ async function selectAwsAccount(accId, forceCurrentMonth = false, bypassCache = 
     // Fetch account's current quota telemetry in background to update topbar quota indicator
     fetchAccountQuotaTelemetry(acc.id, acc.name);
 
+    if (_currentMainView === "costOptimizer") {
+        loadCostOptimizerData(bypassCache);
+    }
+
     // Fetch or restore billing data for this account!
     await fetchBillingForAccount(acc, forceCurrentMonth, bypassCache);
 }
@@ -4039,6 +4053,442 @@ async function fetchBillingForAccount(acc, forceCurrentMonth = false, bypassCach
         const fallbackCache = getLatestAccountBillingCache(acc.id);
         if (fallbackCache) renderFullDashboard(fallbackCache);
     } finally {
-        switchMainView("dashboard");
+        if (_currentMainView !== "costOptimizer") {
+            switchMainView("dashboard");
+        }
     }
 }
+
+
+/* =====================================================================
+   AWS COST OPTIMIZER LOGIC & VISUALIZATION
+   ===================================================================== */
+let _optData = null;
+let _optActiveServiceTab = "ALL";
+let _optActiveProject = "ALL";
+
+function formatCurrency(val) {
+    if (val === null || val === undefined || isNaN(val)) return "$0.00";
+    return "$" + Number(val).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+async function loadCostOptimizerData(bypassCache = false) {
+    const acc = getActiveAwsAccount();
+    const accNameEl = document.getElementById("optConnectedAccountName");
+    if (accNameEl) {
+        accNameEl.textContent = acc ? acc.name : "Default Account";
+    }
+
+    const loadingEl = document.getElementById("optLoadingState");
+    const errorBanner = document.getElementById("optErrorBanner");
+    const spinner = document.getElementById("optRefreshSpinner");
+
+    if (loadingEl) loadingEl.style.display = "block";
+    if (errorBanner) errorBanner.style.display = "none";
+    if (spinner) spinner.style.animation = "spin 0.8s linear infinite";
+
+    try {
+        const accId = acc ? acc.id : "";
+        const url = `/api/cost-optimizer/all?account_id=${encodeURIComponent(accId)}&refresh=${bypassCache ? "true" : "false"}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.success) {
+            if (errorBanner) {
+                const textEl = document.getElementById("optErrorBannerText");
+                if (textEl) textEl.textContent = data.error || "Unable to retrieve AWS cost data. Please check your AWS account permissions and try again.";
+                errorBanner.style.display = "flex";
+            }
+            return;
+        }
+
+        _optData = data;
+        renderCostOptimizerView(data);
+
+    } catch (err) {
+        console.error("Cost Optimizer fetch error:", err);
+        if (errorBanner) {
+            const textEl = document.getElementById("optErrorBannerText");
+            if (textEl) textEl.textContent = "Unable to retrieve AWS cost data. Please check your AWS account permissions and try again.";
+            errorBanner.style.display = "flex";
+        }
+    } finally {
+        if (loadingEl) loadingEl.style.display = "none";
+        if (spinner) spinner.style.animation = "";
+    }
+}
+
+function refreshCostOptimizerData() {
+    loadCostOptimizerData(true);
+}
+
+function renderCostOptimizerView(data) {
+    if (!data) return;
+
+    // 1. Last updated badge
+    const lastUpdEl = document.getElementById("optLastUpdatedBadge");
+    if (lastUpdEl && data.last_updated) {
+        lastUpdEl.textContent = `Last updated: ${data.last_updated}${data.from_cache ? " (Cached)" : ""}`;
+    }
+
+    // 2. Permissions banner
+    const permBanner = document.getElementById("optPermissionsNoticeBanner");
+    const permText = document.getElementById("optPermissionsNoticeText");
+    if (permBanner && data.permissions_status) {
+        const deniedKeys = Object.entries(data.permissions_status)
+            .filter(([_, v]) => typeof v === "string" && (v.includes("denied") || v.includes("AccessDenied") || v.includes("Unauthorized")));
+        if (deniedKeys.length > 0) {
+            permBanner.style.display = "flex";
+            if (permText) {
+                permText.textContent = `Notice: Some resource-level AWS APIs returned restricted permissions (${deniedKeys.length} APIs restricted). Showing Cost Explorer recommendations and derived savings.`;
+            }
+        } else {
+            permBanner.style.display = "none";
+        }
+    }
+
+    // 3. Top Summary Hero Cards
+    const sum = data.summary || {};
+    const totalSavEl = document.getElementById("optTotalSavingsVal");
+    if (totalSavEl) {
+        totalSavEl.textContent = sum.total_estimated_monthly_savings_display || (formatCurrency(sum.total_estimated_monthly_savings) + "/mo");
+    }
+
+    const countEl = document.getElementById("optSuggestionsCountVal");
+    if (countEl) {
+        countEl.textContent = data.suggestions ? data.suggestions.length : 0;
+    }
+
+    const biggestAmtEl = document.getElementById("optBiggestSavingAmount");
+    const biggestHlEl = document.getElementById("optBiggestSavingHeadline");
+    if (sum.biggest_single_saving) {
+        if (biggestAmtEl) biggestAmtEl.textContent = sum.biggest_single_saving.saving_display || (formatCurrency(sum.biggest_single_saving.saving_amount) + "/mo");
+        if (biggestHlEl) biggestHlEl.textContent = sum.biggest_single_saving.headline || sum.biggest_single_saving.service;
+    } else {
+        if (biggestAmtEl) biggestAmtEl.textContent = "$0.00/mo";
+        if (biggestHlEl) biggestHlEl.textContent = "No optimization opportunities detected";
+    }
+
+    // 4. Cost Explorer Backbone Strip
+    const bbCurrentEl = document.getElementById("optBackboneCurrentSpend");
+    if (bbCurrentEl) {
+        bbCurrentEl.textContent = formatCurrency(sum.current_month_cost);
+    }
+
+    const bbTrendEl = document.getElementById("optBackboneTrendVal");
+    if (bbTrendEl) {
+        const trend = sum.trend_vs_last_month_pct;
+        if (trend !== null && trend !== undefined) {
+            const isUp = trend > 0;
+            bbTrendEl.textContent = `${isUp ? "↑ +" : "↓ "}${trend}% vs last month`;
+            bbTrendEl.style.color = isUp ? "#ea580c" : "#16a34a";
+        } else {
+            bbTrendEl.textContent = "--";
+            bbTrendEl.style.color = "var(--text-3)";
+        }
+    }
+
+    const bbForecastEl = document.getElementById("optBackboneForecastSpend");
+    if (bbForecastEl) {
+        if (sum.aws_cost_forecast !== null && sum.aws_cost_forecast !== undefined) {
+            bbForecastEl.textContent = formatCurrency(sum.aws_cost_forecast);
+            bbForecastEl.title = "AWS Cost Explorer ML forecast";
+        } else {
+            bbForecastEl.textContent = formatCurrency(sum.dashboard_estimated_month_end);
+            bbForecastEl.title = "Run-rate estimate based on month-to-date spending pace";
+        }
+    }
+
+    // 5. Service Group Tab Counts
+    const suggestions = data.suggestions || [];
+    const sg = data.service_groups || {};
+
+    const countAll = suggestions.length;
+    const countEC2 = (sg["EC2"] || []).length;
+    const countEC2Other = (sg["EC2-Other"] || []).length;
+    const countS3 = (sg["S3"] || []).length;
+    const countEIP = (sg["Elastic IP"] || []).length;
+
+    const elTabAll = document.getElementById("optCountTabAll");
+    if (elTabAll) elTabAll.textContent = countAll;
+    const elTabEC2 = document.getElementById("optCountTabEC2");
+    if (elTabEC2) elTabEC2.textContent = countEC2;
+    const elTabEC2Other = document.getElementById("optCountTabEC2Other");
+    if (elTabEC2Other) elTabEC2Other.textContent = countEC2Other;
+    const elTabS3 = document.getElementById("optCountTabS3");
+    if (elTabS3) elTabS3.textContent = countS3;
+    const elTabEIP = document.getElementById("optCountTabEIP");
+    if (elTabEIP) elTabEIP.textContent = countEIP;
+
+    // 6. Populate Project Filter Select
+    const projSelect = document.getElementById("optProjectFilterSelect");
+    if (projSelect) {
+        const currentVal = _optActiveProject;
+        const projects = data.projects_list || ["All Projects"];
+        let html = `<option value="ALL">All Projects</option>`;
+        projects.forEach(p => {
+            if (p !== "All Projects") {
+                const sel = (p === currentVal) ? "selected" : "";
+                html += `<option value="${escapeHtml(p)}" ${sel}>${escapeHtml(p)}</option>`;
+            }
+        });
+        projSelect.innerHTML = html;
+        if (currentVal !== "ALL" && !projects.includes(currentVal)) {
+            _optActiveProject = "ALL";
+            projSelect.value = "ALL";
+        }
+    }
+
+    // 7. Render Filtered Suggestions
+    renderFilteredOptSuggestions();
+}
+
+function switchOptServiceTab(tabName) {
+    _optActiveServiceTab = tabName;
+
+    const tabMap = {
+        "ALL": "btnOptTabAll",
+        "EC2": "btnOptTabEC2",
+        "EC2-Other": "btnOptTabEC2Other",
+        "S3": "btnOptTabS3",
+        "Elastic IP": "btnOptTabEIP"
+    };
+
+    Object.entries(tabMap).forEach(([key, btnId]) => {
+        const btn = document.getElementById(btnId);
+        if (btn) {
+            if (key === tabName) {
+                btn.classList.add("active");
+                btn.style.background = "var(--bg-card)";
+                btn.style.color = "var(--text-1)";
+                btn.style.fontWeight = "800";
+                btn.style.boxShadow = "var(--shadow-sm)";
+            } else {
+                btn.classList.remove("active");
+                btn.style.background = "transparent";
+                btn.style.color = "var(--text-2)";
+                btn.style.fontWeight = "600";
+                btn.style.boxShadow = "none";
+            }
+        }
+    });
+
+    renderFilteredOptSuggestions();
+}
+
+function onOptProjectFilterChange() {
+    const sel = document.getElementById("optProjectFilterSelect");
+    _optActiveProject = sel ? sel.value : "ALL";
+    renderFilteredOptSuggestions();
+}
+
+function renderFilteredOptSuggestions() {
+    const container = document.getElementById("optSuggestionsContainer");
+    const emptyState = document.getElementById("optEmptyState");
+    if (!container || !_optData) return;
+
+    let items = _optData.suggestions || [];
+
+    // Filter by Service Group Tab
+    if (_optActiveServiceTab !== "ALL") {
+        items = items.filter(s => s.service === _optActiveServiceTab);
+    }
+
+    // Filter by Project Tag Dropdown
+    if (_optActiveProject !== "ALL") {
+        items = items.filter(s => (s.project_tag || "Untagged") === _optActiveProject);
+    }
+
+    if (items.length === 0) {
+        container.innerHTML = "";
+        container.style.display = "none";
+        if (emptyState) emptyState.style.display = "block";
+        return;
+    }
+
+    if (emptyState) emptyState.style.display = "none";
+    container.style.display = "flex";
+
+    let html = "";
+    items.forEach((s, idx) => {
+        const cardId = `opt-card-${idx}`;
+        
+        // Effort pill
+        let effortCls = "opt-badge-effort-low";
+        let effortLabel = "Low Effort";
+        const eff = (s.effort || "low").toLowerCase();
+        if (eff === "med" || eff === "medium") {
+            effortCls = "opt-badge-effort-med";
+            effortLabel = "Medium Effort";
+        } else if (eff === "high") {
+            effortCls = "opt-badge-effort-high";
+            effortLabel = "High Effort";
+        }
+
+        // Project tag
+        const projTag = s.project_tag || "Untagged";
+        const envTag = s.environment_tag;
+
+        // Clean lines for why_how_to_fix
+        const whyHowFormatted = escapeHtml(s.why_how_to_fix || "")
+            .replace(/\n\n/g, "<br><br>")
+            .replace(/\n/g, "<br>");
+
+        html += `
+            <div class="opt-suggestion-card" id="${cardId}">
+                <div class="opt-suggestion-main" onclick="toggleOptDetail('${cardId}', event)">
+                    <div style="flex: 1; min-width: 260px;">
+                        
+                        <!-- Badges Row -->
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+                            <span class="opt-badge-pill opt-badge-service">${escapeHtml(s.service)}</span>
+                            <span class="opt-badge-pill ${effortCls}">${effortLabel}</span>
+                            <span class="opt-badge-pill opt-badge-tag">📁 ${escapeHtml(projTag)}</span>
+                            ${envTag ? `<span class="opt-badge-pill opt-badge-tag" style="background: rgba(59,130,246,0.08); color: #2563eb; border-color: rgba(59,130,246,0.2);">🏷️ ${escapeHtml(envTag)}</span>` : ""}
+                            <code style="font-size: 11px; background: var(--bg-cream); padding: 2px 7px; border-radius: 4px; color: var(--text-2); font-family: 'JetBrains Mono', monospace; border: 1px solid var(--border-subtle);">${escapeHtml(s.resource_id)}</code>
+                        </div>
+
+                        <!-- Headline -->
+                        <h3 style="font-size: 15px; font-weight: 800; color: var(--text-1); margin: 0 0 6px 0; line-height: 1.35;">
+                            ${escapeHtml(s.headline)}
+                        </h3>
+
+                        <!-- Action description -->
+                        <div style="font-size: 13px; color: var(--text-2); line-height: 1.45;">
+                            <span style="font-weight: 700; color: var(--text-1);">Recommended Action:</span> ${escapeHtml(s.action)}
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Savings & Toggle Button -->
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 10px; min-width: 140px;">
+                        <div style="text-align: right;">
+                            <div style="font-size: 19px; font-weight: 900; color: #059669; letter-spacing: -0.01em;">
+                                Save ${escapeHtml(s.saving_display)}
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-3); font-weight: 600;">
+                                Estimated monthly
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-outline opt-expand-btn" id="optExpandBtn-${cardId}" onclick="toggleOptDetail('${cardId}', event)" style="padding: 5px 12px; font-size: 12px; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                            <span>Why &amp; How to Fix</span>
+                            <span style="font-size: 10px;">▾</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Expandable Detail Pane -->
+                <div class="opt-detail-pane" id="optDetailPane-${cardId}" style="display: none;">
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 14px;">
+                        <div>
+                            <div style="font-size: 11px; font-weight: 800; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                                Why This Matters &amp; Step-by-Step Fix
+                            </div>
+                            <div style="font-size: 12.5px; color: var(--text-1); line-height: 1.5; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;">
+                                ${whyHowFormatted}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div style="font-size: 11px; font-weight: 800; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+                                Risk, Downtime &amp; Operational Impact
+                            </div>
+                            <div style="font-size: 12.5px; color: #92400e; line-height: 1.5; background: #fffdf5; border: 1px solid #fef3c7; border-radius: 8px; padding: 12px 14px;">
+                                <div style="display: flex; align-items: flex-start; gap: 8px;">
+                                    <span style="font-size: 16px;">⚠️</span>
+                                    <div>${escapeHtml(s.risk_note)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metadata Bar -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding-top: 10px; border-top: 1px dashed var(--border-subtle); font-size: 11.5px; color: var(--text-3);">
+                        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                            <span>Resource: <strong style="color: var(--text-2);">${escapeHtml(s.resource_id)}</strong></span>
+                            <span>Project Tag: <strong style="color: var(--text-2);">${escapeHtml(projTag)}</strong></span>
+                            ${envTag ? `<span>Environment: <strong style="color: var(--text-2);">${escapeHtml(envTag)}</strong></span>` : ""}
+                            <span>Effort: <strong style="color: var(--text-2);">${effortLabel}</strong></span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span>Source:</span>
+                            <span style="font-weight: 700; color: var(--terracotta);">${escapeHtml(s.source || "AWS Optimizer Engine")}</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+function toggleOptDetail(cardId, evt) {
+    if (evt) evt.stopPropagation();
+    const pane = document.getElementById(`optDetailPane-${cardId}`);
+    const btn = document.getElementById(`optExpandBtn-${cardId}`);
+    if (!pane) return;
+
+    const isHidden = pane.style.display === "none" || !pane.classList.contains("open");
+    if (isHidden) {
+        pane.style.display = "block";
+        pane.classList.add("open");
+        if (btn) btn.innerHTML = `<span>Hide Details</span><span style="font-size: 10px;">▴</span>`;
+    } else {
+        pane.style.display = "none";
+        pane.classList.remove("open");
+        if (btn) btn.innerHTML = `<span>Why &amp; How to Fix</span><span style="font-size: 10px;">▾</span>`;
+    }
+}
+
+function openOptIamPolicyModal() {
+    const modal = document.getElementById("optIamPolicyModal");
+    if (modal) {
+        modal.style.display = "flex";
+        modal.classList.add("active");
+    }
+}
+
+function closeOptIamPolicyModal() {
+    const modal = document.getElementById("optIamPolicyModal");
+    if (modal) {
+        modal.style.display = "none";
+        modal.classList.remove("active");
+    }
+}
+
+function copyOptIamPolicy() {
+    const codeBlock = document.getElementById("optIamPolicyCodeBlock");
+    if (!codeBlock) return;
+    const text = codeBlock.textContent;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            const btn1 = document.getElementById("btnCopyIamPolicy");
+            const btn2 = document.getElementById("btnCopyIamPolicyPrimary");
+            if (btn1) btn1.textContent = "Copied!";
+            if (btn2) btn2.textContent = "Copied to Clipboard!";
+            setTimeout(() => {
+                if (btn1) btn1.textContent = "Copy Policy JSON";
+                if (btn2) btn2.textContent = "Copy Policy JSON";
+            }, 2500);
+        }).catch(err => {
+            console.error("Clipboard write error:", err);
+        });
+    }
+}
+
+function openCostOptimizerServiceModal(serviceName) {
+    // Retained for backward compatibility
+}
+
+function closeCostOptimizerServiceModal() {
+    const modal = document.getElementById("costOptimizerServiceModal");
+    if (modal) {
+        modal.style.display = "none";
+        modal.classList.remove("active");
+    }
+}
+

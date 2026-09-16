@@ -139,6 +139,15 @@
                 <span class="nav-badge-pill" style="background: var(--terracotta); color: #ffffff; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px;">+ Add</span>
             </button>
 
+            <!-- Cost Optimizer Navigation Option -->
+            <button class="nav-item" id="navBtnCostOptimizer" onclick="switchMainView('costOptimizer')" title="Historical AWS Cost Optimization Recommendations">
+                <span class="nav-icon" style="color: #f59e0b;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+                </span>
+                <span class="nav-label">💡 Cost Optimizer</span>
+                <span class="nav-badge-pill" style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-size: 10.5px; font-weight: 800; padding: 2px 7px; border-radius: 6px;">NEW</span>
+            </button>
+
             <!-- Section: AWS ACCOUNTS (Multi-account switching) -->
             <div class="sidebar-section-header" style="margin-top: 20px; margin-bottom: 8px; padding: 0 10px;">
                 <span class="nav-section-title" style="margin: 0; font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em; color: var(--text-3);">LINKED ACCOUNTS</span>
@@ -748,7 +757,254 @@
             </div>
         </section>
 
+
+        <!-- =========================================================================
+             VIEW 4: AWS COST OPTIMIZER (HISTORICAL ANALYSIS & RECOMMENDATIONS)
+             ========================================================================= -->
+        <section class="main-view-pane" id="viewCostOptimizer">
+
+            <!-- Header Row -->
+            <div class="dashboard-header-flex">
+                <div>
+                    <div class="finops-breadcrumb">COST OPTIMIZER &bull; PLAIN-LANGUAGE SUGGESTIONS &bull; AWS BEST PRACTICES</div>
+                    <h1 class="dashboard-headline">💡 Cost Optimizer</h1>
+                    <p class="dashboard-subtext">Actionable, non-jargon suggestions to reduce spend across EC2, storage, and networking</p>
+                </div>
+                <div class="opt-header-actions" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div class="opt-account-pill" style="display: flex; align-items: center; gap: 8px; background: var(--bg-card); border: 1px solid var(--border); padding: 7px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--text-1); box-shadow: var(--shadow-sm);">
+                        <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
+                        <span>Account: <strong id="optConnectedAccountName">Production AWS</strong></span>
+                    </div>
+                    <div class="opt-timestamp-pill" id="optLastUpdatedBadge" style="font-size: 12px; font-weight: 600; color: var(--text-3); background: var(--bg-cream); border: 1px solid var(--border); padding: 7px 14px; border-radius: 999px;">
+                        Last updated: --
+                    </div>
+                    <button type="button" class="btn-outline" onclick="openOptIamPolicyModal()" style="padding: 7px 14px; font-size: 12px; border-radius: 999px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <span>IAM Permissions</span>
+                    </button>
+                    <button type="button" class="btn-terracotta" id="btnCostOptimizerRefresh" onclick="refreshCostOptimizerData()" style="padding: 7px 16px; font-size: 12.5px; border-radius: 999px; display: inline-flex; align-items: center; gap: 7px; font-weight: 700; cursor: pointer;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" id="optRefreshSpinner"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                        <span>Refresh Suggestions</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading Skeleton State -->
+            <div id="optLoadingState" style="display: none; padding: 40px; text-align: center; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 24px;">
+                <div class="opt-spinner" style="width: 36px; height: 36px; border: 3px solid rgba(200,90,50,0.15); border-top-color: var(--terracotta); border-radius: 50%; margin: 0 auto 16px; animation: spin 0.8s linear infinite;"></div>
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--text-1); margin-bottom: 6px;">Scanning AWS Resources &amp; Recommendations...</h3>
+                <p style="font-size: 13px; color: var(--text-3);">Analyzing EC2 rightsizing, idle instances, unattached EBS, S3 lifecycles, and Elastic IPs.</p>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="optErrorBanner" style="display: none; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 14px 18px; border-radius: 12px; margin-bottom: 20px; align-items: center; justify-content: space-between; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span id="optErrorBannerText" style="font-size: 13px; font-weight: 600;">Unable to retrieve AWS cost data. Please check your AWS account permissions and try again.</span>
+                </div>
+                <button type="button" class="btn-outline" onclick="openAddAccountModal(false)" style="font-size: 12px; padding: 5px 12px; border-color: #dc2626; color: #dc2626; background: #ffffff;">
+                    Review Credentials &rarr;
+                </button>
+            </div>
+
+            <!-- Missing Permissions / Service Notice Helper Banner -->
+            <div id="optPermissionsNoticeBanner" style="display: none; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; padding: 12px 18px; border-radius: 12px; margin-bottom: 20px; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span id="optPermissionsNoticeText" style="font-size: 12.5px; font-weight: 600;">Some resource-level APIs (e.g. Compute Optimizer or EC2 describe) returned permission restrictions. Showing Cost Explorer recommendations and derived savings.</span>
+                </div>
+                <button type="button" class="btn-outline" onclick="openOptIamPolicyModal()" style="font-size: 11.5px; padding: 4px 12px; border-color: #d97706; color: #d97706; background: #ffffff;">
+                    View Required IAM Policy &rarr;
+                </button>
+            </div>
+
+            <!-- ==================== TOP SUMMARY HERO CARDS ==================== -->
+            <div class="opt-summary-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; margin-bottom: 22px;">
+                
+                <!-- Hero Card 1: Total Estimated Monthly Savings -->
+                <div class="kpi-card" style="border-left: 4px solid #10b981;">
+                    <div class="kpi-card-top">
+                        <span class="kpi-label" style="color: #047857;">TOTAL ESTIMATED MONTHLY SAVINGS</span>
+                        <div class="kpi-icon-box box-green">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value text-green" id="optTotalSavingsVal" style="font-size: 28px; font-weight: 900;">~$0.00/mo</div>
+                    <div class="kpi-footer">
+                        <span class="badge-pill pill-green" id="optTotalSavingsBadge">Identified Optimization Potential</span>
+                    </div>
+                </div>
+
+                <!-- Hero Card 2: Count of Suggestions -->
+                <div class="kpi-card">
+                    <div class="kpi-card-top">
+                        <span class="kpi-label">ACTIONABLE SUGGESTIONS</span>
+                        <div class="kpi-icon-box box-peach">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="optSuggestionsCountVal" style="font-size: 28px; font-weight: 900;">0</div>
+                    <div class="kpi-footer">
+                        <span class="badge-pill pill-blue" id="optSuggestionsCountBadge">Across EC2, Storage &amp; Network</span>
+                    </div>
+                </div>
+
+                <!-- Hero Card 3: Biggest Single Saving -->
+                <div class="kpi-card" style="border-left: 4px solid var(--terracotta);">
+                    <div class="kpi-card-top">
+                        <span class="kpi-label" style="color: var(--terracotta);">BIGGEST SINGLE SAVING</span>
+                        <div class="kpi-icon-box box-amber">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-value text-amber" id="optBiggestSavingAmount" style="font-size: 24px; font-weight: 900;">~$0.00/mo</div>
+                    <div class="kpi-footer" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <span id="optBiggestSavingHeadline" style="font-size: 12px; color: var(--text-2); font-weight: 600;">None detected</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ==================== COST EXPLORER BACKBONE STRIP ==================== -->
+            <div class="card-white" style="margin-bottom: 24px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+                <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+                    <div>
+                        <span style="font-size: 11px; font-weight: 800; color: var(--text-3); letter-spacing: 0.05em; display: block;">CURRENT-MONTH SPEND (MTD)</span>
+                        <span style="font-size: 16px; font-weight: 800; color: var(--text-1);" id="optBackboneCurrentSpend">$0.00</span>
+                    </div>
+                    <div style="height: 28px; width: 1px; background: var(--border);"></div>
+                    <div>
+                        <span style="font-size: 11px; font-weight: 800; color: var(--text-3); letter-spacing: 0.05em; display: block;">TREND VS LAST MONTH</span>
+                        <span style="font-size: 14px; font-weight: 800;" id="optBackboneTrendVal">--</span>
+                    </div>
+                    <div style="height: 28px; width: 1px; background: var(--border);"></div>
+                    <div>
+                        <span style="font-size: 11px; font-weight: 800; color: var(--text-3); letter-spacing: 0.05em; display: block;">ESTIMATED MONTH-END</span>
+                        <span style="font-size: 16px; font-weight: 800; color: var(--terracotta);" id="optBackboneForecastSpend">$0.00</span>
+                    </div>
+                </div>
+                <div style="font-size: 11.5px; color: var(--text-3);">
+                    Cost Explorer Data Backbone &bull; Updated Daily
+                </div>
+            </div>
+
+            <!-- ==================== FILTER TOOLBAR & SERVICE TABS ==================== -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+                
+                <!-- Service Group Tabs (EC2, EC2-Other, S3, Elastic IP) -->
+                <div class="opt-service-tabs" style="display: flex; background: var(--bg-cream); border: 1px solid var(--border); border-radius: 20px; padding: 3px; gap: 4px; flex-wrap: wrap;">
+                    <button type="button" class="btn-chart-type active" id="btnOptTabAll" onclick="switchOptServiceTab('ALL')" style="padding: 6px 14px; font-size: 12.5px; border-radius: 16px; border: none; background: var(--bg-card); color: var(--text-1); font-weight: 800; cursor: pointer; box-shadow: var(--shadow-sm);">
+                        All Services (<span id="optCountTabAll">0</span>)
+                    </button>
+                    <button type="button" class="btn-chart-type" id="btnOptTabEC2" onclick="switchOptServiceTab('EC2')" style="padding: 6px 14px; font-size: 12.5px; border-radius: 16px; border: none; background: transparent; color: var(--text-2); font-weight: 600; cursor: pointer;">
+                        EC2 (<span id="optCountTabEC2">0</span>)
+                    </button>
+                    <button type="button" class="btn-chart-type" id="btnOptTabEC2Other" onclick="switchOptServiceTab('EC2-Other')" style="padding: 6px 14px; font-size: 12.5px; border-radius: 16px; border: none; background: transparent; color: var(--text-2); font-weight: 600; cursor: pointer;">
+                        EC2-Other (<span id="optCountTabEC2Other">0</span>)
+                    </button>
+                    <button type="button" class="btn-chart-type" id="btnOptTabS3" onclick="switchOptServiceTab('S3')" style="padding: 6px 14px; font-size: 12.5px; border-radius: 16px; border: none; background: transparent; color: var(--text-2); font-weight: 600; cursor: pointer;">
+                        S3 (<span id="optCountTabS3">0</span>)
+                    </button>
+                    <button type="button" class="btn-chart-type" id="btnOptTabEIP" onclick="switchOptServiceTab('Elastic IP')" style="padding: 6px 14px; font-size: 12.5px; border-radius: 16px; border: none; background: transparent; color: var(--text-2); font-weight: 600; cursor: pointer;">
+                        Elastic IP (<span id="optCountTabEIP">0</span>)
+                    </button>
+                </div>
+
+                <!-- Project Tag Dropdown Filter -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label for="optProjectFilterSelect" style="font-size: 12px; font-weight: 700; color: var(--text-2);">Project Tag:</label>
+                    <select id="optProjectFilterSelect" onchange="onOptProjectFilterChange()" style="padding: 6px 14px; font-size: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-1); font-weight: 700; cursor: pointer; box-shadow: var(--shadow-sm);">
+                        <option value="ALL">All Projects</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- ==================== SUGGESTIONS LIST CONTAINER ==================== -->
+            <div id="optSuggestionsContainer" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px;">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="optEmptyState" style="display: none; padding: 48px; text-align: center; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px solid var(--border); margin-bottom: 28px;">
+                <div style="font-size: 32px; margin-bottom: 10px;">🎉</div>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--text-1); margin-bottom: 4px;">No Suggestions in this Category</h3>
+                <p style="font-size: 13px; color: var(--text-3); margin: 0;">No active cost reduction opportunities match your current filter.</p>
+            </div>
+
+            <!-- ==================== IMPORTANT ESTIMATION DISCLAIMER ==================== -->
+            <div class="card-white" style="margin-bottom: 30px; border-left: 4px solid #f59e0b; background: #fffdfa; padding: 18px 22px;">
+                <div style="display: flex; align-items: flex-start; gap: 14px;">
+                    <span style="font-size: 22px; line-height: 1;">⚠️</span>
+                    <div style="font-size: 12.5px; color: var(--text-2); line-height: 1.55;">
+                        <strong style="color: var(--text-1); display: block; margin-bottom: 4px; font-size: 13px;">Important Estimation Disclaimer:</strong>
+                        Cost optimization recommendations are estimates based on historical AWS billing data and available Cost Explorer information. They are suggestions only and are not guaranteed savings. Actual costs and savings may vary depending on AWS usage, pricing, architecture, region, resource configuration, and other factors. Review recommendations carefully before making changes to your AWS resources.
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
     </main>
+</div>
+
+
+<!-- =========================================================================
+     SERVICE DETAILS MODAL (COST OPTIMIZER DEEP-DIVE)
+     ========================================================================= -->
+<div class="auth-overlay" id="costOptimizerServiceModal" role="dialog" aria-modal="true" style="display: none; align-items: center; justify-content: center;">
+    <div class="auth-card modal-wide" style="max-width: 680px; width: 95%;">
+        
+        <div class="modal-header-flex" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div class="abt-icon-wrap icon-peach" style="width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(200,90,50,0.12); color: var(--terracotta);">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+                </div>
+                <div>
+                    <h2 class="modal-title" id="optModalServiceName" style="font-size: 18px; font-weight: 800; color: var(--text-1); margin: 0;">Service Name</h2>
+                    <p class="modal-subtitle" style="font-size: 12px; color: var(--text-3); margin: 2px 0 0 0;">Historical Expenditure &amp; Action Plan</p>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="closeCostOptimizerServiceModal()" aria-label="Close" style="background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-3);">✕</button>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 22px;">
+            <div style="background: var(--bg-cream-light); padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);">
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-3);">CURRENT (MTD)</div>
+                <div style="font-size: 18px; font-weight: 800; color: var(--text-1); margin-top: 4px;" id="optModalCurrentCost">$0.00</div>
+            </div>
+            <div style="background: var(--bg-cream-light); padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);">
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-3);">PREVIOUS MONTH</div>
+                <div style="font-size: 18px; font-weight: 800; color: var(--text-1); margin-top: 4px;" id="optModalPrevCost">$0.00</div>
+            </div>
+            <div style="background: var(--bg-cream-light); padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);">
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-3);">3-MO AVERAGE</div>
+                <div style="font-size: 18px; font-weight: 800; color: var(--text-1); margin-top: 4px;" id="optModalHistAvg">$0.00</div>
+            </div>
+            <div style="background: var(--bg-cream-light); padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);">
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-3);">PROJECTED END</div>
+                <div style="font-size: 18px; font-weight: 800; color: var(--terracotta); margin-top: 4px;" id="optModalProjectedCost">$0.00</div>
+            </div>
+            <div style="background: var(--bg-cream-light); padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);">
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-3);">CHANGE vs AVG</div>
+                <div style="font-size: 18px; font-weight: 800; margin-top: 4px;" id="optModalChangePct">--</div>
+            </div>
+        </div>
+
+        <!-- Recommendations Container -->
+        <div>
+            <h3 style="font-size: 14px; font-weight: 800; color: var(--text-1); margin-bottom: 12px;">Suggested Optimization Actions</h3>
+            <div id="optModalRecommendationsList" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <div style="margin-top: 22px; text-align: right;">
+            <button type="button" class="btn-terracotta" onclick="closeCostOptimizerServiceModal()" style="padding: 8px 20px; font-size: 13px; font-weight: 700; border-radius: 8px; cursor: pointer;">Done</button>
+        </div>
+
+    </div>
 </div>
 
 
@@ -1616,6 +1872,103 @@
             <button type="button" class="btn-terracotta" onclick="openAdminFromLimitModal()" style="padding: 9px 18px; font-size: 13px; background: #dc2626; border-color: #dc2626;">
                 Increase Limit in Admin Panel
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================== COST OPTIMIZER IAM POLICY MODAL ============================== -->
+<div class="auth-overlay" id="optIamPolicyModal" role="dialog" aria-modal="true" style="z-index: 100002; display: none; align-items: center; justify-content: center;">
+    <div class="auth-card modal-wide" style="max-width: 680px; width: 94%; max-height: 90vh; display: flex; flex-direction: column; padding: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(200,90,50,0.12); color: var(--terracotta); display: flex; align-items: center; justify-content: center;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <div>
+                    <h3 style="font-size: 17px; font-weight: 800; color: var(--text-1); margin: 0;">Cost Optimizer IAM Policy (Read-Only)</h3>
+                    <p style="font-size: 12px; color: var(--text-3); margin: 2px 0 0 0;">Zero write/delete access. Only inspects utilization, metrics, and billing recommendations.</p>
+                </div>
+            </div>
+            <button type="button" class="btn-icon" onclick="closeOptIamPolicyModal()" style="border: none; background: transparent; cursor: pointer; font-size: 18px; color: var(--text-3);">&times;</button>
+        </div>
+
+        <div style="background: #fffdf5; border: 1px solid #fef3c7; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #92400e; line-height: 1.45;">
+            <strong>Setup Note:</strong> Attach this policy to your IAM User or Role. For full instance rightsizing insights, also ensure <strong>AWS Compute Optimizer</strong> is opted-in (AWS Console &rarr; Compute Optimizer &rarr; <em>Get started</em>).
+        </div>
+
+        <div style="flex: 1; overflow-y: auto; background: #1e1e2e; border-radius: 8px; padding: 14px; margin-bottom: 16px; position: relative;">
+            <button type="button" id="btnCopyIamPolicy" onclick="copyOptIamPolicy()" style="position: absolute; top: 10px; right: 10px; font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.15); color: #ffffff; border: 1px solid rgba(255,255,255,0.25); border-radius: 6px; padding: 5px 10px; cursor: pointer;">
+                Copy Policy JSON
+            </button>
+            <pre style="margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #a6accd; line-height: 1.45; white-space: pre-wrap;"><code id="optIamPolicyCodeBlock">{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CostOptimizerCostExplorerRead",
+      "Effect": "Allow",
+      "Action": [
+        "ce:GetCostAndUsage",
+        "ce:GetCostForecast",
+        "ce:GetDimensionValues",
+        "ce:GetTags",
+        "ce:GetAnomalies"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CostOptimizerHubAndComputeOptimizerRead",
+      "Effect": "Allow",
+      "Action": [
+        "cost-optimization-hub:ListRecommendations",
+        "cost-optimization-hub:GetPreferences",
+        "compute-optimizer:GetEC2InstanceRecommendations",
+        "compute-optimizer:GetAutoScalingGroupRecommendations",
+        "compute-optimizer:GetEBSVolumeRecommendations"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CostOptimizerEC2ResourceRead",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:DescribeVolumes",
+        "ec2:DescribeSnapshots",
+        "ec2:DescribeAddresses",
+        "ec2:DescribeNatGateways",
+        "ec2:DescribeTags"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CostOptimizerCloudWatchMetricsRead",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:GetMetricData",
+        "cloudwatch:ListMetrics"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CostOptimizerS3Read",
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListAllMyBuckets",
+        "s3:GetBucketLocation",
+        "s3:GetLifecycleConfiguration",
+        "s3:GetBucketVersioning",
+        "s3:GetBucketTagging"
+      ],
+      "Resource": "*"
+    }
+  ]
+}</code></pre>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" class="btn-outline" onclick="closeOptIamPolicyModal()" style="padding: 8px 18px; font-size: 12.5px;">Close</button>
+            <button type="button" class="btn-terracotta" onclick="copyOptIamPolicy()" id="btnCopyIamPolicyPrimary" style="padding: 8px 18px; font-size: 12.5px;">Copy Policy JSON</button>
         </div>
     </div>
 </div>

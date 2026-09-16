@@ -13,6 +13,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from flask import Flask, render_template, jsonify, request, Response
 from aws_billing import get_billing_data
+from cost_optimizer import analyze_cost_optimizer
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -2354,6 +2355,149 @@ def download_dashboard_report():
         )
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ==========================================
+# AWS COST OPTIMIZER APIS
+# ==========================================
+
+def _resolve_cost_optimizer_account(req):
+    """Resolve active AWS account credentials for Cost Optimizer request."""
+    account_id = req.args.get("account_id") or ""
+    req_json = req.get_json(silent=True) or {}
+    if not account_id:
+        account_id = req_json.get("account_id") or ""
+
+    accounts = load_aws_accounts()
+    account = None
+    if account_id:
+        account = next((a for a in accounts if a.get("id") == account_id), None)
+
+    if not account and accounts:
+        account = accounts[0]
+
+    access_key = (account.get("accessKey") if account else "") or req_json.get("access_key") or ""
+    secret_key = (account.get("secretKey") if account else "") or req_json.get("secret_key") or ""
+    region = (account.get("region") if account else "") or req_json.get("region") or "us-east-1"
+    resolved_id = (account.get("id") if account else "") or account_id or "default"
+    account_name = (account.get("name") if account else "") or req_json.get("account_name") or "AWS Account"
+
+    return {
+        "account_id": resolved_id,
+        "account_name": account_name,
+        "access_key": access_key,
+        "secret_key": secret_key,
+        "region": region
+    }
+
+
+def _run_cost_optimizer_analysis(req):
+    """Run Cost Optimizer analysis pipeline with error handling."""
+    acc_info = _resolve_cost_optimizer_account(req)
+    if not acc_info["access_key"] or not acc_info["secret_key"]:
+        return {
+            "success": False,
+            "error": "No AWS credentials found. Please link an AWS account first."
+        }, 400
+
+    refresh = req.args.get("refresh", "").lower() in ["1", "true", "yes"]
+    if not refresh:
+        req_json = req.get_json(silent=True) or {}
+        refresh = bool(req_json.get("refresh"))
+
+    try:
+        data = analyze_cost_optimizer(
+            access_key=acc_info["access_key"],
+            secret_key=acc_info["secret_key"],
+            region=acc_info["region"],
+            account_id=acc_info["account_id"],
+            bypass_cache=refresh
+        )
+        data["account_name"] = acc_info["account_name"]
+        data["account_id"] = acc_info["account_id"]
+        return data, 200
+    except Exception as e:
+        print(f"[Cost Optimizer Error] {e}")
+        return {
+            "success": False,
+            "error": "Unable to retrieve AWS cost data. Please check your AWS account permissions and try again.",
+            "details": str(e)
+        }, 500
+
+
+@app.route("/api/cost-optimizer/all", methods=["GET", "POST"])
+def api_cost_optimizer_all():
+    data, code = _run_cost_optimizer_analysis(request)
+    return jsonify(data), code
+
+
+@app.route("/api/cost-optimizer/summary", methods=["GET", "POST"])
+def api_cost_optimizer_summary():
+    data, code = _run_cost_optimizer_analysis(request)
+    if code != 200:
+        return jsonify(data), code
+    return jsonify({
+        "success": True,
+        "account_id": data.get("account_id"),
+        "account_name": data.get("account_name"),
+        "last_updated": data.get("last_updated"),
+        "summary": data.get("summary"),
+        "period_info": data.get("period_info")
+    })
+
+
+@app.route("/api/cost-optimizer/services", methods=["GET", "POST"])
+def api_cost_optimizer_services():
+    data, code = _run_cost_optimizer_analysis(request)
+    if code != 200:
+        return jsonify(data), code
+    return jsonify({
+        "success": True,
+        "account_id": data.get("account_id"),
+        "account_name": data.get("account_name"),
+        "services": data.get("services"),
+        "high_increase_services": data.get("high_increase_services")
+    })
+
+
+@app.route("/api/cost-optimizer/history", methods=["GET", "POST"])
+def api_cost_optimizer_history():
+    data, code = _run_cost_optimizer_analysis(request)
+    if code != 200:
+        return jsonify(data), code
+    return jsonify({
+        "success": True,
+        "account_id": data.get("account_id"),
+        "account_name": data.get("account_name"),
+        "chart_data": data.get("chart_data"),
+        "period_info": data.get("period_info")
+    })
+
+
+@app.route("/api/cost-optimizer/forecast", methods=["GET", "POST"])
+def api_cost_optimizer_forecast():
+    data, code = _run_cost_optimizer_analysis(request)
+    if code != 200:
+        return jsonify(data), code
+    return jsonify({
+        "success": True,
+        "account_id": data.get("account_id"),
+        "account_name": data.get("account_name"),
+        "forecast": data.get("forecast")
+    })
+
+
+@app.route("/api/cost-optimizer/recommendations", methods=["GET", "POST"])
+def api_cost_optimizer_recommendations():
+    data, code = _run_cost_optimizer_analysis(request)
+    if code != 200:
+        return jsonify(data), code
+    return jsonify({
+        "success": True,
+        "account_id": data.get("account_id"),
+        "account_name": data.get("account_name"),
+        "recommendations": data.get("recommendations")
+    })
 
 
 if __name__ == "__main__":

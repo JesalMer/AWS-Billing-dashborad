@@ -2,3 +2,6 @@ aws_accounts.json
 .env
 .env.*
 node_modules/
+cost_optimizer_cache.json
+*.cache.json
+__pycache__/

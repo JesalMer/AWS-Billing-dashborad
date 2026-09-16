@@ -3065,4 +3065,212 @@ input, select, textarea { font-family: inherit; outline: none; }
     to { transform: rotate(360deg); }
 }
 
+/* =====================================================================
+   AWS COST OPTIMIZER STYLES
+   ===================================================================== */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.opt-rec-card {
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+.opt-rec-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.services-ledger-table th {
+    white-space: nowrap;
+}
+
+[data-theme="dark"] #viewCostOptimizer .card-white,
+[data-theme="dark"] #viewCostOptimizer .kpi-card {
+    background: #1c1917 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] #viewCostOptimizer .opt-account-pill {
+    background: #1c1917 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f5f5f4 !important;
+}
+
+[data-theme="dark"] #viewCostOptimizer .opt-timestamp-pill {
+    background: #292524 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #a8a29e !important;
+}
+
+[data-theme="dark"] #viewCostOptimizer .opt-forecast-pillars-grid > div {
+    background: #292524 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] #viewCostOptimizer .opt-rec-card {
+    background: #1c1917 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] #viewCostOptimizer .services-ledger-table thead tr {
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] #viewCostOptimizer .services-ledger-table tbody tr {
+    border-bottom-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] #viewCostOptimizer .services-ledger-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03) !important;
+}
+
+[data-theme="dark"] #costOptimizerServiceModal .auth-card {
+    background: #1c1917 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] #costOptimizerServiceModal div[style*="background: var(--bg-cream-light)"] {
+    background: #292524 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* =====================================================================
+   COST OPTIMIZER PLAIN-LANGUAGE SUGGESTION CARDS & ACCORDION
+   ===================================================================== */
+.opt-suggestion-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s ease, border-color 0.18s ease;
+    overflow: hidden;
+}
+
+.opt-suggestion-card:hover {
+    border-color: rgba(200, 90, 50, 0.35);
+    box-shadow: var(--shadow-md);
+}
+
+.opt-suggestion-main {
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.opt-suggestion-main:hover .opt-expand-btn {
+    border-color: var(--terracotta);
+    color: var(--terracotta);
+}
+
+.opt-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.opt-badge-effort-low {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.opt-badge-effort-med {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.opt-badge-effort-high {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.opt-badge-service {
+    background: var(--bg-sand);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    font-weight: 800;
+}
+
+.opt-badge-tag {
+    background: rgba(200, 90, 50, 0.08);
+    color: var(--terracotta);
+    border: 1px solid rgba(200, 90, 50, 0.2);
+}
+
+.opt-detail-pane {
+    border-top: 1px solid var(--border-subtle);
+    background: var(--bg-cream-light);
+    padding: 18px 22px;
+    animation: optFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes optFadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .opt-suggestion-card {
+    background: #1c1917 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .opt-suggestion-card:hover {
+    border-color: rgba(200, 90, 50, 0.5) !important;
+}
+
+[data-theme="dark"] .opt-detail-pane {
+    background: #24201e !important;
+    border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme="dark"] .opt-detail-pane div[style*="background: var(--bg-card)"] {
+    background: #1c1917 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #e7e5e4 !important;
+}
+
+[data-theme="dark"] .opt-detail-pane div[style*="background: #fffdf5"] {
+    background: #292218 !important;
+    border-color: #78350f !important;
+    color: #fde68a !important;
+}
+
+[data-theme="dark"] .opt-badge-effort-low {
+    background: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+    border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+[data-theme="dark"] .opt-badge-effort-med {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #fbbf24 !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+[data-theme="dark"] .opt-badge-effort-high {
+    background: rgba(239, 68, 68, 0.15) !important;
+    color: #f87171 !important;
+    border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+[data-theme="dark"] .opt-badge-service {
+    background: #292524 !important;
+    color: #d6d3d1 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+
 
