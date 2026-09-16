@@ -147,6 +147,15 @@
             <div class="sidebar-accounts-list" id="sidebarAccountsList">
                 <!-- Dynamically populated via renderSidebarAccounts() in JS -->
             </div>
+
+            <!-- Download Report Button (Only downloads currently fetched dashboard data) -->
+            <button class="nav-item nav-item-download-report" id="btnSidebarDownloadReport" onclick="downloadCurrentDashboardReport()" title="Download report for currently active dashboard data" style="margin-top: 10px; width: 100%; cursor: pointer;">
+                <span class="nav-icon" style="color: #2563eb;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </span>
+                <span class="nav-label" style="font-weight: 700;">Download Report</span>
+                <span class="nav-badge-pill" style="background: rgba(37,99,235,0.14); color: #2563eb; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 6px;">PDF</span>
+            </button>
         </div>
 
         <!-- ============================== BOTTOM ADMIN PANEL CTA BUTTON ============================== -->
@@ -192,6 +201,12 @@
                     <button type="button" class="btn-apply-header-date" id="btnApplyHeaderDate" onclick="applyHeaderDateFilter()">Apply</button>
                 </div>
 
+                <!-- Active AWS Account API Quota Pill Badge -->
+                <div id="headerAccountQuotaBadge" class="header-quota-badge" title="Active AWS Account Daily API Quota" style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); border: 1px solid var(--border); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--text-2); box-shadow: 0 1px 3px rgba(0,0,0,0.05); user-select: none;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="#d97706" stroke="#d97706" stroke-width="1"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <span id="headerQuotaText">API Calls: 0/2 Used Today</span>
+                </div>
+
                 <!-- Dark / Light Theme Toggle Button -->
                 <button class="icon-round-btn theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark / Light Theme">
                     <svg class="theme-icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -232,6 +247,17 @@
                     <h1 class="dashboard-headline">AWS Billing Dashboard</h1>
                     <p class="dashboard-subtext" id="dashboardSubtextPeriod">Cost intelligence across <strong>linked accounts</strong> &bull; <span id="dashboardDatePeriodLabel">Current Month &bull; Month-to-Date</span></p>
                 </div>
+            </div>
+
+            <!-- Quota Limit Alert Banner -->
+            <div id="dashboardQuotaAlertBanner" style="display: none; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; padding: 12px 18px; border-radius: 12px; margin-bottom: 20px; align-items: center; justify-content: space-between; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span id="dashboardQuotaAlertText" style="font-size: 13px; font-weight: 600;">Daily AWS API call limit reached. Serving cached dashboard data.</span>
+                </div>
+                <button type="button" class="btn-outline" onclick="openAdminPanelModal('api-limits')" style="font-size: 12px; padding: 5px 12px; border-color: #d97706; color: #d97706; background: #ffffff;">
+                    Manage Limit in Admin Panel &rarr;
+                </button>
             </div>
 
             <!-- ============================== 4 TOP KPI CARDS (CURRENT, PREVIOUS, FORECAST, TOTAL ACTIVE) ============================== -->
@@ -748,7 +774,17 @@
                     <p class="admin-modal-subtitle">Auto-scheduled Crontabs &bull; Custom Date Reports &bull; SMTP Outbox Engine</p>
                 </div>
             </div>
-            <button class="modal-close-btn" onclick="closeAdminPanelModal()" aria-label="Close">✕</button>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div id="adminSessionIndicator" style="display: none; align-items: center; gap: 6px; font-size: 11.5px; background: rgba(34,197,94,0.1); color: #16a34a; border: 1px solid rgba(34,197,94,0.25); border-radius: 20px; padding: 4px 12px; font-weight: 600;">
+                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #22c55e;"></span>
+                    <span id="adminSessionIndicatorText">Session Active (24h)</span>
+                </div>
+                <button type="button" class="btn-outline" onclick="handleAdminLockSession()" title="Lock Admin Panel (Requires password again on next open)" style="font-size: 11.5px; padding: 6px 12px; border-radius: 8px; color: var(--text-2); display: flex; align-items: center; gap: 5px; background: var(--bg-card); cursor: pointer;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Lock Session
+                </button>
+                <button class="modal-close-btn" onclick="closeAdminPanelModal()" aria-label="Close" style="position: static;">✕</button>
+            </div>
         </div>
 
         <!-- Big User-Friendly Nav Cards -->
@@ -780,6 +816,16 @@
                 <div class="abt-text-wrap">
                     <span class="abt-title">SMTP Mail Server</span>
                     <span class="abt-sub"><span id="adminSmtpStatusDot" class="status-indicator-dot dot-amber"></span> <span id="adminSmtpStatusText">Checking credentials...</span></span>
+                </div>
+            </button>
+
+            <button type="button" class="admin-big-tab" id="modalTabBtnApiLimits" onclick="switchAdminModalTab('api-limits')">
+                <div class="abt-icon-wrap icon-amber" style="background: rgba(245,158,11,0.14); color: #d97706;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <div class="abt-text-wrap">
+                    <span class="abt-title">API Limits &amp; Admins</span>
+                    <span class="abt-sub"><span id="adminApiCallsUsedBadge">0 / 2 calls</span> &bull; Security</span>
                 </div>
             </button>
         </div>
@@ -849,10 +895,16 @@
                     <input type="hidden" id="newCronSchedule" value="daily">
 
                     <!-- Form Inputs Grid -->
-                    <div class="form-grid-3" style="margin-top: 14px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 14px;">
                         <div class="form-group">
                             <label for="newCronName">Automation Title</label>
                             <input type="text" id="newCronName" value="Daily AWS Billing Summary">
+                        </div>
+                        <div class="form-group">
+                            <label for="newCronAccount">Target AWS Account</label>
+                            <select id="newCronAccount" style="width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); color: var(--text-1); font-size: 13px;">
+                                <option value="">Active Account</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="newCronEmail">Recipient Email Address</label>
@@ -1096,11 +1148,161 @@
                 </div>
             </div>
 
+            <!-- TAB 4: API LIMITS & ADMIN USERS -->
+            <div id="adminModalApiLimitsPane" class="admin-pane-content" style="display: none;">
+                <!-- Card 1: AWS API Call Quota Controller -->
+                <div class="smtp-config-card" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="badge-tag" style="background: rgba(245,158,11,0.15); color: #d97706; font-weight: 800;">PER-ACCOUNT RATE LIMITING</span>
+                                <h4 style="font-size: 15px; font-weight: 800; color: var(--text-1); margin: 0;">AWS Cost Explorer API Call Quotas</h4>
+                            </div>
+                            <p style="font-size: 12px; color: var(--text-3); margin-top: 4px;">Each AWS account has its own independent daily API call limit. Default is <strong>2 calls/day</strong> per account.</p>
+                        </div>
+                        <span class="badge-tag" id="quotaUsageBadge" style="background: var(--bg-tag); color: var(--text-1); font-weight: 800; font-size: 12px; padding: 5px 10px;">
+                            0 / 2 Used Today
+                        </span>
+                    </div>
+
+                    <!-- Account Selector for Quota Management -->
+                    <div style="margin-bottom: 14px; display: flex; align-items: center; gap: 10px; background: var(--bg-canvas); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);">
+                        <label for="adminQuotaAccountSelect" style="font-size: 12px; font-weight: 700; color: var(--text-2); white-space: nowrap;">Manage AWS Account:</label>
+                        <select id="adminQuotaAccountSelect" onchange="onAdminQuotaAccountChanged()" style="flex: 1; padding: 7px 10px; font-size: 13px; font-weight: 600; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-1);">
+                            <option value="__all__">Global Default (All New Accounts)</option>
+                        </select>
+                    </div>
+
+                    <!-- Visual Quota Bar -->
+                    <div style="background: var(--border); border-radius: 999px; height: 10px; overflow: hidden; margin-bottom: 14px;">
+                        <div id="quotaProgressBar" style="background: var(--terracotta); height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; background: var(--bg-canvas); padding: 16px; border-radius: 10px; border: 1px solid var(--border);">
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-2); margin-bottom: 6px;" id="adminQuotaLimitInputLabel">Allowed API Calls / Day</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="number" id="inputDailyQuotaLimit" min="1" max="100" value="2" style="width: 90px; padding: 8px 12px; font-size: 14px; font-weight: 700; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); color: var(--text-1);">
+                                <button type="button" class="btn-terracotta" onclick="saveApiQuotaLimit()" style="padding: 8px 16px; font-size: 12.5px; font-weight: 700;">Save Limit</button>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: flex-start;">
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-2); margin-bottom: 6px;">Reset Counter</label>
+                            <button type="button" class="btn-outline" onclick="resetApiQuotaCounter()" style="padding: 8px 16px; font-size: 12.5px; font-weight: 700;">
+                                🔄 Reset Today's Count
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Admin Users Management & Password Change -->
+                <div class="smtp-config-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="badge-tag" style="background: rgba(37,99,235,0.12); color: #2563eb; font-weight: 800;">ACCESS CONTROL</span>
+                                <h4 style="font-size: 15px; font-weight: 800; color: var(--text-1); margin: 0;">Admin Users &amp; Passwords</h4>
+                            </div>
+                            <p style="font-size: 12px; color: var(--text-3); margin-top: 4px;">Manage authorized admin emails and update access passwords.</p>
+                        </div>
+                    </div>
+
+                    <!-- Current Admins List -->
+                    <div style="margin-bottom: 20px;">
+                        <h5 style="font-size: 13px; font-weight: 800; color: var(--text-1); margin-bottom: 8px;">Authorized Admin Accounts</h5>
+                        <div id="adminUsersListContainer" style="border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--bg-card);">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <!-- Add New Admin Email -->
+                        <div style="background: var(--bg-canvas); padding: 16px; border-radius: 10px; border: 1px solid var(--border);">
+                            <h5 style="font-size: 13px; font-weight: 800; color: var(--text-1); margin: 0 0 10px 0;">+ Add New Admin</h5>
+                            <form onsubmit="handleCreateAdminUser(event)">
+                                <div style="margin-bottom: 10px;">
+                                    <label style="display: block; font-size: 11.5px; font-weight: 700; color: var(--text-2); margin-bottom: 4px;">Admin Email</label>
+                                    <input type="email" id="newAdminEmail" placeholder="admin@example.com" required style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); color: var(--text-1); box-sizing: border-box;">
+                                </div>
+                                <div style="margin-bottom: 12px;">
+                                    <label style="display: block; font-size: 11.5px; font-weight: 700; color: var(--text-2); margin-bottom: 4px;">Initial Password</label>
+                                    <input type="password" id="newAdminPassword" placeholder="••••••••" required style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); color: var(--text-1); box-sizing: border-box;">
+                                </div>
+                                <button type="submit" class="btn-terracotta" style="width: 100%; padding: 9px; font-size: 12.5px; font-weight: 700;">Add Admin User</button>
+                            </form>
+                        </div>
+
+                        <!-- Change Admin Password -->
+                        <div style="background: var(--bg-canvas); padding: 16px; border-radius: 10px; border: 1px solid var(--border);">
+                            <h5 style="font-size: 13px; font-weight: 800; color: var(--text-1); margin: 0 0 10px 0;">🔑 Change Admin Password</h5>
+                            <form onsubmit="handleChangeAdminPassword(event)">
+                                <div style="margin-bottom: 10px;">
+                                    <label style="display: block; font-size: 11.5px; font-weight: 700; color: var(--text-2); margin-bottom: 4px;">Select Admin Email</label>
+                                    <select id="changePasswordAdminSelect" required style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); color: var(--text-1); box-sizing: border-box;">
+                                        <!-- Populated dynamically via JS -->
+                                    </select>
+                                </div>
+                                <div style="margin-bottom: 12px;">
+                                    <label style="display: block; font-size: 11.5px; font-weight: 700; color: var(--text-2); margin-bottom: 4px;">New Password</label>
+                                    <input type="password" id="changePasswordNewPass" placeholder="••••••••" required style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-card); color: var(--text-1); box-sizing: border-box;">
+                                </div>
+                                <button type="submit" class="btn-outline" style="width: 100%; padding: 9px; font-size: 12.5px; font-weight: 700;">Update Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="modal-footer-flex">
             <button type="button" class="btn-outline" onclick="closeAdminPanelModal()">Close</button>
         </div>
+    </div>
+</div>
+
+<!-- ============================== ADMIN AUTHENTICATION PROMPT MODAL ============================== -->
+<div class="auth-overlay" id="adminAuthPromptModal" role="dialog" aria-modal="true" style="z-index: 100005; display: none;">
+    <div class="auth-card" style="max-width: 440px; text-align: left; padding: 28px 30px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35); border: 1px solid var(--border); border-radius: 16px; background: var(--bg-card);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(200,90,50,0.12); color: var(--terracotta); display: flex; align-items: center; justify-content: center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                    <h3 style="font-size: 18px; font-weight: 800; color: var(--text-1); margin: 0;">Admin Verification</h3>
+                    <p style="font-size: 12px; color: var(--text-3); margin: 3px 0 0 0;">Enter admin credentials to proceed</p>
+                </div>
+            </div>
+            <button class="modal-close-btn" onclick="closeAdminAuthPromptModal()" aria-label="Close" style="top: 0; right: 0; position: relative;">✕</button>
+        </div>
+
+        <div style="margin-bottom: 16px; background: rgba(200,90,50,0.08); border: 1px dashed rgba(200,90,50,0.35); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 16px;">⏱️</span>
+            <span>Once verified, this browser remembers your session for <strong>24 hours</strong> so you won't be prompted again until 24h expires.</span>
+        </div>
+
+        <form id="adminAuthPromptForm" onsubmit="handleAdminAuthVerify(event)">
+            <div style="margin-bottom: 14px;">
+                <label for="adminPromptEmail" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-2); margin-bottom: 6px;">Admin Email</label>
+                <input type="email" id="adminPromptEmail" placeholder="jesal.mer@bytestechnolab.com" required style="width: 100%; padding: 11px 14px; font-size: 13.5px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); color: var(--text-1); box-sizing: border-box;">
+            </div>
+
+            <div style="margin-bottom: 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label for="adminPromptPassword" style="font-size: 12px; font-weight: 700; color: var(--text-2);">Admin Password</label>
+                    <button type="button" onclick="toggleAdminPromptPassword()" style="background: none; border: none; color: var(--terracotta); font-size: 11px; font-weight: 700; cursor: pointer; padding: 0;">Show/Hide</button>
+                </div>
+                <input type="password" id="adminPromptPassword" placeholder="••••••••" required style="width: 100%; padding: 11px 14px; font-size: 13.5px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); color: var(--text-1); box-sizing: border-box;">
+            </div>
+
+            <div id="adminPromptErrorBox" style="display: none; padding: 10px 14px; background: #fee2e2; color: #dc2626; border-radius: 8px; font-size: 12px; font-weight: 600; margin-bottom: 16px;"></div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="button" class="btn-outline" onclick="closeAdminAuthPromptModal()" style="flex: 1; padding: 11px;">Cancel</button>
+                <button type="submit" class="btn-terracotta" id="btnSubmitAdminAuth" style="flex: 2; padding: 11px; font-weight: 700;">Verify &amp; Enter &rarr;</button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -1373,6 +1575,48 @@
                 <button type="submit" class="btn-terracotta" id="btnSaveAccount">Add &amp; Fetch Data</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- ============================== API CALL LIMIT REACHED POPUP MODAL ============================== -->
+<div class="auth-overlay" id="apiLimitReachedModal" role="dialog" aria-modal="true" style="z-index: 100001; display: none;">
+    <div class="auth-card" style="max-width: 460px; width: 92%; padding: 28px; text-align: center; border-top: 4px solid #ef4444;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+        </div>
+
+        <h3 style="font-size: 19px; font-weight: 800; color: var(--text-1); margin: 0 0 8px 0;" id="apiLimitModalTitle">
+            Daily API Limit Reached
+        </h3>
+
+        <p style="font-size: 13.5px; color: var(--text-2); line-height: 1.55; margin: 0 0 20px 0;" id="apiLimitModalMessage">
+            You have consumed all allocated AWS Cost Explorer API calls for this account today. Further API calls are blocked to prevent unexpected billing.
+        </p>
+
+        <div style="background: var(--bg-sand); border: 1px dashed var(--border); border-radius: 10px; padding: 12px; margin-bottom: 22px; display: flex; justify-content: space-around; align-items: center;">
+            <div>
+                <span style="font-size: 11.5px; color: var(--text-3); font-weight: 600; display: block;">Account</span>
+                <strong style="font-size: 13px; color: var(--text-1);" id="apiLimitModalAccName">Bytes</strong>
+            </div>
+            <div style="height: 24px; width: 1px; background: var(--border);"></div>
+            <div>
+                <span style="font-size: 11.5px; color: var(--text-3); font-weight: 600; display: block;">API Usage</span>
+                <strong style="font-size: 13px; color: #dc2626;" id="apiLimitModalQuota">3 / 3 Calls Used</strong>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button type="button" class="btn-outline" onclick="closeApiLimitModal()" style="padding: 9px 18px; font-size: 13px;">
+                Keep Cached Data
+            </button>
+            <button type="button" class="btn-terracotta" onclick="openAdminFromLimitModal()" style="padding: 9px 18px; font-size: 13px; background: #dc2626; border-color: #dc2626;">
+                Increase Limit in Admin Panel
+            </button>
+        </div>
     </div>
 </div>
 

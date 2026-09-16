@@ -145,6 +145,91 @@ function formatCurrency(num) {
     return "$" + num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+function getAccountBillingCacheKey(accId, startDate, endDate) {
+    const aid = (accId || "default").trim();
+    const s = (startDate || "start").trim();
+    const e = (endDate || "end").trim();
+    return `finops_cache_${aid}_${s}_${e}`;
+}
+
+function getAccountBillingCache(accId, startDate, endDate) {
+    try {
+        const key = getAccountBillingCacheKey(accId, startDate, endDate);
+        const val = localStorage.getItem(key);
+        if (val) {
+            const parsed = JSON.parse(val);
+            if (parsed && (parsed.services || parsed.current_cost !== undefined)) {
+                return parsed;
+            }
+        }
+    } catch (err) {
+        console.warn("Failed to load account billing cache:", err);
+    }
+    return null;
+}
+
+function saveAccountBillingCache(accId, startDate, endDate, data) {
+    try {
+        if (!accId || !data) return;
+        const key = getAccountBillingCacheKey(accId, startDate, endDate);
+        localStorage.setItem(key, JSON.stringify(data));
+        // Also save latest cache for this account regardless of date range
+        localStorage.setItem(`finops_cache_latest_${accId}`, JSON.stringify(data));
+    } catch (err) {
+        console.warn("Failed to save account billing cache:", err);
+    }
+}
+
+function getLatestAccountBillingCache(accId) {
+    try {
+        const val = localStorage.getItem(`finops_cache_latest_${accId}`);
+        if (val) return JSON.parse(val);
+    } catch (err) {}
+    return null;
+}
+
+function syncBillingDataToServerCache(accId, accName, data) {
+    if (!data) return;
+    try {
+        fetch("/api/admin/cache/sync", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                account_id: accId || "active_account",
+                account_name: accName || "AWS Account",
+                billing_data: data
+            })
+        }).catch(() => {});
+    } catch (e) {}
+}
+
+function updateHeaderQuotaBadge(callsToday, limit, accountName) {
+    const badge = document.getElementById("headerAccountQuotaBadge");
+    const text = document.getElementById("headerQuotaText");
+    if (!text) return;
+
+    const c = (callsToday !== undefined && callsToday !== null) ? callsToday : 0;
+    const l = (limit !== undefined && limit !== null) ? limit : 2;
+    const nameStr = accountName ? ` (${accountName})` : "";
+    text.textContent = `API Calls: ${c}/${l} Used Today${nameStr}`;
+
+    if (badge) {
+        if (c >= l) {
+            badge.style.background = "#fee2e2";
+            badge.style.borderColor = "#fca5a5";
+            badge.style.color = "#dc2626";
+        } else if (c > 0) {
+            badge.style.background = "#fffbeb";
+            badge.style.borderColor = "#fde68a";
+            badge.style.color = "#d97706";
+        } else {
+            badge.style.background = "var(--bg-card)";
+            badge.style.borderColor = "var(--border)";
+            badge.style.color = "var(--text-2)";
+        }
+    }
+}
+
 function getUserBillingKey(email) {
     if (!email) return null;
     return "finops_billing_data_" + email.toLowerCase().trim();
@@ -191,8 +276,21 @@ document.addEventListener("DOMContentLoaded", function () {
         try {
             _currentUser = JSON.parse(savedUserJson);
             applyUserSession(_currentUser);
-            const userBilling = loadUserBillingData(_currentUser.email);
-            renderFullDashboard(userBilling || EMPTY_BILLING_DATA);
+
+            // User request: When user refreshes page, show that active AWS account's cached data only!
+            loadAwsAccounts();
+            const activeAcc = getActiveAwsAccount();
+            let loadedBilling = null;
+            if (activeAcc) {
+                loadedBilling = getAccountBillingCache(activeAcc.id, currRange.start, currRange.end) || getLatestAccountBillingCache(activeAcc.id);
+            }
+            if (!loadedBilling) {
+                loadedBilling = loadUserBillingData(_currentUser.email);
+            }
+            renderFullDashboard(loadedBilling || EMPTY_BILLING_DATA);
+            if (activeAcc) {
+                fetchAccountQuotaTelemetry(activeAcc.id, activeAcc.name);
+            }
         } catch (e) {
             renderFullDashboard(EMPTY_BILLING_DATA);
             switchAuthTab("login");
@@ -210,10 +308,19 @@ document.addEventListener("DOMContentLoaded", function () {
     loadSmtpSettings();
 
     // 4. Initialize AWS Multi-Accounts & Cost Explorer Comparison Graph
-    loadAwsAccounts();
+    if (!_awsAccounts.length) {
+        loadAwsAccounts();
+    }
+    const activeAcc = getActiveAwsAccount();
+    if (activeAcc) {
+        fetchAccountQuotaTelemetry(activeAcc.id, activeAcc.name);
+    }
     if (_billingData) {
         renderCostExplorerGraph(_billingData.daily, _billingData.categories, _billingData.current_cost, _billingData.previous_cost);
     }
+
+    // Continuously sync accounts and real billing data to server so crontab always has real data
+    syncAccountsAndCacheToServer();
 
     // Close service detail modal on backdrop click
     const sdmModal = document.getElementById("serviceDetailModal");
@@ -328,7 +435,203 @@ function showRegionsView() {
 /* =====================================================================
    ADMIN PANEL MODAL CONTROLLER (SIDEBAR CTA)
    ===================================================================== */
+/* =====================================================================
+   ADMIN AUTHENTICATION & 24-HOUR PERSISTENT SESSION
+   ===================================================================== */
+const ADMIN_AUTH_SESSION_KEY = "finops_admin_auth_session";
+const ADMIN_AUTH_TTL_MS = 24 * 60 * 60 * 1000; // 24 Hours in milliseconds
+
+function getAdminAuthSession() {
+    try {
+        const raw = localStorage.getItem(ADMIN_AUTH_SESSION_KEY);
+        if (!raw) return null;
+        const session = JSON.parse(raw);
+        if (!session || typeof session !== "object" || !session.timestamp) return null;
+        return session;
+    } catch (e) {
+        return null;
+    }
+}
+
+function isAdminAuthValid() {
+    const session = getAdminAuthSession();
+    if (!session || !session.timestamp) return false;
+    const now = Date.now();
+    const elapsed = now - Number(session.timestamp);
+    // Valid if timestamp is within last 24 hours (86,400,000 ms) and not futuristic
+    return elapsed >= 0 && elapsed < ADMIN_AUTH_TTL_MS;
+}
+
+function saveAdminAuthSession(email, adminData = {}) {
+    const session = {
+        email: email || "",
+        timestamp: Date.now(),
+        admin: adminData || {}
+    };
+    try {
+        localStorage.setItem(ADMIN_AUTH_SESSION_KEY, JSON.stringify(session));
+    } catch (e) {
+        console.error("Failed to save admin session:", e);
+    }
+}
+
+function clearAdminAuthSession() {
+    try {
+        localStorage.removeItem(ADMIN_AUTH_SESSION_KEY);
+    } catch (e) {}
+}
+
+function getAdminSessionRemainingTimeStr() {
+    const session = getAdminAuthSession();
+    if (!session || !session.timestamp) return "";
+    const remainingMs = ADMIN_AUTH_TTL_MS - (Date.now() - Number(session.timestamp));
+    if (remainingMs <= 0) return "Expired";
+    const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+    const mins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+    if (hours > 0) {
+        return `${hours}h ${mins}m remaining`;
+    }
+    return `${mins}m remaining`;
+}
+
+function updateAdminSessionUI() {
+    const indicator = document.getElementById("adminSessionIndicator");
+    const indicatorText = document.getElementById("adminSessionIndicatorText");
+    const session = getAdminAuthSession();
+    if (session && isAdminAuthValid()) {
+        const timeStr = getAdminSessionRemainingTimeStr();
+        if (indicator) indicator.style.display = "inline-flex";
+        if (indicatorText) {
+            indicatorText.textContent = `${session.email || "Admin"} • Active (${timeStr})`;
+        }
+    } else {
+        if (indicator) indicator.style.display = "none";
+    }
+}
+
+function handleAdminLockSession() {
+    clearAdminAuthSession();
+    closeAdminPanelModal();
+    const banner = document.getElementById("dashboardQuotaAlertBanner");
+    const bannerText = document.getElementById("dashboardQuotaAlertText");
+    if (banner && bannerText) {
+        bannerText.textContent = "🔒 Admin session locked. Verification credentials will be required on next entry.";
+        banner.style.display = "block";
+        setTimeout(() => { banner.style.display = "none"; }, 4500);
+    }
+}
+
+let _pendingAdminTab = "cron";
+
 function openAdminPanelModal(initialTab = "cron") {
+    _pendingAdminTab = initialTab || "cron";
+
+    // ── 24-HOUR PERSISTENCE CHECK ──
+    // If admin already verified within the last 24 hours, do NOT show the popup modal!
+    if (isAdminAuthValid()) {
+        console.log("[Admin Auth] Active 24-hour session found — bypassing verification popup.");
+        openAdminPanelDirect(_pendingAdminTab);
+        return;
+    }
+
+    // Otherwise (no session or 24 hours elapsed): prompt for admin email & password
+    const promptModal = document.getElementById("adminAuthPromptModal");
+    if (promptModal) {
+        promptModal.style.display = "flex";
+        promptModal.classList.add("active");
+        const emailInp = document.getElementById("adminPromptEmail");
+        const passInp = document.getElementById("adminPromptPassword");
+        const errBox = document.getElementById("adminPromptErrorBox");
+        if (errBox) errBox.style.display = "none";
+        if (passInp) passInp.value = "";
+        
+        const prevSession = getAdminAuthSession();
+        if (emailInp) {
+            if (prevSession && prevSession.email) {
+                emailInp.value = prevSession.email;
+            } else if (!emailInp.value) {
+                emailInp.value = "jesal.mer@bytestechnolab.com";
+            }
+        }
+        setTimeout(() => { if (passInp) passInp.focus(); }, 60);
+    } else {
+        openAdminPanelDirect(_pendingAdminTab);
+    }
+}
+
+function closeAdminAuthPromptModal() {
+    const promptModal = document.getElementById("adminAuthPromptModal");
+    if (promptModal) {
+        promptModal.style.display = "none";
+        promptModal.classList.remove("active");
+    }
+    const errBox = document.getElementById("adminPromptErrorBox");
+    if (errBox) errBox.style.display = "none";
+}
+
+function toggleAdminPromptPassword() {
+    const p = document.getElementById("adminPromptPassword");
+    if (p) p.type = (p.type === "password") ? "text" : "password";
+}
+
+async function handleAdminAuthVerify(e) {
+    if (e) e.preventDefault();
+    const emailInp = document.getElementById("adminPromptEmail");
+    const passInp = document.getElementById("adminPromptPassword");
+    const errBox = document.getElementById("adminPromptErrorBox");
+    const submitBtn = document.getElementById("btnSubmitAdminAuth");
+
+    const email = emailInp ? emailInp.value.trim().toLowerCase() : "";
+    const password = passInp ? passInp.value.trim() : "";
+
+    if (!email || !password) {
+        if (errBox) {
+            errBox.style.display = "block";
+            errBox.textContent = "Please provide both admin email and password.";
+        }
+        return;
+    }
+
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Verifying...";
+    }
+    if (errBox) errBox.style.display = "none";
+
+    try {
+        const res = await fetch("/api/admin/auth/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            // ── SAVE 24-HOUR ADMIN SESSION IN LOCALSTORAGE ──
+            saveAdminAuthSession(email, data.admin || {});
+            console.log(`[Admin Auth] Verified successfully. Session valid for 24 hours for ${email}.`);
+            closeAdminAuthPromptModal();
+            openAdminPanelDirect(_pendingAdminTab);
+        } else {
+            if (errBox) {
+                errBox.style.display = "block";
+                errBox.textContent = data.error || "Invalid admin email or password.";
+            }
+        }
+    } catch (err) {
+        if (errBox) {
+            errBox.style.display = "block";
+            errBox.textContent = "Failed to communicate with server. Please try again.";
+        }
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Verify & Enter →";
+        }
+    }
+}
+
+function openAdminPanelDirect(initialTab = "cron") {
     const modal = document.getElementById("adminPanelModal");
     if (!modal) return;
     modal.classList.add("active");
@@ -336,6 +639,9 @@ function openAdminPanelModal(initialTab = "cron") {
     loadCronJobs();
     loadSmtpSettings();
     populateCustomServicesChecklist();
+    loadApiQuota();
+    loadAdminUsersList();
+    updateAdminSessionUI();
 }
 
 function closeAdminPanelModal() {
@@ -344,28 +650,76 @@ function closeAdminPanelModal() {
 }
 
 function switchAdminModalTab(tab) {
-    const tabs = ["cron", "custom-reports", "smtp"];
+    const tabs = ["cron", "custom-reports", "smtp", "api-limits"];
     const tabBtns = {
         "cron": document.getElementById("modalTabBtnCron"),
         "custom-reports": document.getElementById("modalTabBtnCustom"),
-        "smtp": document.getElementById("modalTabBtnSmtp")
+        "smtp": document.getElementById("modalTabBtnSmtp"),
+        "api-limits": document.getElementById("modalTabBtnApiLimits")
     };
     const tabPanes = {
         "cron": document.getElementById("adminModalCronPane"),
         "custom-reports": document.getElementById("adminModalCustomPane"),
-        "smtp": document.getElementById("adminModalSmtpPane")
+        "smtp": document.getElementById("adminModalSmtpPane"),
+        "api-limits": document.getElementById("adminModalApiLimitsPane")
     };
 
     tabs.forEach(t => {
         if (tabBtns[t]) tabBtns[t].classList.toggle("active", t === tab);
         if (tabPanes[t]) tabPanes[t].style.display = (t === tab) ? "block" : "none";
     });
+
+    if (tab === "api-limits") {
+        loadApiQuota();
+        loadAdminUsersList();
+    }
+}
+
+function populateCronAccountDropdown() {
+    const sel = document.getElementById("newCronAccount");
+    if (!sel) return;
+    sel.innerHTML = "";
+    if (!_awsAccounts || !_awsAccounts.length) {
+        sel.innerHTML = '<option value="">Active Account (Default)</option>';
+        return;
+    }
+    _awsAccounts.forEach(acc => {
+        const opt = document.createElement("option");
+        opt.value = acc.id;
+        opt.textContent = `${acc.name} (${acc.region || 'us-east-1'})`;
+        if (acc.id === _activeAwsAccountId) opt.selected = true;
+        sel.appendChild(opt);
+    });
+}
+
+function syncAccountsAndCacheToServer() {
+    if (!_awsAccounts || !_awsAccounts.length) return;
+    try {
+        fetch("/api/admin/accounts/sync", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ accounts: _awsAccounts })
+        }).catch(() => {});
+
+        const activeAcc = getActiveAwsAccount();
+        if (activeAcc) {
+            const cache = _billingData || getLatestAccountBillingCache(activeAcc.id);
+            if (cache) {
+                syncBillingDataToServerCache(activeAcc.id, activeAcc.name, cache);
+            }
+        }
+    } catch (e) {}
 }
 
 function toggleAddCronForm() {
     const form = document.getElementById("addCronForm");
     if (form) {
-        form.style.display = (form.style.display === "none") ? "block" : "none";
+        const isOpening = (form.style.display === "none");
+        form.style.display = isOpening ? "block" : "none";
+        if (isOpening) {
+            populateCronAccountDropdown();
+            syncAccountsAndCacheToServer();
+        }
     }
 }
 
@@ -464,6 +818,7 @@ async function loadCronJobs() {
                                 </span>
                             </div>
                             <div class="cci-meta-row">
+                                <span class="cci-chip" style="background: rgba(200,90,50,0.12); color: var(--terracotta); font-weight: 700;">☁️ ${j.account_name || 'Active Account'}</span>
                                 <span class="cci-chip chip-email">✉️ ${j.email}</span>
                                 <span class="cci-chip chip-time">⏰ ${schedLabel}</span>
                                 <span class="cci-chip">📄 ${(j.format || 'pdf').toUpperCase()}</span>
@@ -505,6 +860,12 @@ async function saveNewCronJob() {
     const oneTimeDate = document.getElementById("newCronOneTimeDate")?.value || "";
     const format = document.getElementById("newCronFormat")?.value || "pdf";
 
+    // Target AWS Account
+    const accSelect = document.getElementById("newCronAccount");
+    const selAccId = accSelect ? accSelect.value : (_activeAwsAccountId || "");
+    const targetAcc = (_awsAccounts || []).find(a => a.id === selAccId) || getActiveAwsAccount();
+    const activeBilling = _billingData || (targetAcc ? getLatestAccountBillingCache(targetAcc.id) : null);
+
     if (!email) {
         alert("Please enter a valid recipient email for the Crontab digest.");
         return;
@@ -517,6 +878,9 @@ async function saveNewCronJob() {
             body: JSON.stringify({
                 name,
                 email,
+                account_id: targetAcc ? targetAcc.id : "",
+                account_name: targetAcc ? targetAcc.name : "",
+                billing_data: activeBilling,
                 schedule,
                 time,
                 interval_minutes: intervalMinutes,
@@ -536,9 +900,25 @@ async function saveNewCronJob() {
 
 async function runCronJobNow(id) {
     try {
-        let res = await fetch(`/api/admin/cron/${id}/run`, { method: "POST" });
+        const activeAcc = (typeof getActiveAwsAccount === "function") ? getActiveAwsAccount() : null;
+        const currentBilling = _billingData || (activeAcc ? getLatestAccountBillingCache(activeAcc.id) : null);
+        const payload = {
+            billing_data: currentBilling,
+            account_id: activeAcc ? activeAcc.id : "",
+            account_name: activeAcc ? activeAcc.name : ""
+        };
+
+        let res = await fetch(`/api/admin/cron/${id}/run`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
         if (!res.ok) {
-            res = await fetch(`/api/admin/cron/run-now/${id}`, { method: "POST" });
+            res = await fetch(`/api/admin/cron/run-now/${id}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
         }
         const data = await res.json();
         alert(data.message || "Report dispatched to mentioned email address!");
@@ -837,6 +1217,468 @@ async function runSmtpTest() {
 }
 
 /* =====================================================================
+   AWS API CALL QUOTA & RATE LIMITING
+   ===================================================================== */
+let _currentQuotaData = null;
+
+async function loadApiQuota() {
+    try {
+        const res = await fetch("/api/admin/quota");
+        const data = await res.json();
+        if (data.success) {
+            _currentQuotaData = data;
+            populateAdminQuotaAccountDropdown(data);
+            renderSelectedAdminQuotaView();
+        }
+    } catch (e) {
+        console.error("Failed to load API quota:", e);
+    }
+}
+
+function populateAdminQuotaAccountDropdown(data) {
+    const sel = document.getElementById("adminQuotaAccountSelect");
+    if (!sel) return;
+
+    const currentVal = sel.value || "__all__";
+    let html = `<option value="__all__">Global Default (All New Accounts) [${data.default_limit || 2} calls/day]</option>`;
+
+    // Populate from active known AWS accounts
+    const seenAccIds = new Set();
+    if (_awsAccounts && _awsAccounts.length) {
+        _awsAccounts.forEach(acc => {
+            seenAccIds.add(acc.id);
+            const accQuota = (data.accounts && data.accounts[acc.id]) || null;
+            const lim = accQuota ? accQuota.daily_limit : (data.default_limit || 2);
+            const calls = accQuota ? accQuota.calls_today : 0;
+            html += `<option value="${acc.id}">${escapeHtml(acc.name)} (${calls}/${lim} calls used today)</option>`;
+        });
+    }
+
+    // Also include any accounts stored in quota file not yet in _awsAccounts
+    if (data.accounts) {
+        Object.keys(data.accounts).forEach(accId => {
+            if (!seenAccIds.has(accId) && accId !== "__all__") {
+                const a = data.accounts[accId];
+                html += `<option value="${accId}">${escapeHtml(a.name || accId)} (${a.calls_today || 0}/${a.daily_limit || 2} calls used today)</option>`;
+            }
+        });
+    }
+
+    sel.innerHTML = html;
+    if (Array.from(sel.options).some(o => o.value === currentVal)) {
+        sel.value = currentVal;
+    } else if (_activeAwsAccountId && Array.from(sel.options).some(o => o.value === _activeAwsAccountId)) {
+        sel.value = _activeAwsAccountId;
+    } else {
+        sel.value = "__all__";
+    }
+}
+
+function onAdminQuotaAccountChanged() {
+    renderSelectedAdminQuotaView();
+}
+
+function renderSelectedAdminQuotaView() {
+    if (!_currentQuotaData) return;
+    const sel = document.getElementById("adminQuotaAccountSelect");
+    const targetKey = sel ? sel.value : "__all__";
+
+    let limit = _currentQuotaData.default_limit || 2;
+    let calls = 0;
+    let accountTitle = "Global Default";
+
+    if (targetKey !== "__all__" && _currentQuotaData.accounts && _currentQuotaData.accounts[targetKey]) {
+        const acc = _currentQuotaData.accounts[targetKey];
+        limit = acc.daily_limit || limit;
+        calls = acc.calls_today || 0;
+        accountTitle = acc.name || targetKey;
+    } else if (targetKey !== "__all__") {
+        const found = _awsAccounts.find(a => a.id === targetKey);
+        accountTitle = found ? found.name : targetKey;
+    }
+
+    const pct = Math.min(100, Math.round((calls / limit) * 100));
+
+    const badge = document.getElementById("quotaUsageBadge");
+    if (badge) {
+        badge.textContent = `${calls} / ${limit} Used Today`;
+        if (calls >= limit) {
+            badge.style.background = "#fee2e2";
+            badge.style.color = "#dc2626";
+        } else {
+            badge.style.background = "var(--bg-tag)";
+            badge.style.color = "var(--text-1)";
+        }
+    }
+
+    const inputLimit = document.getElementById("inputDailyQuotaLimit");
+    if (inputLimit) inputLimit.value = limit;
+
+    const progBar = document.getElementById("quotaProgressBar");
+    if (progBar) {
+        progBar.style.width = `${pct}%`;
+        progBar.style.background = (calls >= limit) ? "#dc2626" : "var(--terracotta)";
+    }
+
+    const tabBadge = document.getElementById("adminApiCallsUsedBadge");
+    if (tabBadge) tabBadge.textContent = `${calls} / ${limit} calls`;
+
+    const label = document.getElementById("adminQuotaLimitInputLabel");
+    if (label) {
+        label.textContent = targetKey === "__all__" ? "Default Daily Limit (All Accounts)" : `Daily Limit for ${accountTitle}`;
+    }
+}
+
+async function saveApiQuotaLimit() {
+    const sel = document.getElementById("adminQuotaAccountSelect");
+    const targetKey = sel ? sel.value : "__all__";
+    const inputLimit = document.getElementById("inputDailyQuotaLimit");
+    const val = parseInt(inputLimit?.value, 10);
+    if (!val || val < 1) {
+        alert("Please specify a valid limit of at least 1 API call per day.");
+        return;
+    }
+
+    const payload = { daily_limit: val };
+    if (targetKey !== "__all__") {
+        payload.account_id = targetKey;
+        const found = _awsAccounts.find(a => a.id === targetKey);
+        if (found) payload.account_name = found.name;
+    } else {
+        payload.default_limit = val;
+    }
+
+    try {
+        const res = await fetch("/api/admin/quota", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(`Daily AWS API call limit successfully updated to ${val} calls/day!`);
+            loadApiQuota();
+            // Refresh active account quota telemetry badge if active account was modified
+            if (targetKey === "__all__" || targetKey === _activeAwsAccountId) {
+                const acc = getActiveAwsAccount();
+                if (acc) fetchAccountQuotaTelemetry(acc.id, acc.name);
+            }
+        } else {
+            alert(data.error || "Failed to update quota limit.");
+        }
+    } catch (e) {
+        alert("Error saving quota limit: " + e.message);
+    }
+}
+
+async function resetApiQuotaCounter() {
+    const sel = document.getElementById("adminQuotaAccountSelect");
+    const targetKey = sel ? sel.value : "__all__";
+    const promptMsg = targetKey === "__all__" 
+        ? "Are you sure you want to reset today's AWS API call counter for ALL accounts?"
+        : "Are you sure you want to reset today's AWS API call counter for this account?";
+
+    if (!confirm(promptMsg)) return;
+
+    const payload = { reset_today: true };
+    if (targetKey !== "__all__") {
+        payload.account_id = targetKey;
+    }
+
+    try {
+        const res = await fetch("/api/admin/quota", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert("API call counter has been reset to 0.");
+            loadApiQuota();
+            hideQuotaLimitNotice();
+            const acc = getActiveAwsAccount();
+            if (acc) fetchAccountQuotaTelemetry(acc.id, acc.name);
+        }
+    } catch (e) {
+        alert("Error resetting counter: " + e.message);
+    }
+}
+
+async function fetchAccountQuotaTelemetry(accId, accName) {
+    try {
+        const res = await fetch(`/api/admin/quota?account_id=${encodeURIComponent(accId || '')}&account_name=${encodeURIComponent(accName || '')}`);
+        const data = await res.json();
+        if (data.success && data.quota) {
+            updateHeaderQuotaBadge(data.quota.calls_today, data.quota.daily_limit, data.quota.name || accName);
+            if (data.quota.calls_today >= data.quota.daily_limit) {
+                showQuotaLimitNotice(`Daily AWS API call limit reached for ${data.quota.name || accName} (${data.quota.calls_today}/${data.quota.daily_limit} calls used today).`);
+            } else {
+                hideQuotaLimitNotice();
+            }
+        }
+    } catch (err) {
+        console.warn("fetchAccountQuotaTelemetry error:", err);
+    }
+}
+
+function showQuotaLimitNotice(msg) {
+    const banner = document.getElementById("dashboardQuotaAlertBanner");
+    const text = document.getElementById("dashboardQuotaAlertText");
+    if (banner) {
+        banner.style.display = "flex";
+        if (text) text.textContent = msg || "Daily AWS API call limit reached. Serving cached dashboard data.";
+    }
+}
+
+function hideQuotaLimitNotice() {
+    const banner = document.getElementById("dashboardQuotaAlertBanner");
+    if (banner) banner.style.display = "none";
+}
+
+function openApiLimitModal(accountName, callsToday, dailyLimit, message) {
+    const modal = document.getElementById("apiLimitReachedModal");
+    if (!modal) return;
+    const nameEl = document.getElementById("apiLimitModalAccName");
+    const quotaEl = document.getElementById("apiLimitModalQuota");
+    const msgEl = document.getElementById("apiLimitModalMessage");
+
+    const accName = accountName || "AWS Account";
+    const calls = (callsToday !== undefined && callsToday !== null) ? callsToday : 0;
+    const limit = (dailyLimit !== undefined && dailyLimit !== null) ? dailyLimit : 2;
+
+    if (nameEl) nameEl.textContent = accName;
+    if (quotaEl) quotaEl.textContent = `${calls} / ${limit} Calls Used`;
+    if (msgEl) {
+        msgEl.textContent = message || `Daily AWS API call limit reached for ${accName} (${calls}/${limit} calls used today). To avoid unintended charges, live data fetching is paused. You can increase this limit in the Admin Panel.`;
+    }
+
+    modal.style.display = "flex";
+    modal.style.opacity = "1";
+    modal.style.visibility = "visible";
+    modal.style.pointerEvents = "auto";
+}
+
+function closeApiLimitModal() {
+    const modal = document.getElementById("apiLimitReachedModal");
+    if (!modal) return;
+    modal.style.display = "none";
+    modal.style.opacity = "0";
+    modal.style.visibility = "hidden";
+    modal.style.pointerEvents = "none";
+}
+
+function openAdminFromLimitModal() {
+    closeApiLimitModal();
+    if (typeof openAdminPanelModal === "function") {
+        openAdminPanelModal("api-limits");
+    }
+}
+
+/* =====================================================================
+   ADMIN USERS & ACCESS CONTROL
+   ===================================================================== */
+let _adminUsersList = [];
+
+async function loadAdminUsersList() {
+    try {
+        const res = await fetch("/api/admin/users");
+        const data = await res.json();
+        if (data.success && Array.isArray(data.admins)) {
+            _adminUsersList = data.admins;
+            renderAdminUsersList(data.admins);
+        }
+    } catch (e) {
+        console.error("Failed to load admin users:", e);
+    }
+}
+
+function renderAdminUsersList(admins) {
+    const container = document.getElementById("adminUsersListContainer");
+    const select = document.getElementById("changePasswordAdminSelect");
+
+    if (select) {
+        select.innerHTML = admins.map(a => `<option value="${a.email}">${a.email} (${a.role || 'Admin'})</option>`).join("");
+    }
+
+    if (!container) return;
+    if (!admins.length) {
+        container.innerHTML = `<div style="padding: 14px; text-align: center; color: var(--text-3); font-size: 12px;">No admin accounts found.</div>`;
+        return;
+    }
+
+    let html = `
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+            <thead>
+                <tr style="background: var(--bg-canvas); border-bottom: 1px solid var(--border); color: var(--text-2);">
+                    <th style="padding: 10px 14px; font-weight: 700;">Admin Email</th>
+                    <th style="padding: 10px 14px; font-weight: 700;">Role</th>
+                    <th style="padding: 10px 14px; font-weight: 700;">Created</th>
+                    <th style="padding: 10px 14px; font-weight: 700; text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    admins.forEach(a => {
+        html += `
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 10px 14px; font-weight: 700; color: var(--text-1);">${a.email}</td>
+                <td style="padding: 10px 14px;"><span class="badge-pill pill-blue" style="font-size: 10px;">${a.role || 'Admin'}</span></td>
+                <td style="padding: 10px 14px; color: var(--text-3);">${a.created_at || '—'}</td>
+                <td style="padding: 10px 14px; text-align: right;">
+                    <button type="button" class="btn-outline" onclick="handleDeleteAdminUser('${a.email}')" style="padding: 4px 8px; font-size: 11px; color: #dc2626; border-color: rgba(220,38,38,0.25);" title="Delete admin user">
+                        ✕ Delete
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+}
+
+async function handleCreateAdminUser(e) {
+    if (e) e.preventDefault();
+    const emailInp = document.getElementById("newAdminEmail");
+    const passInp = document.getElementById("newAdminPassword");
+
+    const email = emailInp?.value.trim().toLowerCase();
+    const password = passInp?.value.trim();
+
+    if (!email || !password) {
+        alert("Please specify both admin email and password.");
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/admin/users", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, role: "Administrator" })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(`Admin '${email}' successfully created!`);
+            if (emailInp) emailInp.value = "";
+            if (passInp) passInp.value = "";
+            loadAdminUsersList();
+        } else {
+            alert(data.error || "Failed to create admin.");
+        }
+    } catch (err) {
+        alert("Error creating admin: " + err.message);
+    }
+}
+
+async function handleDeleteAdminUser(email) {
+    if (!confirm(`Are you sure you want to remove admin '${email}'?`)) return;
+    try {
+        const res = await fetch(`/api/admin/users/${encodeURIComponent(email)}`, {
+            method: "DELETE"
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(`Admin '${email}' removed.`);
+            loadAdminUsersList();
+        } else {
+            alert(data.error || "Failed to remove admin.");
+        }
+    } catch (err) {
+        alert("Error removing admin: " + err.message);
+    }
+}
+
+async function handleChangeAdminPassword(e) {
+    if (e) e.preventDefault();
+    const select = document.getElementById("changePasswordAdminSelect");
+    const passInp = document.getElementById("changePasswordNewPass");
+
+    const email = select?.value;
+    const new_password = passInp?.value.trim();
+
+    if (!email || !new_password) {
+        alert("Please select an admin email and provide a new password.");
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/admin/change-password", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, new_password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(`Password successfully changed for '${email}'!`);
+            if (passInp) passInp.value = "";
+        } else {
+            alert(data.error || "Failed to update password.");
+        }
+    } catch (err) {
+        alert("Error updating password: " + err.message);
+    }
+}
+
+/* =====================================================================
+   DASHBOARD REPORT DIRECT DOWNLOAD CONTROLLER
+   ===================================================================== */
+async function downloadCurrentDashboardReport() {
+    const btn = document.getElementById("btnSidebarDownloadReport");
+    const origHtml = btn ? btn.innerHTML : "";
+
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `
+            <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg></span>
+            <span class="nav-label">Downloading...</span>
+        `;
+    }
+
+    try {
+        const activeAcc = (typeof getActiveAwsAccount === "function") ? getActiveAwsAccount() : null;
+        const accountName = activeAcc?.name || (_billingData && _billingData.account_alias) || "Production AWS";
+        const currentData = _billingData || DEFAULT_SAMPLE_DATA;
+
+        const res = await fetch("/api/billing/download-report", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                billing_data: currentData,
+                account_name: accountName
+            })
+        });
+
+        if (!res.ok) {
+            throw new Error(`Server returned HTTP ${res.status}`);
+        }
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+
+        const pStart = currentData?.period?.start ? currentData.period.start.replace(/-/g, "") : "curr";
+        const pEnd = currentData?.period?.end ? currentData.period.end.replace(/-/g, "") : "period";
+        a.download = `AWS_Cost_Report_${pStart}_${pEnd}.pdf`;
+
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (e) {
+        console.error("Error downloading dashboard report:", e);
+        alert("Failed to download PDF report. Please try again.");
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+        }
+    }
+}
+
+/* =====================================================================
    COST EXPLORER LEDGER & SERVICE NAME SEARCH
    ===================================================================== */
 function filterLedgerTable(queryVal) {
@@ -1100,8 +1942,43 @@ function renderFullDashboard(data) {
     if (!data) return;
     _billingData = data;
 
+    const activeAcc = (typeof getActiveAwsAccount === "function") ? getActiveAwsAccount() : null;
+    if (activeAcc) {
+        const displayAcc = document.getElementById("displayConnectedName");
+        if (displayAcc) displayAcc.textContent = activeAcc.name;
+        const displayReg = document.getElementById("displayConnectedRegion");
+        if (displayReg) displayReg.textContent = activeAcc.region || "us-east-1";
+    }
+
     if (_currentUser && _currentUser.email) {
         saveUserBillingData(_currentUser.email, data);
+    }
+
+    // Automatically sync current-month billing data to server cache so cron engine always has fresh data
+    if (data && data.services && data.services.length > 0) {
+        const from = data.period?.start || "";
+        const to = data.period?.end || "";
+        if (typeof isCurrentMonthPeriod === "function" && isCurrentMonthPeriod(from, to)) {
+            syncBillingDataToServerCache(activeAcc ? activeAcc.id : "active_account", activeAcc ? activeAcc.name : "AWS Account", data);
+        }
+    }
+
+    // Update upper quota indicator badge:
+    // Always fetch fresh quota from server — cached data may have old quota counts
+    // Only use data.quota if it came directly from a live API call (not restored from cache)
+    if (data.quota && data._fromLiveApi) {
+        const accName = data.quota.account_name || (activeAcc ? activeAcc.name : data.account_alias) || "";
+        updateHeaderQuotaBadge(data.quota.calls_today, data.quota.daily_limit, accName);
+    } else if (activeAcc) {
+        // Always refresh badge from server for accurate live count
+        fetchAccountQuotaTelemetry(activeAcc.id, activeAcc.name);
+    }
+
+    // Handle Quota Limit Warning
+    if (data.limit_reached) {
+        showQuotaLimitNotice(data.limit_message || "Daily AWS API call limit reached. Serving cached dashboard data.");
+    } else {
+        hideQuotaLimitNotice();
     }
 
     // Update dynamic date period line on dashboard
@@ -1341,10 +2218,14 @@ async function fetchBilling() {
         if (fromInput) fromInput.value = from;
         if (toInput) toInput.value = to;
 
+        const activeAcc = (typeof getActiveAwsAccount === "function") ? getActiveAwsAccount() : null;
+        const accId = activeAcc?.id || ("acc_" + accountName.toLowerCase().replace(/[^a-z0-9]/g, "_"));
+
         const res = await fetch("/api/billing", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
+                account_id: accId,
                 access_key: accessKey,
                 secret_key: secretKey,
                 region: region,
@@ -1404,11 +2285,38 @@ async function fetchBilling() {
     }
 }
 
-function onRefresh() {
+function onRefresh(forceApi = false) {
     const syncIcon = document.getElementById("syncIcon");
     if (syncIcon) syncIcon.style.transform = "rotate(360deg)";
     setTimeout(() => { if (syncIcon) syncIcon.style.transform = "none"; }, 500);
-    fetchBilling();
+
+    const acc = getActiveAwsAccount();
+    if (acc) {
+        // User request: For refresh do not use AWS API, fetch data from cache instead of new API!
+        const fromInput = document.getElementById("headerDateFrom");
+        const toInput = document.getElementById("headerDateTo");
+        const from = fromInput ? fromInput.value : "";
+        const to = toInput ? toInput.value : "";
+
+        if (!forceApi) {
+            const cached = getAccountBillingCache(acc.id, from, to) || getLatestAccountBillingCache(acc.id);
+            if (cached) {
+                console.log(`[Refresh Cache] Loaded cached data for ${acc.name} without consuming API quota.`);
+                renderFullDashboard(cached);
+                const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const displaySync = document.getElementById("displayLastSynced");
+                if (displaySync) displaySync.textContent = `${nowTime} UTC (Cache)`;
+                const sideSync = document.getElementById("sidebarSyncTime");
+                if (sideSync) sideSync.textContent = nowTime;
+                fetchAccountQuotaTelemetry(acc.id, acc.name);
+                return;
+            }
+        }
+        // If cache not found or forced, call fetchBillingForAccount
+        fetchBillingForAccount(acc, false, forceApi);
+    } else {
+        fetchBilling();
+    }
 }
 
 function toggleSecretKey() {
@@ -1419,7 +2327,12 @@ function toggleSecretKey() {
 }
 
 function onDateRangeChange() {
-    fetchBilling();
+    const acc = getActiveAwsAccount();
+    if (acc) {
+        selectAwsAccount(acc.id, false, false);
+    } else {
+        fetchBilling();
+    }
 }
 
 /* =====================================================================
@@ -1511,6 +2424,7 @@ function handleLogout() {
         if (key) localStorage.removeItem(key);
     }
     localStorage.removeItem("finops_current_user");
+    clearAdminAuthSession(); // Clear 24-hour admin session on logout
     _currentUser = null;
     _billingData = null;
     renderFullDashboard(EMPTY_BILLING_DATA);
@@ -1544,17 +2458,36 @@ async function applyHeaderDateFilter() {
     }
 
     try {
-        const payload = {
-            start_date: from,
-            end_date: to
-        };
-
         const activeAcc = (typeof getActiveAwsAccount === "function") ? getActiveAwsAccount() : null;
+
+        // ── Step 1: Check cache first for the selected date range ──
+        if (activeAcc) {
+            const cached = getAccountBillingCache(activeAcc.id, from, to);
+            if (cached) {
+                console.log(`[Cache Hit] Serving cached data for "${activeAcc.name}" [${from} → ${to}]`);
+                if (!cached.period) cached.period = {};
+                cached.period.start = from;
+                cached.period.end = to;
+                if (!isCurrentMonthPeriod(from, to)) {
+                    cached.show_forecast = false;
+                    cached.forecast = null;
+                }
+                renderFullDashboard(cached);
+                // Refresh quota badge from server (don't use stale quota in cache)
+                fetchAccountQuotaTelemetry(activeAcc.id, activeAcc.name);
+                if (applyBtn) { applyBtn.disabled = false; applyBtn.textContent = "Apply"; }
+                return;
+            }
+        }
+
+        // ── Step 2: Build payload (always include account_id for accurate per-account quota) ──
+        const payload = { start_date: from, end_date: to };
         if (activeAcc && activeAcc.accessKey && activeAcc.secretKey) {
             payload.access_key = activeAcc.accessKey;
             payload.secret_key = activeAcc.secretKey;
             payload.region = activeAcc.region || "us-east-1";
             payload.account_name = activeAcc.name;
+            payload.account_id = activeAcc.id;
         } else {
             const keyInput = document.getElementById("accessKey")?.value.trim();
             const secInput = document.getElementById("secretKey")?.value.trim();
@@ -1566,6 +2499,7 @@ async function applyHeaderDateFilter() {
             }
         }
 
+        // ── Step 3: Call API ──
         const res = await fetch("/api/billing", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1574,6 +2508,19 @@ async function applyHeaderDateFilter() {
         const json = await res.json();
         const data = json.data || json;
 
+        // ── Step 4: If limit reached → show popup, do NOT render dummy data ──
+        if (data && data.limit_reached) {
+            const accName = (activeAcc ? activeAcc.name : null) || data.quota?.account_name || "AWS Account";
+            const callsToday = data.quota?.calls_today ?? 0;
+            const dailyLimit = data.quota?.daily_limit ?? 0;
+            updateHeaderQuotaBadge(callsToday, dailyLimit, accName);
+            showQuotaLimitNotice(data.limit_message || `Daily API limit reached for ${accName}.`);
+            openApiLimitModal(accName, callsToday, dailyLimit, data.limit_message);
+            if (applyBtn) { applyBtn.disabled = false; applyBtn.textContent = "Apply"; }
+            return;
+        }
+
+        // ── Step 5: Render live fetched data ──
         if (data) {
             if (!data.period) data.period = {};
             data.period.start = from;
@@ -1581,6 +2528,12 @@ async function applyHeaderDateFilter() {
             if (!isCurrentMonthPeriod(from, to)) {
                 data.show_forecast = false;
                 data.forecast = null;
+            }
+            // Mark as live so renderFullDashboard uses its embedded quota
+            data._fromLiveApi = true;
+            // Save to cache for this date range so future Apply won't burn quota
+            if (activeAcc) {
+                saveAccountBillingCache(activeAcc.id, from, to, data);
             }
             renderFullDashboard(data);
         }
@@ -1736,7 +2689,8 @@ ${(data.services || OPTION_D_SERVICES).map(s => `<tr><td>${s.service}</td><td cl
 }
 
 function downloadPDFReport() {
-    window.print();
+    // Strictly uses active fetched/cached dashboard data without calling AWS API
+    downloadCurrentDashboardReport();
 }
 
 function downloadCSV() {
@@ -2021,6 +2975,15 @@ function getServiceDetails(serviceName) {
 
     const totalCost = typeof svcObj.cost === "number" ? svcObj.cost : 50.00;
 
+    // Derive dynamic usage hours based on selected billing period days
+    const activeAcc = (typeof getActiveAwsAccount === "function") ? getActiveAwsAccount() : null;
+    const accountName = activeAcc?.name || _billingData?.account_alias || "Production AWS";
+    const accSlug = (accountName || "aws").toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").slice(0, 12);
+    
+    const periodDays = _billingData?.period?.days ? parseInt(_billingData.period.days, 10) : 15;
+    const dynamicRuntimeHrs = Math.max(1, Math.round(periodDays * 24));
+    const dynamicUsageStr = svcObj.usage || `${dynamicRuntimeHrs} hrs active`;
+
     if (catalogItem) {
         // Clone and sync total cost and status
         const item = JSON.parse(JSON.stringify(catalogItem));
@@ -2032,11 +2995,27 @@ function getServiceDetails(serviceName) {
         item.color = svcObj.color || "#fdf0ea";
         item.textColor = svcObj.textColor || "#c85a32";
 
-        // Proportionally scale resource costs to match total cost
+        // Update usage metrics with account-specific period runtime
+        if (item.usageMetrics && Array.isArray(item.usageMetrics)) {
+            item.usageMetrics.forEach(m => {
+                if (m.label && (m.label.includes("Runtime") || m.label.includes("Hours"))) {
+                    m.value = `${dynamicRuntimeHrs} hrs`;
+                    m.desc = `${periodDays}-day active billing period`;
+                }
+            });
+        }
+
+        // Dynamically customize resource names and runtime to this specific AWS account and period
         const sumResourceCosts = item.resources.reduce((a, r) => a + (r.cost || 0), 0);
         if (sumResourceCosts > 0) {
-            item.resources.forEach(r => {
+            item.resources.forEach((r, idx) => {
                 r.cost = parseFloat(((r.cost / sumResourceCosts) * totalCost).toFixed(2));
+                r.name = `${accSlug}-${r.name.replace(/^prod-|^dev-|^eks-cluster-/, "")}`;
+                if (r.usage && r.usage.includes("744 hrs")) {
+                    const pctMatch = r.usage.match(/\(([^)]+)\)/);
+                    const suffix = pctMatch ? ` (${pctMatch[1]})` : " active";
+                    r.usage = `${dynamicRuntimeHrs} hrs${suffix}`;
+                }
             });
         }
         return item;
@@ -2048,9 +3027,9 @@ function getServiceDetails(serviceName) {
         service: cleanName,
         code: code,
         category: svcObj.category || "Cloud Service",
-        summary: `Provisioned cloud workload resources delivering high availability, scaling, and telemetry for ${cleanName}.`,
+        summary: `Provisioned cloud workload resources delivering high availability, scaling, and telemetry for ${cleanName} in account ${accountName}.`,
         status: svcObj.status || "Healthy",
-        statusDesc: "Workload telemetry and cost patterns operate within established budget parameters.",
+        statusDesc: `Workload telemetry and cost patterns operate within established budget parameters for ${accountName}.`,
         costStatusNote: `Current accrued billing is ${formatCurrency(totalCost)}.`,
         cost: totalCost,
         change: svcObj.change || "+2.1%",
@@ -2058,19 +3037,19 @@ function getServiceDetails(serviceName) {
         color: svcObj.color || "#f4ede6",
         textColor: svcObj.textColor || "#1a1512",
         regions: [
-            { region: "us-east-1 (N. Virginia)", costPct: 70, resourcesCount: 2, isPrimary: true, note: "Primary Deployment Region" },
+            { region: `${svcObj.region || "us-east-1"} (Primary)`, costPct: 70, resourcesCount: 2, isPrimary: true, note: `Primary Deployment (${accountName})` },
             { region: "us-west-2 (Oregon)", costPct: 30, resourcesCount: 1, isPrimary: false, note: "Secondary Standby Region" }
         ],
         usageMetrics: [
-            { label: "Active Operational Runtime", value: "744 hrs", desc: "100% monthly uptime" },
-            { label: "Monthly Data Transferred", value: "2.4 TB", desc: "Ingress / Egress volume" },
+            { label: "Active Operational Runtime", value: `${dynamicRuntimeHrs} hrs`, desc: `${periodDays}-day active billing cycle` },
+            { label: "Account Service Usage", value: dynamicUsageStr, desc: `Allocated to ${accountName}` },
             { label: "Active Provisioned Units", value: "3 Units", desc: "Managed resources" },
             { label: "Health SLA", value: "99.99%", desc: "No degradation incidents" }
         ],
         resources: [
-            { id: `${code.toLowerCase()}-res-prod-01`, name: `prod-${code.toLowerCase()}-primary`, type: `${svcObj.category || 'Standard'} Provisioned Unit`, region: "us-east-1", usage: "744 hrs active", cost: parseFloat((totalCost * 0.65).toFixed(2)), status: "Healthy" },
-            { id: `${code.toLowerCase()}-res-prod-02`, name: `prod-${code.toLowerCase()}-secondary`, type: `${svcObj.category || 'Standard'} Secondary Unit`, region: "us-east-1", usage: "744 hrs active", cost: parseFloat((totalCost * 0.25).toFixed(2)), status: "Healthy" },
-            { id: `${code.toLowerCase()}-res-standby`, name: `dr-${code.toLowerCase()}-standby`, type: `${svcObj.category || 'Standard'} Standby Unit`, region: "us-west-2", usage: "350 hrs standby", cost: parseFloat((totalCost * 0.10).toFixed(2)), status: "Healthy" }
+            { id: `${accSlug}-${code.toLowerCase()}-01`, name: `${accSlug}-${code.toLowerCase()}-primary`, type: `${svcObj.category || 'Standard'} Provisioned Unit`, region: svcObj.region || "us-east-1", usage: `${dynamicRuntimeHrs} hrs active`, cost: parseFloat((totalCost * 0.65).toFixed(2)), status: "Healthy" },
+            { id: `${accSlug}-${code.toLowerCase()}-02`, name: `${accSlug}-${code.toLowerCase()}-secondary`, type: `${svcObj.category || 'Standard'} Secondary Unit`, region: svcObj.region || "us-east-1", usage: `${dynamicRuntimeHrs} hrs active`, cost: parseFloat((totalCost * 0.25).toFixed(2)), status: "Healthy" },
+            { id: `${accSlug}-${code.toLowerCase()}-standby`, name: `${accSlug}-${code.toLowerCase()}-standby`, type: `${svcObj.category || 'Standard'} Standby Unit`, region: "us-west-2", usage: `${Math.round(dynamicRuntimeHrs * 0.45)} hrs standby`, cost: parseFloat((totalCost * 0.10).toFixed(2)), status: "Healthy" }
         ]
     };
 }
@@ -2928,7 +3907,7 @@ function deleteAwsAccount(e, accId) {
     }
 }
 
-async function selectAwsAccount(accId, forceCurrentMonth = false) {
+async function selectAwsAccount(accId, forceCurrentMonth = false, bypassCache = false) {
     _activeAwsAccountId = accId;
     saveAwsAccounts();
     renderSidebarAccounts();
@@ -2952,11 +3931,14 @@ async function selectAwsAccount(accId, forceCurrentMonth = false) {
     if (fKey) fKey.value = acc.accessKey;
     if (fSec) fSec.value = acc.secretKey;
 
-    // Fetch billing data for this account!
-    await fetchBillingForAccount(acc, forceCurrentMonth);
+    // Fetch account's current quota telemetry in background to update topbar quota indicator
+    fetchAccountQuotaTelemetry(acc.id, acc.name);
+
+    // Fetch or restore billing data for this account!
+    await fetchBillingForAccount(acc, forceCurrentMonth, bypassCache);
 }
 
-async function fetchBillingForAccount(acc, forceCurrentMonth = false) {
+async function fetchBillingForAccount(acc, forceCurrentMonth = false, bypassCache = false) {
     let from = "";
     let to = "";
 
@@ -2975,11 +3957,30 @@ async function fetchBillingForAccount(acc, forceCurrentMonth = false) {
         to = toInput ? toInput.value : "";
     }
 
+    // 1. Cache-First Check: If not explicitly bypassed, load from cache and avoid consuming API quota!
+    if (!bypassCache) {
+        const cachedData = getAccountBillingCache(acc.id, from, to) || getLatestAccountBillingCache(acc.id);
+        if (cachedData) {
+            console.log(`[Cache Hit] Serving cached billing data for account "${acc.name}" without consuming API quota.`);
+            const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const displaySync = document.getElementById("displayLastSynced");
+            if (displaySync) displaySync.textContent = `${nowTime} UTC (Cache)`;
+            const sideSync = document.getElementById("sidebarSyncTime");
+            if (sideSync) sideSync.textContent = nowTime;
+
+            renderFullDashboard(cachedData);
+            switchMainView("dashboard");
+            return;
+        }
+    }
+
+    // 2. Cache Miss or Force Refresh: Call /api/billing with this account's ID and credentials
     const payload = {
+        account_id: acc.id,
+        account_name: acc.name,
         access_key: acc.accessKey,
         secret_key: acc.secretKey,
-        region: acc.region || "us-east-1",
-        account_name: acc.name
+        region: acc.region || "us-east-1"
     };
 
     if (from && to && from <= to) {
@@ -3003,10 +4004,40 @@ async function fetchBillingForAccount(acc, forceCurrentMonth = false) {
             const sideSync = document.getElementById("sidebarSyncTime");
             if (sideSync) sideSync.textContent = nowTime;
 
+            // Update quota telemetry badge (always, even on limit_reached)
+            if (data.quota) {
+                updateHeaderQuotaBadge(data.quota.calls_today, data.quota.daily_limit, acc.name);
+            }
+
+            // If limit reached: show popup modal + serve cached data, do NOT render dummy live data
+            if (data.limit_reached) {
+                showQuotaLimitNotice(data.limit_message || `Daily AWS API call limit reached for ${acc.name}.`);
+                const callsToday = data.quota?.calls_today ?? 0;
+                const dailyLimit = data.quota?.daily_limit ?? 0;
+                openApiLimitModal(acc.name, callsToday, dailyLimit, data.limit_message);
+
+                // Try to serve previously fetched cached data
+                const cachedFallback = getLatestAccountBillingCache(acc.id);
+                if (cachedFallback) {
+                    renderFullDashboard(cachedFallback);
+                }
+                // Don't save dummy data to cache
+                switchMainView("dashboard");
+                return;
+            }
+
+            hideQuotaLimitNotice();
+            // Mark as live API data so renderFullDashboard uses its embedded quota (not stale cache)
+            data._fromLiveApi = true;
+            // Cache the retrieved live billing data for this account
+            saveAccountBillingCache(acc.id, from, to, data);
             renderFullDashboard(data);
         }
     } catch (e) {
         console.error("Error fetching account billing data:", e);
+        // Fallback to latest cache if network error
+        const fallbackCache = getLatestAccountBillingCache(acc.id);
+        if (fallbackCache) renderFullDashboard(fallbackCache);
     } finally {
         switchMainView("dashboard");
     }

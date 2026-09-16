@@ -1,0 +1,4 @@
+aws_accounts.json
+.env
+.env.*
+node_modules/

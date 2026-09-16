@@ -3033,4 +3033,36 @@ input, select, textarea { font-family: inherit; outline: none; }
     visibility: visible !important;
 }
 
+/* =====================================================================
+   SIDEBAR DOWNLOAD REPORT & ADMIN AUTH PROMPT
+   ===================================================================== */
+.nav-item-download-report {
+    background: transparent;
+    border: 1px dashed rgba(37, 99, 235, 0.4);
+    border-radius: var(--radius-md);
+    margin-top: 8px;
+    transition: all 0.2s ease;
+}
+
+.nav-item-download-report:hover {
+    background: rgba(37, 99, 235, 0.08);
+    border-color: #2563eb;
+}
+
+#adminAuthPromptModal.active {
+    display: flex !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+}
+
+.spin-svg {
+    animation: spinReport 1s linear infinite;
+}
+
+@keyframes spinReport {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
 

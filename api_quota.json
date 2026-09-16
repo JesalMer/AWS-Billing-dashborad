@@ -1,0 +1,26 @@
+{
+  "default_limit": 5,
+  "date": "2026-09-16",
+  "accounts": {
+    "acc_1789536095876_638": {
+      "name": "Bhavesh Sir",
+      "daily_limit": 5,
+      "calls_today": 1
+    },
+    "production_aws": {
+      "name": "Production AWS",
+      "daily_limit": 5,
+      "calls_today": 1
+    },
+    "acc_1789540220686_153": {
+      "name": "catrion",
+      "daily_limit": 5,
+      "calls_today": 2
+    },
+    "acc_1789467186889_546": {
+      "name": "BhaveshSir",
+      "daily_limit": 9,
+      "calls_today": 2
+    }
+  }
+}

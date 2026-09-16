@@ -26,10 +26,188 @@ BASE_DIR = os.path.dirname(__file__)
 CRON_FILE = os.path.join(BASE_DIR, "cron_jobs.json")
 USERS_FILE = os.path.join(BASE_DIR, "users.json")
 SMTP_FILE = os.path.join(BASE_DIR, "smtp_config.json")
+BILLING_CACHE_FILE = os.path.join(BASE_DIR, "billing_cache.json")
+ACCOUNTS_FILE = os.path.join(BASE_DIR, "aws_accounts.json")
+
+
+def load_aws_accounts():
+    if not os.path.exists(ACCOUNTS_FILE):
+        return []
+    try:
+        with open(ACCOUNTS_FILE, "r") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
+def save_aws_accounts(accounts):
+    try:
+        with open(ACCOUNTS_FILE, "w") as f:
+            json.dump(accounts, f, indent=2)
+    except Exception as e:
+        print(f"[AWS Accounts] Failed to save accounts: {e}")
 
 
 def hash_password(password):
     return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
+
+# ==========================================
+# SERVER-SIDE BILLING CACHE
+# Stores real fetched billing data per account per date on disk.
+# Used by cron job to send real data instead of dummy data.
+# ==========================================
+
+def _load_billing_cache():
+    if not os.path.exists(BILLING_CACHE_FILE):
+        return {}
+    try:
+        with open(BILLING_CACHE_FILE, "r") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def _save_billing_cache(cache_data):
+    try:
+        with open(BILLING_CACHE_FILE, "w") as f:
+            json.dump(cache_data, f, indent=2)
+    except Exception as e:
+        print(f"[BillingCache] Failed to save: {e}")
+
+
+def save_server_billing_cache(account_id, account_name, billing_data):
+    """
+    Save real fetched billing data to the server-side cache.
+    Saves under account_id, account_name, and global 'latest' keys.
+    """
+    if not billing_data or not isinstance(billing_data, dict):
+        return
+    cache = _load_billing_cache()
+    today = datetime.now().strftime("%Y-%m-%d")
+    current_ym = datetime.now().strftime("%Y-%m")  # e.g. "2026-09"
+
+    # Detect the period from billing data
+    period = billing_data.get("period", {}) or {}
+    period_start = period.get("start", "")
+    period_end = period.get("end", "")
+
+    # If period_start is not set or empty, treat as current month
+    is_current_month = period_start.startswith(current_ym) if period_start else True
+    if not period_start:
+        period_start = f"{current_ym}-01"
+        period_end = today
+
+    clean_id = (account_id or "").strip() or "default"
+    clean_name = (account_name or "").strip()
+
+    entry = {
+        "account_id": clean_id,
+        "account_name": clean_name or billing_data.get("account_alias", "AWS Account"),
+        "date": today,
+        "period_start": period_start,
+        "period_end": period_end,
+        "is_current_month": is_current_month,
+        "data": billing_data
+    }
+
+    # Save under primary key and global latest
+    cache[clean_id] = entry
+    cache["latest"] = entry
+
+    if clean_name:
+        cache[f"name_{clean_name.lower().replace(' ', '_')}"] = entry
+
+    if is_current_month:
+        cache[f"{clean_id}_current_month"] = entry
+        cache["latest_current_month"] = entry
+        if clean_name:
+            cache[f"name_{clean_name.lower().replace(' ', '_')}_current_month"] = entry
+        print(f"[BillingCache] Saved REAL current-month data for '{clean_name or clean_id}' | period: {period_start} → {period_end}")
+    else:
+        print(f"[BillingCache] Saved billing data for '{clean_name or clean_id}' | period: {period_start} → {period_end}")
+
+    _save_billing_cache(cache)
+
+
+def get_server_billing_cache(account_id=None, account_name=None, current_month_only=False):
+    """
+    Get server-side cached billing data.
+    - current_month_only=True: prefer data covering current month, fallback to latest real cache.
+    Returns (billing_data_dict, date_str, period_str) or (None, None, None).
+    """
+    cache = _load_billing_cache()
+    current_ym = datetime.now().strftime("%Y-%m")
+
+    def extract(entry):
+        if not entry or not isinstance(entry, dict) or "data" not in entry:
+            return None, None, None
+        return entry.get("data"), entry.get("date"), f"{entry.get('period_start','')} → {entry.get('period_end','')}"
+
+    def is_current_month_entry(entry):
+        if not isinstance(entry, dict) or "data" not in entry:
+            return False
+        if entry.get("is_current_month"):
+            return True
+        ps = entry.get("period_start", "") or (entry.get("data", {}).get("period", {}) or {}).get("start", "")
+        return ps.startswith(current_ym) if ps else True
+
+    # 1. Try account_id specific keys
+    if account_id:
+        aid = str(account_id).strip()
+        if current_month_only:
+            cm_key = f"{aid}_current_month"
+            if cm_key in cache and is_current_month_entry(cache[cm_key]):
+                return extract(cache[cm_key])
+        if aid in cache:
+            entry = cache[aid]
+            if not current_month_only or is_current_month_entry(entry):
+                return extract(entry)
+
+    # 2. Try account_name specific keys
+    if account_name:
+        name_key = f"name_{str(account_name).strip().lower().replace(' ', '_')}"
+        if current_month_only:
+            cm_name_key = f"{name_key}_current_month"
+            if cm_name_key in cache and is_current_month_entry(cache[cm_name_key]):
+                return extract(cache[cm_name_key])
+        if name_key in cache:
+            entry = cache[name_key]
+            if not current_month_only or is_current_month_entry(entry):
+                return extract(entry)
+        for k, entry in cache.items():
+            if (isinstance(entry, dict)
+                    and entry.get("account_name", "").strip().lower() == str(account_name).strip().lower()
+                    and (not current_month_only or is_current_month_entry(entry))):
+                return extract(entry)
+
+    # 3. Try global latest_current_month
+    if current_month_only and "latest_current_month" in cache:
+        res = extract(cache["latest_current_month"])
+        if res[0]:
+            return res
+
+    # 4. Check ANY current-month entry in cache
+    if current_month_only:
+        for k, entry in cache.items():
+            if is_current_month_entry(entry):
+                res = extract(entry)
+                if res[0]:
+                    return res
+
+    # 5. Fallback: Return 'latest' or most recent valid cache entry
+    if "latest" in cache:
+        res = extract(cache["latest"])
+        if res[0]:
+            return res
+
+    if cache:
+        valid = [e for e in cache.values() if isinstance(e, dict) and "data" in e]
+        if valid:
+            latest = sorted(valid, key=lambda e: e.get("date", ""), reverse=True)[0]
+            return extract(latest)
+
+    return None, None, None
 
 
 # ==========================================
@@ -68,6 +246,171 @@ def load_users():
 def save_users(users):
     with open(USERS_FILE, "w") as f:
         json.dump(users, f, indent=2)
+
+
+ADMIN_USERS_FILE = os.path.join(BASE_DIR, "admin_users.json")
+API_QUOTA_FILE = os.path.join(BASE_DIR, "api_quota.json")
+
+
+def load_admin_users():
+    default_admins = [
+        {
+            "id": "adm-1",
+            "email": "jesal.mer@bytestechnolab.com",
+            "password_hash": hash_password("admin@123"),
+            "role": "Super Admin",
+            "created_at": "2026-09-15 10:00:00"
+        },
+        {
+            "id": "adm-2",
+            "email": "jigar.prajapati@bytestechnolab.com",
+            "password_hash": hash_password("admin@123"),
+            "role": "Super Admin",
+            "created_at": "2026-09-15 10:00:00"
+        }
+    ]
+    if not os.path.exists(ADMIN_USERS_FILE):
+        save_admin_users(default_admins)
+        return default_admins
+    try:
+        with open(ADMIN_USERS_FILE, "r") as f:
+            admins = json.load(f)
+            if not admins:
+                save_admin_users(default_admins)
+                return default_admins
+            return admins
+    except Exception:
+        return default_admins
+
+
+def save_admin_users(admins):
+    with open(ADMIN_USERS_FILE, "w") as f:
+        json.dump(admins, f, indent=2)
+
+
+def load_api_quota():
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    default_quota = {
+        "default_limit": 2,
+        "date": today_str,
+        "accounts": {}
+    }
+    if not os.path.exists(API_QUOTA_FILE):
+        save_api_quota(default_quota)
+        return default_quota
+    try:
+        with open(API_QUOTA_FILE, "r") as f:
+            data = json.load(f)
+        if not isinstance(data, dict):
+            data = default_quota
+
+        if "default_limit" not in data or data["default_limit"] is None:
+            data["default_limit"] = 2
+
+        if "accounts" not in data or not isinstance(data["accounts"], dict):
+            data["accounts"] = {}
+
+        # Reset daily counters if date changed
+        if data.get("date") != today_str:
+            data["date"] = today_str
+            for acc_key in data["accounts"]:
+                if isinstance(data["accounts"][acc_key], dict):
+                    data["accounts"][acc_key]["calls_today"] = 0
+            # Also reset legacy calls_today if present
+            if "calls_today" in data:
+                data["calls_today"] = 0
+            save_api_quota(data)
+
+        return data
+    except Exception:
+        return default_quota
+
+
+def save_api_quota(quota_data):
+    with open(API_QUOTA_FILE, "w") as f:
+        json.dump(quota_data, f, indent=2)
+
+
+def get_account_api_quota(account_id=None, account_name=None):
+    quota_data = load_api_quota()
+    default_limit = quota_data.get("default_limit", 2)
+    accounts = quota_data.setdefault("accounts", {})
+
+    acc_key = (account_id or "").strip()
+
+    # If account_id is provided and is a known key, use it directly (definitive match)
+    if acc_key and acc_key in accounts:
+        acc_entry = accounts[acc_key]
+        if isinstance(acc_entry, dict):
+            limit = acc_entry.get("daily_limit", default_limit)
+            calls = acc_entry.get("calls_today", 0)
+            return quota_data, acc_key, acc_entry, limit, calls
+
+    # If account_id is provided but NOT a known key, check if it's an alias for an existing name entry
+    if acc_key and account_name:
+        for k, v in accounts.items():
+            if isinstance(v, dict) and v.get("name", "").strip().lower() == account_name.strip().lower():
+                # Migrate: rename entry to the real account_id key
+                accounts[acc_key] = v
+                del accounts[k]
+                save_api_quota(quota_data)
+                acc_entry = accounts[acc_key]
+                limit = acc_entry.get("daily_limit", default_limit)
+                calls = acc_entry.get("calls_today", 0)
+                return quota_data, acc_key, acc_entry, limit, calls
+
+    # No account_id: fall back to name-based lookup
+    if not acc_key:
+        if account_name:
+            for k, v in accounts.items():
+                if isinstance(v, dict) and v.get("name", "").strip().lower() == account_name.strip().lower():
+                    acc_key = k
+                    break
+        if not acc_key:
+            acc_key = (account_name or "").strip().lower().replace(" ", "_")
+        if not acc_key:
+            acc_key = "default"
+
+    acc_entry = accounts.get(acc_key)
+    if not acc_entry or not isinstance(acc_entry, dict):
+        acc_entry = {
+            "name": account_name or "Default Account",
+            "daily_limit": default_limit,
+            "calls_today": 0
+        }
+        accounts[acc_key] = acc_entry
+        save_api_quota(quota_data)
+
+    limit = acc_entry.get("daily_limit", default_limit)
+    calls = acc_entry.get("calls_today", 0)
+    return quota_data, acc_key, acc_entry, limit, calls
+
+
+def check_and_increment_api_quota(account_id=None, account_name=None):
+    quota_data, acc_key, acc_entry, limit, calls = get_account_api_quota(account_id, account_name)
+    limit_reached = (calls >= limit)
+    limit_message = None
+
+    if limit_reached:
+        display_name = acc_entry.get("name") or account_name or "this account"
+        limit_message = f"Daily AWS API call limit reached for {display_name} ({calls}/{limit} calls used today). You can increase this account's limit in Admin Panel."
+    else:
+        calls += 1
+        acc_entry["calls_today"] = calls
+        if account_name and not acc_entry.get("name"):
+            acc_entry["name"] = account_name
+        save_api_quota(quota_data)
+
+    return {
+        "limit_reached": limit_reached,
+        "limit_message": limit_message,
+        "daily_limit": limit,
+        "calls_today": calls,
+        "calls_remaining": max(0, limit - calls),
+        "account_id": acc_key,
+        "account_name": acc_entry.get("name") or account_name
+    }
+
 
 
 # ==========================================
@@ -481,24 +824,33 @@ def billing():
         secret_key = (data.get("secret_key") or "").strip()
         region = data.get("region", "us-east-1")
         account_name = (data.get("account_name") or "").strip() or "Production AWS"
+        account_id = (data.get("account_id") or "").strip()
         start_date = data.get("start_date")
         end_date = data.get("end_date")
+
+        # Check Per-Account API Call Quota (Isolated Rate Limiting)
+        quota_res = check_and_increment_api_quota(account_id=account_id, account_name=account_name)
+        limit_reached = quota_res["limit_reached"]
+        limit_message = quota_res["limit_message"]
+        daily_limit = quota_res["daily_limit"]
+        calls_today = quota_res["calls_today"]
 
         billing_data = None
         is_live_aws = False
         aws_error = None
 
-        if access_key and secret_key:
-            try:
-                raw_data = get_billing_data(access_key, secret_key, region, start_date=start_date, end_date=end_date)
-                if raw_data and raw_data.get("services"):
-                    billing_data = raw_data
-                    is_live_aws = True
-            except Exception as ce_err:
-                aws_error = str(ce_err)
-                print(f"[AWS Cost Explorer] Note: {ce_err}")
+        if not limit_reached:
+            if access_key and secret_key:
+                try:
+                    raw_data = get_billing_data(access_key, secret_key, region, start_date=start_date, end_date=end_date)
+                    if raw_data and raw_data.get("services"):
+                        billing_data = raw_data
+                        is_live_aws = True
+                except Exception as ce_err:
+                    aws_error = str(ce_err)
+                    print(f"[AWS Cost Explorer] Note: {ce_err}")
 
-        # If live AWS was not returned or keys are demo/invalid, produce tailored live data
+        # If limit was reached or live AWS was not returned or keys are demo/invalid, produce tailored live data
         if not billing_data or not billing_data.get("services"):
             billing_data = generate_dynamic_billing_data(
                 region=region,
@@ -512,6 +864,20 @@ def billing():
         if aws_error:
             enriched["aws_notice"] = aws_error
 
+        # ── Save billing data to server-side cache (used by cron job reports) ──
+        save_server_billing_cache(account_id or "default", account_name, enriched)
+
+        enriched["limit_reached"] = limit_reached
+        if limit_message:
+            enriched["limit_message"] = limit_message
+        enriched["quota"] = {
+            "daily_limit": daily_limit,
+            "calls_today": calls_today,
+            "calls_remaining": max(0, daily_limit - calls_today),
+            "account_id": quota_res["account_id"],
+            "account_name": quota_res["account_name"]
+        }
+
         response_dict = {
             "success": True,
             "data": enriched,
@@ -521,6 +887,15 @@ def billing():
 
     except Exception as e:
         fallback = enrich_billing_data(generate_dynamic_billing_data(region="us-east-1"), region="us-east-1")
+        _, acc_key, acc_entry, limit, calls = get_account_api_quota()
+        fallback["limit_reached"] = False
+        fallback["quota"] = {
+            "daily_limit": limit,
+            "calls_today": calls,
+            "calls_remaining": max(0, limit - calls),
+            "account_id": acc_key,
+            "account_name": acc_entry.get("name", "Default Account")
+        }
         return jsonify({
             "success": True,
             "data": fallback,
@@ -779,10 +1154,20 @@ def create_cron_job():
             cron_expr = "0 8 * * *"
             time_label = f"{norm_time} (Daily)"
 
+        acc_id = (data.get("account_id") or "").strip()
+        acc_name = (data.get("account_name") or "").strip()
+        if not acc_id:
+            known_accs = load_aws_accounts()
+            if known_accs:
+                acc_id = known_accs[0].get("id", "")
+                acc_name = known_accs[0].get("name", "")
+
         new_job = {
             "id": "cron-" + str(uuid.uuid4())[:8],
             "name": name,
             "email": email,
+            "account_id": acc_id,
+            "account_name": acc_name,
             "schedule": schedule,
             "cron_expr": cron_expr,
             "time": time_label,
@@ -799,6 +1184,10 @@ def create_cron_job():
             "last_run_epoch": 0,
             "next_run": "Scheduled"
         }
+
+        # If real billing data was sent with creation, immediately cache it
+        if data.get("billing_data"):
+            save_server_billing_cache(acc_id or "default", acc_name, data["billing_data"])
 
         jobs = load_cron_jobs()
         jobs.insert(0, new_job)
@@ -1355,7 +1744,69 @@ def start_cron_scheduler():
                         j["last_run_epoch"] = now.timestamp()
                         updated = True
 
-                        b_data = enrich_billing_data(generate_dynamic_billing_data())
+                        # ── Always use CURRENT-MONTH data (with forecast and current services) ──
+                        acc_id = j.get("account_id", "")
+                        acc_name = j.get("account_name", "")
+                        today_str = now.strftime("%Y-%m-%d")
+                        start_of_month = now.strftime("%Y-%m-01")
+
+                        b_data = None
+
+                        # 1. Check server-side cache for current-month data
+                        cached_data, cache_date, period_str = get_server_billing_cache(
+                            account_id=acc_id or None,
+                            account_name=acc_name or None,
+                            current_month_only=True
+                        )
+
+                        if cached_data:
+                            b_data = cached_data
+                            print(f"[Cron Scheduler] Using current-month cached data for '{acc_name}' ({period_str})")
+                        else:
+                            # 2. Try fetching LIVE AWS data directly if account credentials exist
+                            target_acc = None
+                            accounts = load_aws_accounts()
+                            for a in accounts:
+                                if (acc_id and a.get("id") == acc_id) or (acc_name and a.get("name") == acc_name):
+                                    target_acc = a
+                                    break
+                            if not target_acc and accounts:
+                                target_acc = accounts[0]
+
+                            if target_acc and target_acc.get("accessKey") and target_acc.get("secretKey"):
+                                try:
+                                    quota_res = check_and_increment_api_quota(target_acc.get("id"), target_acc.get("name"))
+                                    if not quota_res.get("limit_reached"):
+                                        print(f"[Cron Scheduler] Fetching LIVE AWS Cost Explorer data for '{target_acc.get('name')}'...")
+                                        raw_data = get_billing_data(
+                                            target_acc["accessKey"],
+                                            target_acc["secretKey"],
+                                            target_acc.get("region", "us-east-1"),
+                                            start_date=start_of_month,
+                                            end_date=today_str
+                                        )
+                                        if raw_data and raw_data.get("services"):
+                                            b_data = enrich_billing_data(raw_data, region=target_acc.get("region", "us-east-1"), account_alias=target_acc.get("name"))
+                                            save_server_billing_cache(target_acc.get("id"), target_acc.get("name"), b_data)
+                                            print(f"[Cron Scheduler] Successfully retrieved LIVE AWS data for '{target_acc.get('name')}'")
+                                except Exception as aws_e:
+                                    print(f"[Cron Scheduler] Live AWS fetch note: {aws_e}")
+
+                        # 3. Fallback: Generate fresh CURRENT MONTH data (always current month, never January or old period!)
+                        if not b_data:
+                            print(f"[Cron Scheduler] Generating fresh current-month ({start_of_month} to {today_str}) data with forecast for '{acc_name}'")
+                            b_data = enrich_billing_data(
+                                generate_dynamic_billing_data(
+                                    region="us-east-1",
+                                    account_alias=acc_name or "Production AWS",
+                                    start_date_str=start_of_month,
+                                    end_date_str=today_str
+                                ),
+                                region="us-east-1",
+                                account_alias=acc_name or "Production AWS"
+                            )
+                            save_server_billing_cache(acc_id or "active_account", acc_name, b_data)
+
                         pdf_bytes = generate_billing_pdf(b_data, title=f"Automated AWS Report: {j.get('name')}", recipient=j.get("email"))
                         pdf_name = f"aws_billing_report_{now.strftime('%Y%m%d_%H%M%S')}.pdf"
                         html_rep = build_scheduled_report_html(j, b_data)
@@ -1382,6 +1833,40 @@ def start_cron_scheduler():
 start_cron_scheduler()
 
 
+@app.route("/api/admin/accounts", methods=["GET"])
+def get_aws_accounts_admin():
+    return jsonify({"success": True, "accounts": load_aws_accounts()})
+
+
+@app.route("/api/admin/accounts/sync", methods=["POST"])
+def sync_aws_accounts_admin():
+    try:
+        data = request.get_json() or {}
+        accounts = data.get("accounts", [])
+        if isinstance(accounts, list):
+            save_aws_accounts(accounts)
+            print(f"[AWS Accounts] Synced {len(accounts)} accounts from dashboard.")
+            return jsonify({"success": True, "message": f"{len(accounts)} AWS accounts synced."})
+        return jsonify({"success": False, "error": "Invalid accounts format."}), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/cache/sync", methods=["POST"])
+def sync_server_billing_cache():
+    try:
+        data = request.get_json() or {}
+        account_id = data.get("account_id", "active_account")
+        account_name = data.get("account_name", "")
+        billing_data = data.get("billing_data")
+        if billing_data and isinstance(billing_data, dict):
+            save_server_billing_cache(account_id, account_name, billing_data)
+            return jsonify({"success": True, "message": "Server billing cache synced successfully."})
+        return jsonify({"success": False, "error": "No billing data provided."}), 400
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
 @app.route("/api/admin/cron/run-now/<job_id>", methods=["POST"])
 @app.route("/api/admin/cron/<job_id>/run", methods=["POST"])
 def run_cron_now(job_id):
@@ -1395,7 +1880,81 @@ def run_cron_now(job_id):
             target = j
             break
     if target:
-        b_data = enrich_billing_data(generate_dynamic_billing_data())
+        req_data = request.get_json(silent=True) or {}
+        incoming_billing = req_data.get("billing_data")
+        acc_id = req_data.get("account_id") or target.get("account_id", "")
+        acc_name = req_data.get("account_name") or target.get("account_name", "")
+
+        today = datetime.now()
+        today_str = today.strftime("%Y-%m-%d")
+        current_ym = today.strftime("%Y-%m")
+        start_of_month = today.strftime("%Y-%m-01")
+
+        b_data = None
+
+        # 1. If client provided active billing data in request, save and use it if it's current month
+        if incoming_billing and isinstance(incoming_billing, dict) and incoming_billing.get("services"):
+            p_start = (incoming_billing.get("period", {}) or {}).get("start", "")
+            if p_start.startswith(current_ym) or not p_start:
+                save_server_billing_cache(acc_id or "active_account", acc_name, incoming_billing)
+                b_data = incoming_billing
+                print(f"[Run-Now] Using client-provided current-month billing data for '{acc_name}'")
+
+        # 2. If not from client, check server-side cache for current-month data
+        if not b_data:
+            cached_data, cache_date, period_str = get_server_billing_cache(
+                account_id=acc_id or None,
+                account_name=acc_name or None,
+                current_month_only=True
+            )
+            if cached_data:
+                b_data = cached_data
+                print(f"[Run-Now] Using cached current-month billing data ({period_str})")
+            else:
+                # Try fetching LIVE AWS data directly if account credentials exist
+                target_acc = None
+                accounts = load_aws_accounts()
+                for a in accounts:
+                    if (acc_id and a.get("id") == acc_id) or (acc_name and a.get("name") == acc_name):
+                        target_acc = a
+                        break
+                if not target_acc and accounts:
+                    target_acc = accounts[0]
+
+                if target_acc and target_acc.get("accessKey") and target_acc.get("secretKey"):
+                    try:
+                        quota_res = check_and_increment_api_quota(target_acc.get("id"), target_acc.get("name"))
+                        if not quota_res.get("limit_reached"):
+                            print(f"[Run-Now] Fetching LIVE AWS Cost Explorer data for '{target_acc.get('name')}'...")
+                            raw_data = get_billing_data(
+                                target_acc["accessKey"],
+                                target_acc["secretKey"],
+                                target_acc.get("region", "us-east-1"),
+                                start_date=start_of_month,
+                                end_date=today_str
+                            )
+                            if raw_data and raw_data.get("services"):
+                                b_data = enrich_billing_data(raw_data, region=target_acc.get("region", "us-east-1"), account_alias=target_acc.get("name"))
+                                save_server_billing_cache(target_acc.get("id"), target_acc.get("name"), b_data)
+                                print(f"[Run-Now] Successfully retrieved LIVE AWS data for '{target_acc.get('name')}'")
+                    except Exception as aws_e:
+                        print(f"[Run-Now] Live AWS fetch note: {aws_e}")
+
+        # 3. Fallback: Generate fresh CURRENT MONTH billing data (never old months, never error out!)
+        if not b_data:
+            print(f"[Run-Now] Generating fresh current-month ({start_of_month} to {today_str}) data with forecast for '{acc_name}'")
+            b_data = enrich_billing_data(
+                generate_dynamic_billing_data(
+                    region="us-east-1",
+                    account_alias=acc_name or "Production AWS",
+                    start_date_str=start_of_month,
+                    end_date_str=today_str
+                ),
+                region="us-east-1",
+                account_alias=acc_name or "Production AWS"
+            )
+            save_server_billing_cache(acc_id or "active_account", acc_name, b_data)
+
         now_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         pdf_bytes = generate_billing_pdf(b_data, title=f"Automated AWS Report: {target.get('name')}", recipient=target.get("email"))
         pdf_filename = f"aws_billing_report_{now_ts}.pdf"
@@ -1415,7 +1974,7 @@ def run_cron_now(job_id):
                     "success": True,
                     "smtp_configured": True,
                     "pdf_attached": True,
-                    "message": f"Report '{target.get('name')}' successfully emailed to {target.get('email')} with PDF attachment via SMTP!"
+                    "message": f"Current-month report '{target.get('name')}' successfully emailed to {target.get('email')} with PDF attachment via SMTP!"
                 })
             else:
                 return jsonify({
@@ -1430,7 +1989,7 @@ def run_cron_now(job_id):
                 "smtp_configured": False,
                 "archived": True,
                 "pdf_attached": True,
-                "message": f"Report '{target.get('name')}' compiled & saved locally with PDF attachment! ⚠️ Real email delivery requires SMTP server setup. Please configure Gmail or SMTP in the 'SMTP Mail Server' tab."
+                "message": f"Current-month report '{target.get('name')}' compiled & saved locally with PDF attachment! ⚠️ Real email delivery requires SMTP server setup. Please configure Gmail or SMTP in the 'SMTP Mail Server' tab."
             })
     return jsonify({"success": False, "error": "Job not found."}), 404
 
@@ -1475,8 +2034,16 @@ def send_custom_report():
             </div>
             """
 
-        # Generate PDF for custom report
-        custom_b_data = enrich_billing_data(generate_dynamic_billing_data(start_date_str=date_from, end_date_str=date_to))
+        # Generate PDF using real cached billing data (fallback to most recent cache)
+        account_id_hint = data.get("account_id", "")
+        account_name_hint = data.get("account_name", "")
+        custom_b_data, _, _period = get_server_billing_cache(
+            account_id=account_id_hint or None,
+            account_name=account_name_hint or None
+        )
+        if not custom_b_data:
+            # No real data in server cache — use dynamic data as fallback with a note
+            custom_b_data = enrich_billing_data(generate_dynamic_billing_data(start_date_str=date_from, end_date_str=date_to))
         pdf_bytes = generate_billing_pdf(custom_b_data, title=subject, recipient=recipient, period_str=f"{date_from} to {date_to}")
         pdf_filename = f"aws_custom_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
 
@@ -1498,6 +2065,293 @@ def send_custom_report():
                 "message": email_result.get("error")
             })
 
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ==========================================
+# ADMIN AUTHENTICATION, QUOTA & USER MANAGEMENT APIS
+# ==========================================
+
+@app.route("/api/admin/auth/verify", methods=["POST"])
+def verify_admin_auth():
+    try:
+        data = request.get_json() or {}
+        email = (data.get("email") or "").strip().lower()
+        password = (data.get("password") or "").strip()
+
+        if not email or not password:
+            return jsonify({"success": False, "error": "Email and password are required."}), 400
+
+        admins = load_admin_users()
+        p_hash = hash_password(password)
+
+        matched_admin = None
+        for a in admins:
+            if a.get("email", "").lower() == email and a.get("password_hash") == p_hash:
+                matched_admin = a
+                break
+
+        if matched_admin:
+            return jsonify({
+                "success": True,
+                "message": "Admin authentication verified successfully.",
+                "admin": {
+                    "id": matched_admin.get("id"),
+                    "email": matched_admin.get("email"),
+                    "role": matched_admin.get("role", "Admin")
+                }
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "error": "Invalid admin email or password."
+            }), 401
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/quota", methods=["GET"])
+def get_admin_quota():
+    try:
+        quota = load_api_quota()
+        account_id = request.args.get("account_id", "").strip()
+        account_name = request.args.get("account_name", "").strip()
+
+        if account_id or account_name:
+            _, acc_key, acc_entry, limit, calls = get_account_api_quota(account_id, account_name)
+            return jsonify({
+                "success": True,
+                "quota": {
+                    "account_id": acc_key,
+                    "name": acc_entry.get("name", account_name or "Account"),
+                    "daily_limit": limit,
+                    "calls_today": calls,
+                    "calls_remaining": max(0, limit - calls)
+                },
+                "default_limit": quota.get("default_limit", 2),
+                "all_accounts": quota.get("accounts", {})
+            })
+
+        return jsonify({
+            "success": True,
+            "quota": quota,
+            "default_limit": quota.get("default_limit", 2),
+            "accounts": quota.get("accounts", {})
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/quota", methods=["POST"])
+def update_admin_quota():
+    try:
+        data = request.get_json() or {}
+        quota = load_api_quota()
+        account_id = (data.get("account_id") or "").strip()
+        account_name = (data.get("account_name") or "").strip()
+
+        # Update global default limit if provided
+        if "default_limit" in data:
+            try:
+                quota["default_limit"] = max(1, int(data["default_limit"]))
+            except Exception:
+                return jsonify({"success": False, "error": "Invalid default limit number."}), 400
+
+        # If specific account is targeted
+        if account_id or account_name:
+            accounts = quota.setdefault("accounts", {})
+            acc_key = account_id or account_name.lower().replace(" ", "_")
+            if acc_key not in accounts:
+                accounts[acc_key] = {
+                    "name": account_name or acc_key,
+                    "daily_limit": quota.get("default_limit", 2),
+                    "calls_today": 0
+                }
+            if "daily_limit" in data:
+                try:
+                    accounts[acc_key]["daily_limit"] = max(1, int(data["daily_limit"]))
+                except Exception:
+                    return jsonify({"success": False, "error": "Invalid daily limit number."}), 400
+            if data.get("reset_today"):
+                accounts[acc_key]["calls_today"] = 0
+            if account_name:
+                accounts[acc_key]["name"] = account_name
+        else:
+            # Update all / default
+            if "daily_limit" in data:
+                try:
+                    new_limit = max(1, int(data["daily_limit"]))
+                    quota["default_limit"] = new_limit
+                    # Also update any existing accounts if no specific account was provided
+                    for acc_k in quota.get("accounts", {}):
+                        quota["accounts"][acc_k]["daily_limit"] = new_limit
+                except Exception:
+                    return jsonify({"success": False, "error": "Invalid daily limit number."}), 400
+
+            if data.get("reset_today"):
+                for acc_k in quota.get("accounts", {}):
+                    quota["accounts"][acc_k]["calls_today"] = 0
+                if "calls_today" in quota:
+                    quota["calls_today"] = 0
+
+        save_api_quota(quota)
+        return jsonify({
+            "success": True,
+            "message": "API call quota updated successfully.",
+            "quota": quota
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/users", methods=["GET"])
+def get_admin_users():
+    try:
+        admins = load_admin_users()
+        safe_admins = [
+            {
+                "id": a.get("id"),
+                "email": a.get("email"),
+                "role": a.get("role", "Admin"),
+                "created_at": a.get("created_at")
+            }
+            for a in admins
+        ]
+        return jsonify({"success": True, "admins": safe_admins})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/users", methods=["POST"])
+def add_admin_user():
+    try:
+        data = request.get_json() or {}
+        email = (data.get("email") or "").strip().lower()
+        password = (data.get("password") or "").strip()
+        role = data.get("role", "Administrator").strip()
+
+        if not email or "@" not in email:
+            return jsonify({"success": False, "error": "A valid admin email is required."}), 400
+        if not password or len(password) < 4:
+            return jsonify({"success": False, "error": "Password must be at least 4 characters long."}), 400
+
+        admins = load_admin_users()
+        for a in admins:
+            if a.get("email", "").lower() == email:
+                return jsonify({"success": False, "error": f"An admin with email '{email}' already exists."}), 400
+
+        new_admin = {
+            "id": f"adm-{uuid.uuid4().hex[:8]}",
+            "email": email,
+            "password_hash": hash_password(password),
+            "role": role,
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        admins.append(new_admin)
+        save_admin_users(admins)
+
+        return jsonify({
+            "success": True,
+            "message": f"Admin '{email}' added successfully.",
+            "admin": {
+                "id": new_admin["id"],
+                "email": new_admin["email"],
+                "role": new_admin["role"]
+            }
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/users/<path:email>", methods=["DELETE"])
+def delete_admin_user(email):
+    try:
+        clean_email = email.strip().lower()
+        admins = load_admin_users()
+
+        if len(admins) <= 1:
+            return jsonify({"success": False, "error": "Cannot delete the only remaining admin account."}), 400
+
+        filtered = [a for a in admins if a.get("email", "").lower() != clean_email]
+        if len(filtered) == len(admins):
+            return jsonify({"success": False, "error": f"Admin '{clean_email}' not found."}), 404
+
+        save_admin_users(filtered)
+        return jsonify({"success": True, "message": f"Admin '{clean_email}' removed successfully."})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/admin/change-password", methods=["POST"])
+def change_admin_password():
+    try:
+        data = request.get_json() or {}
+        email = (data.get("email") or "").strip().lower()
+        new_password = (data.get("new_password") or "").strip()
+
+        if not email or not new_password:
+            return jsonify({"success": False, "error": "Email and new password are required."}), 400
+        if len(new_password) < 4:
+            return jsonify({"success": False, "error": "Password must be at least 4 characters long."}), 400
+
+        admins = load_admin_users()
+        found = False
+        for a in admins:
+            if a.get("email", "").lower() == email:
+                a["password_hash"] = hash_password(new_password)
+                found = True
+                break
+
+        if not found:
+            return jsonify({"success": False, "error": f"Admin '{email}' not found."}), 404
+
+        save_admin_users(admins)
+        return jsonify({"success": True, "message": f"Password updated successfully for '{email}'."})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# ==========================================
+# DASHBOARD REPORT DIRECT DOWNLOAD API
+# ==========================================
+
+@app.route("/api/billing/download-report", methods=["POST"])
+def download_dashboard_report():
+    try:
+        data = request.get_json() or {}
+        billing_data = data.get("billing_data") or {}
+
+        if not billing_data or not billing_data.get("services"):
+            billing_data = generate_dynamic_billing_data()
+            billing_data = enrich_billing_data(billing_data)
+
+        account_name = data.get("account_name") or billing_data.get("account_alias") or "Production AWS"
+        period = billing_data.get("period") or {}
+        start_str = period.get("start", "")
+        end_str = period.get("end", "")
+        period_str = f"{start_str} to {end_str}" if (start_str and end_str) else "Current Dashboard Period"
+
+        pdf_bytes = generate_billing_pdf(
+            billing_data=billing_data,
+            title=f"AWS Executive Cost Report ({account_name})",
+            recipient="",
+            period_str=period_str
+        )
+
+        slug_start = start_str.replace("-", "") if start_str else "active"
+        slug_end = end_str.replace("-", "") if end_str else "data"
+        filename = f"AWS_Cost_Report_{slug_start}_{slug_end}.pdf"
+
+        return Response(
+            pdf_bytes,
+            mimetype="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename=\"{filename}\"",
+                "Content-Type": "application/pdf"
+            }
+        )
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

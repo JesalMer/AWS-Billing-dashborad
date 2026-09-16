@@ -1,0 +1,6844 @@
+{
+  "active_account": {
+    "account_id": "active_account",
+    "account_name": "",
+    "date": "2026-09-15",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-15",
+    "is_current_month": true,
+    "data": {
+      "current_cost": 646.55,
+      "previous_cost": 1282.34,
+      "forecast": 724.14,
+      "show_forecast": true,
+      "services": [
+        {
+          "service": "Amazon Elastic Compute Cloud",
+          "cost": 219.1,
+          "category": "Compute",
+          "code": "EC2",
+          "status": "Needs Review",
+          "change": "+7.4%",
+          "trendUp": true,
+          "color": "#fdf0ea",
+          "textColor": "#c85a32",
+          "region": "us-east-1",
+          "usage": "372 hrs"
+        },
+        {
+          "service": "Amazon Elastic Kubernetes Service",
+          "cost": 107.7,
+          "category": "Compute",
+          "code": "EKS",
+          "status": "Critical",
+          "change": "+14.8%",
+          "trendUp": true,
+          "color": "#fef2f2",
+          "textColor": "#dc2626",
+          "region": "us-east-1",
+          "usage": "Cluster Core"
+        },
+        {
+          "service": "Amazon Relational Database Service",
+          "cost": 94.3,
+          "category": "Database",
+          "code": "RDS",
+          "status": "Needs Review",
+          "change": "+4.2%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "360 hrs Multi-AZ"
+        },
+        {
+          "service": "Amazon Simple Storage Service",
+          "cost": 69.55,
+          "category": "Storage",
+          "code": "S3",
+          "status": "Healthy",
+          "change": "-2.1%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "us-east-1",
+          "usage": "8.4 TB Standard"
+        },
+        {
+          "service": "Amazon CloudFront & Data Transfer",
+          "cost": 71.25,
+          "category": "Data Transfer",
+          "code": "CF",
+          "status": "Healthy",
+          "change": "+3.3%",
+          "trendUp": true,
+          "color": "#eff6ff",
+          "textColor": "#2563eb",
+          "region": "Global",
+          "usage": "14.6 TB Out"
+        },
+        {
+          "service": "Amazon DynamoDB",
+          "cost": 34.9,
+          "category": "Database",
+          "code": "DB",
+          "status": "Healthy",
+          "change": "+1.0%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "On-Demand PayPerReq"
+        },
+        {
+          "service": "Amazon CloudWatch",
+          "cost": 22.65,
+          "category": "Analytics",
+          "code": "CW",
+          "status": "Healthy",
+          "change": "+0.6%",
+          "trendUp": true,
+          "color": "#f5f5f4",
+          "textColor": "#57534e",
+          "region": "us-east-1",
+          "usage": "Logs & Alarms"
+        },
+        {
+          "service": "AWS Lambda",
+          "cost": 19.75,
+          "category": "Compute",
+          "code": "\u03bb",
+          "status": "Healthy",
+          "change": "-1.0%",
+          "trendUp": false,
+          "color": "#fff7ed",
+          "textColor": "#ea580c",
+          "region": "us-east-1",
+          "usage": "6.4M reqs"
+        },
+        {
+          "service": "Amazon Route 53",
+          "cost": 6.25,
+          "category": "Networking",
+          "code": "R53",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "Global",
+          "usage": "Hosted Zones"
+        },
+        {
+          "service": "AWS Cost Explorer API",
+          "cost": 1.1,
+          "category": "Other",
+          "code": "CE",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "Global",
+          "usage": "22 Queries"
+        }
+      ],
+      "services_count": 10,
+      "daily": {
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/04",
+          "09/06",
+          "09/08",
+          "09/10",
+          "09/12",
+          "09/14"
+        ],
+        "current_costs": [
+          20.64,
+          22.75,
+          24.43,
+          25.72,
+          27.77,
+          29.15,
+          30.49,
+          31.86
+        ],
+        "costs": [
+          20.64,
+          22.75,
+          24.43,
+          25.72,
+          27.77,
+          29.15,
+          30.49,
+          31.86
+        ],
+        "prev_costs": [
+          77.7,
+          85.33,
+          86.49,
+          93.51,
+          99.06,
+          106.45,
+          113.01,
+          119.16
+        ]
+      },
+      "regions": [
+        {
+          "region": "us-east-1 (Primary)",
+          "cost": 433.19,
+          "share": 67.0
+        },
+        {
+          "region": "us-west-2 (Oregon)",
+          "cost": 116.38,
+          "share": 18.0
+        },
+        {
+          "region": "eu-west-1 (Ireland)",
+          "cost": 58.19,
+          "share": 9.0
+        },
+        {
+          "region": "Global / Edge",
+          "cost": 38.79,
+          "share": 6.0
+        }
+      ],
+      "period": {
+        "start": "2026-09-01",
+        "end": "2026-09-15",
+        "days": 15,
+        "previous_start": "2026-08-01",
+        "previous_end": "2026-08-31"
+      },
+      "categories": [
+        {
+          "name": "Compute",
+          "cost": 346.55,
+          "pct": 53.6,
+          "color": "#c85a32"
+        },
+        {
+          "name": "Database",
+          "cost": 129.2,
+          "pct": 20.0,
+          "color": "#22c55e"
+        },
+        {
+          "name": "Data Transfer",
+          "cost": 71.25,
+          "pct": 11.0,
+          "color": "#3b82f6"
+        },
+        {
+          "name": "Storage",
+          "cost": 69.55,
+          "pct": 10.8,
+          "color": "#f59e0b"
+        },
+        {
+          "name": "Analytics",
+          "cost": 22.65,
+          "pct": 3.5,
+          "color": "#06b6d4"
+        },
+        {
+          "name": "Networking",
+          "cost": 6.25,
+          "pct": 1.0,
+          "color": "#8b5cf6"
+        },
+        {
+          "name": "Other",
+          "cost": 1.1,
+          "pct": 0.2,
+          "color": "#64748b"
+        }
+      ],
+      "account_alias": "Production AWS",
+      "region": "us-east-1",
+      "synced_at": "17:23 UTC"
+    }
+  },
+  "active_account_current_month": {
+    "account_id": "active_account",
+    "account_name": "",
+    "date": "2026-09-15",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-15",
+    "is_current_month": true,
+    "data": {
+      "current_cost": 646.55,
+      "previous_cost": 1282.34,
+      "forecast": 724.14,
+      "show_forecast": true,
+      "services": [
+        {
+          "service": "Amazon Elastic Compute Cloud",
+          "cost": 219.1,
+          "category": "Compute",
+          "code": "EC2",
+          "status": "Needs Review",
+          "change": "+7.4%",
+          "trendUp": true,
+          "color": "#fdf0ea",
+          "textColor": "#c85a32",
+          "region": "us-east-1",
+          "usage": "372 hrs"
+        },
+        {
+          "service": "Amazon Elastic Kubernetes Service",
+          "cost": 107.7,
+          "category": "Compute",
+          "code": "EKS",
+          "status": "Critical",
+          "change": "+14.8%",
+          "trendUp": true,
+          "color": "#fef2f2",
+          "textColor": "#dc2626",
+          "region": "us-east-1",
+          "usage": "Cluster Core"
+        },
+        {
+          "service": "Amazon Relational Database Service",
+          "cost": 94.3,
+          "category": "Database",
+          "code": "RDS",
+          "status": "Needs Review",
+          "change": "+4.2%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "360 hrs Multi-AZ"
+        },
+        {
+          "service": "Amazon Simple Storage Service",
+          "cost": 69.55,
+          "category": "Storage",
+          "code": "S3",
+          "status": "Healthy",
+          "change": "-2.1%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "us-east-1",
+          "usage": "8.4 TB Standard"
+        },
+        {
+          "service": "Amazon CloudFront & Data Transfer",
+          "cost": 71.25,
+          "category": "Data Transfer",
+          "code": "CF",
+          "status": "Healthy",
+          "change": "+3.3%",
+          "trendUp": true,
+          "color": "#eff6ff",
+          "textColor": "#2563eb",
+          "region": "Global",
+          "usage": "14.6 TB Out"
+        },
+        {
+          "service": "Amazon DynamoDB",
+          "cost": 34.9,
+          "category": "Database",
+          "code": "DB",
+          "status": "Healthy",
+          "change": "+1.0%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "On-Demand PayPerReq"
+        },
+        {
+          "service": "Amazon CloudWatch",
+          "cost": 22.65,
+          "category": "Analytics",
+          "code": "CW",
+          "status": "Healthy",
+          "change": "+0.6%",
+          "trendUp": true,
+          "color": "#f5f5f4",
+          "textColor": "#57534e",
+          "region": "us-east-1",
+          "usage": "Logs & Alarms"
+        },
+        {
+          "service": "AWS Lambda",
+          "cost": 19.75,
+          "category": "Compute",
+          "code": "\u03bb",
+          "status": "Healthy",
+          "change": "-1.0%",
+          "trendUp": false,
+          "color": "#fff7ed",
+          "textColor": "#ea580c",
+          "region": "us-east-1",
+          "usage": "6.4M reqs"
+        },
+        {
+          "service": "Amazon Route 53",
+          "cost": 6.25,
+          "category": "Networking",
+          "code": "R53",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "Global",
+          "usage": "Hosted Zones"
+        },
+        {
+          "service": "AWS Cost Explorer API",
+          "cost": 1.1,
+          "category": "Other",
+          "code": "CE",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "Global",
+          "usage": "22 Queries"
+        }
+      ],
+      "services_count": 10,
+      "daily": {
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/04",
+          "09/06",
+          "09/08",
+          "09/10",
+          "09/12",
+          "09/14"
+        ],
+        "current_costs": [
+          20.64,
+          22.75,
+          24.43,
+          25.72,
+          27.77,
+          29.15,
+          30.49,
+          31.86
+        ],
+        "costs": [
+          20.64,
+          22.75,
+          24.43,
+          25.72,
+          27.77,
+          29.15,
+          30.49,
+          31.86
+        ],
+        "prev_costs": [
+          77.7,
+          85.33,
+          86.49,
+          93.51,
+          99.06,
+          106.45,
+          113.01,
+          119.16
+        ]
+      },
+      "regions": [
+        {
+          "region": "us-east-1 (Primary)",
+          "cost": 433.19,
+          "share": 67.0
+        },
+        {
+          "region": "us-west-2 (Oregon)",
+          "cost": 116.38,
+          "share": 18.0
+        },
+        {
+          "region": "eu-west-1 (Ireland)",
+          "cost": 58.19,
+          "share": 9.0
+        },
+        {
+          "region": "Global / Edge",
+          "cost": 38.79,
+          "share": 6.0
+        }
+      ],
+      "period": {
+        "start": "2026-09-01",
+        "end": "2026-09-15",
+        "days": 15,
+        "previous_start": "2026-08-01",
+        "previous_end": "2026-08-31"
+      },
+      "categories": [
+        {
+          "name": "Compute",
+          "cost": 346.55,
+          "pct": 53.6,
+          "color": "#c85a32"
+        },
+        {
+          "name": "Database",
+          "cost": 129.2,
+          "pct": 20.0,
+          "color": "#22c55e"
+        },
+        {
+          "name": "Data Transfer",
+          "cost": 71.25,
+          "pct": 11.0,
+          "color": "#3b82f6"
+        },
+        {
+          "name": "Storage",
+          "cost": 69.55,
+          "pct": 10.8,
+          "color": "#f59e0b"
+        },
+        {
+          "name": "Analytics",
+          "cost": 22.65,
+          "pct": 3.5,
+          "color": "#06b6d4"
+        },
+        {
+          "name": "Networking",
+          "cost": 6.25,
+          "pct": 1.0,
+          "color": "#8b5cf6"
+        },
+        {
+          "name": "Other",
+          "cost": 1.1,
+          "pct": 0.2,
+          "color": "#64748b"
+        }
+      ],
+      "account_alias": "Production AWS",
+      "region": "us-east-1",
+      "synced_at": "17:23 UTC"
+    }
+  },
+  "acc_1789467186889_546": {
+    "account_id": "acc_1789467186889_546",
+    "account_name": "BhaveshSir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "BhaveshSir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789467186889_546",
+        "account_name": "BhaveshSir",
+        "calls_remaining": 7,
+        "calls_today": 2,
+        "daily_limit": 9
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "12:31 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "acc_1789467186889_546_current_month": {
+    "account_id": "acc_1789467186889_546",
+    "account_name": "BhaveshSir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "BhaveshSir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789467186889_546",
+        "account_name": "BhaveshSir",
+        "calls_remaining": 7,
+        "calls_today": 2,
+        "daily_limit": 9
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "12:31 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "latest": {
+    "account_id": "acc_1789467186889_546",
+    "account_name": "BhaveshSir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "BhaveshSir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789467186889_546",
+        "account_name": "BhaveshSir",
+        "calls_remaining": 7,
+        "calls_today": 2,
+        "daily_limit": 9
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "12:31 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "name_bhaveshsir": {
+    "account_id": "acc_1789467186889_546",
+    "account_name": "BhaveshSir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "BhaveshSir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789467186889_546",
+        "account_name": "BhaveshSir",
+        "calls_remaining": 7,
+        "calls_today": 2,
+        "daily_limit": 9
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "12:31 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "latest_current_month": {
+    "account_id": "acc_1789467186889_546",
+    "account_name": "BhaveshSir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "BhaveshSir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789467186889_546",
+        "account_name": "BhaveshSir",
+        "calls_remaining": 7,
+        "calls_today": 2,
+        "daily_limit": 9
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "12:31 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "name_bhaveshsir_current_month": {
+    "account_id": "acc_1789467186889_546",
+    "account_name": "BhaveshSir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "BhaveshSir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789467186889_546",
+        "account_name": "BhaveshSir",
+        "calls_remaining": 7,
+        "calls_today": 2,
+        "daily_limit": 9
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "12:31 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "acc_1789479134043_920": {
+    "account_id": "acc_1789479134043_920",
+    "account_name": "BhaveshSir",
+    "date": "2026-09-15",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-15",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "BhaveshSir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 293.86,
+          "name": "Compute",
+          "pct": 69.6
+        },
+        {
+          "color": "#64748b",
+          "cost": 104.05,
+          "name": "Other",
+          "pct": 24.6
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 22.48,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.75,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.03,
+          "name": "Analytics",
+          "pct": 0
+        }
+      ],
+      "current_cost": 422.18,
+      "daily": {
+        "costs": [
+          28.92,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          22.85,
+          0
+        ],
+        "current_costs": [
+          28.92,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          22.85,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15"
+        ],
+        "prev_costs": [
+          26.61,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          21.02,
+          0
+        ]
+      },
+      "forecast": 844.36,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 15,
+        "end": "2026-09-15",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789479134043_920",
+        "account_name": "BhaveshSir",
+        "calls_remaining": 1,
+        "calls_today": 8,
+        "daily_limit": 9
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 306.45,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 81.55,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 26.9,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.26,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.75,
+          "region": "global"
+        },
+        {
+          "cost": 0.27,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 160.15,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 133.71,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 61.59,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 22.48,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 16.65,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 3.03,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.75,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.27,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.03,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "19:02 UTC",
+      "tax": 0.27,
+      "_fromLiveApi": true
+    }
+  },
+  "acc_1789479134043_920_current_month": {
+    "account_id": "acc_1789479134043_920",
+    "account_name": "BhaveshSir",
+    "date": "2026-09-15",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-15",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "BhaveshSir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 293.86,
+          "name": "Compute",
+          "pct": 69.6
+        },
+        {
+          "color": "#64748b",
+          "cost": 104.05,
+          "name": "Other",
+          "pct": 24.6
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 22.48,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.75,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.03,
+          "name": "Analytics",
+          "pct": 0
+        }
+      ],
+      "current_cost": 422.18,
+      "daily": {
+        "costs": [
+          28.92,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          22.85,
+          0
+        ],
+        "current_costs": [
+          28.92,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          22.85,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15"
+        ],
+        "prev_costs": [
+          26.61,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          21.02,
+          0
+        ]
+      },
+      "forecast": 844.36,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 15,
+        "end": "2026-09-15",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789479134043_920",
+        "account_name": "BhaveshSir",
+        "calls_remaining": 1,
+        "calls_today": 8,
+        "daily_limit": 9
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 306.45,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 81.55,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 26.9,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.26,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.75,
+          "region": "global"
+        },
+        {
+          "cost": 0.27,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 160.15,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 133.71,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 61.59,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 22.48,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 16.65,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 3.03,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.75,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.27,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.03,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "19:02 UTC",
+      "tax": 0.27,
+      "_fromLiveApi": true
+    }
+  },
+  "acc_1789536095876_638": {
+    "account_id": "acc_1789536095876_638",
+    "account_name": "Bhavesh Sir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "Bhavesh Sir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789536095876_638",
+        "account_name": "Bhavesh Sir",
+        "calls_remaining": 4,
+        "calls_today": 1,
+        "daily_limit": 5
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "10:51 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "name_bhavesh_sir": {
+    "account_id": "acc_1789536095876_638",
+    "account_name": "Bhavesh Sir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "Bhavesh Sir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789536095876_638",
+        "account_name": "Bhavesh Sir",
+        "calls_remaining": 4,
+        "calls_today": 1,
+        "daily_limit": 5
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "10:51 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "acc_1789536095876_638_current_month": {
+    "account_id": "acc_1789536095876_638",
+    "account_name": "Bhavesh Sir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "Bhavesh Sir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789536095876_638",
+        "account_name": "Bhavesh Sir",
+        "calls_remaining": 4,
+        "calls_today": 1,
+        "daily_limit": 5
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "10:51 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "name_bhavesh_sir_current_month": {
+    "account_id": "acc_1789536095876_638",
+    "account_name": "Bhavesh Sir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "Bhavesh Sir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789536095876_638",
+        "account_name": "Bhavesh Sir",
+        "calls_remaining": 4,
+        "calls_today": 1,
+        "daily_limit": 5
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "10:51 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "default": {
+    "account_id": "default",
+    "account_name": "Production AWS",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-11",
+    "is_current_month": true,
+    "data": {
+      "current_cost": 474.59,
+      "previous_cost": 1282.4,
+      "forecast": null,
+      "show_forecast": false,
+      "services": [
+        {
+          "service": "Amazon Elastic Compute Cloud",
+          "cost": 160.82,
+          "category": "Compute",
+          "code": "EC2",
+          "status": "Needs Review",
+          "change": "+7.4%",
+          "trendUp": true,
+          "color": "#fdf0ea",
+          "textColor": "#c85a32",
+          "region": "us-east-1",
+          "usage": "273 hrs"
+        },
+        {
+          "service": "Amazon Elastic Kubernetes Service",
+          "cost": 79.05,
+          "category": "Compute",
+          "code": "EKS",
+          "status": "Critical",
+          "change": "+14.8%",
+          "trendUp": true,
+          "color": "#fef2f2",
+          "textColor": "#dc2626",
+          "region": "us-east-1",
+          "usage": "Cluster Core"
+        },
+        {
+          "service": "Amazon Relational Database Service",
+          "cost": 69.22,
+          "category": "Database",
+          "code": "RDS",
+          "status": "Needs Review",
+          "change": "+4.2%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "264 hrs Multi-AZ"
+        },
+        {
+          "service": "Amazon Simple Storage Service",
+          "cost": 51.05,
+          "category": "Storage",
+          "code": "S3",
+          "status": "Healthy",
+          "change": "-2.1%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "us-east-1",
+          "usage": "8.4 TB Standard"
+        },
+        {
+          "service": "Amazon CloudFront & Data Transfer",
+          "cost": 52.3,
+          "category": "Data Transfer",
+          "code": "CF",
+          "status": "Healthy",
+          "change": "+3.3%",
+          "trendUp": true,
+          "color": "#eff6ff",
+          "textColor": "#2563eb",
+          "region": "Global",
+          "usage": "14.6 TB Out"
+        },
+        {
+          "service": "Amazon DynamoDB",
+          "cost": 25.62,
+          "category": "Database",
+          "code": "DB",
+          "status": "Healthy",
+          "change": "+1.0%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "On-Demand PayPerReq"
+        },
+        {
+          "service": "Amazon CloudWatch",
+          "cost": 16.63,
+          "category": "Analytics",
+          "code": "CW",
+          "status": "Healthy",
+          "change": "+0.6%",
+          "trendUp": true,
+          "color": "#f5f5f4",
+          "textColor": "#57534e",
+          "region": "us-east-1",
+          "usage": "Logs & Alarms"
+        },
+        {
+          "service": "AWS Lambda",
+          "cost": 14.5,
+          "category": "Compute",
+          "code": "\u03bb",
+          "status": "Healthy",
+          "change": "-1.0%",
+          "trendUp": false,
+          "color": "#fff7ed",
+          "textColor": "#ea580c",
+          "region": "us-east-1",
+          "usage": "4.7M reqs"
+        },
+        {
+          "service": "Amazon Route 53",
+          "cost": 4.59,
+          "category": "Networking",
+          "code": "R53",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "Global",
+          "usage": "Hosted Zones"
+        },
+        {
+          "service": "AWS Cost Explorer API",
+          "cost": 0.81,
+          "category": "Other",
+          "code": "CE",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "Global",
+          "usage": "22 Queries"
+        }
+      ],
+      "services_count": 10,
+      "daily": {
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/09",
+          "09/10"
+        ],
+        "current_costs": [
+          15.47,
+          16.14,
+          17.24,
+          19.1,
+          19.71,
+          20.76,
+          22.98,
+          23.92
+        ],
+        "costs": [
+          15.47,
+          16.14,
+          17.24,
+          19.1,
+          19.71,
+          20.76,
+          22.98,
+          23.92
+        ],
+        "prev_costs": [
+          103.8,
+          111.69,
+          121.07,
+          125.8,
+          134.32,
+          147.09,
+          147.7,
+          160.75
+        ]
+      },
+      "regions": [
+        {
+          "region": "us-east-1 (Primary)",
+          "cost": 317.98,
+          "share": 67.0
+        },
+        {
+          "region": "us-west-2 (Oregon)",
+          "cost": 85.43,
+          "share": 18.0
+        },
+        {
+          "region": "eu-west-1 (Ireland)",
+          "cost": 42.71,
+          "share": 9.0
+        },
+        {
+          "region": "Global / Edge",
+          "cost": 28.48,
+          "share": 6.0
+        }
+      ],
+      "period": {
+        "start": "2026-09-01",
+        "end": "2026-09-11",
+        "days": 11,
+        "previous_start": "2026-08-01",
+        "previous_end": "2026-08-31"
+      },
+      "categories": [
+        {
+          "name": "Compute",
+          "cost": 254.37,
+          "pct": 53.6,
+          "color": "#c85a32"
+        },
+        {
+          "name": "Database",
+          "cost": 94.84,
+          "pct": 20.0,
+          "color": "#22c55e"
+        },
+        {
+          "name": "Data Transfer",
+          "cost": 52.3,
+          "pct": 11.0,
+          "color": "#3b82f6"
+        },
+        {
+          "name": "Storage",
+          "cost": 51.05,
+          "pct": 10.8,
+          "color": "#f59e0b"
+        },
+        {
+          "name": "Analytics",
+          "cost": 16.63,
+          "pct": 3.5,
+          "color": "#06b6d4"
+        },
+        {
+          "name": "Networking",
+          "cost": 4.59,
+          "pct": 1.0,
+          "color": "#8b5cf6"
+        },
+        {
+          "name": "Other",
+          "cost": 0.81,
+          "pct": 0.2,
+          "color": "#64748b"
+        }
+      ],
+      "account_alias": "Production AWS",
+      "region": "us-east-1",
+      "synced_at": "11:43 UTC",
+      "is_live_aws": false
+    }
+  },
+  "name_production_aws": {
+    "account_id": "default",
+    "account_name": "Production AWS",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-11",
+    "is_current_month": true,
+    "data": {
+      "current_cost": 474.59,
+      "previous_cost": 1282.4,
+      "forecast": null,
+      "show_forecast": false,
+      "services": [
+        {
+          "service": "Amazon Elastic Compute Cloud",
+          "cost": 160.82,
+          "category": "Compute",
+          "code": "EC2",
+          "status": "Needs Review",
+          "change": "+7.4%",
+          "trendUp": true,
+          "color": "#fdf0ea",
+          "textColor": "#c85a32",
+          "region": "us-east-1",
+          "usage": "273 hrs"
+        },
+        {
+          "service": "Amazon Elastic Kubernetes Service",
+          "cost": 79.05,
+          "category": "Compute",
+          "code": "EKS",
+          "status": "Critical",
+          "change": "+14.8%",
+          "trendUp": true,
+          "color": "#fef2f2",
+          "textColor": "#dc2626",
+          "region": "us-east-1",
+          "usage": "Cluster Core"
+        },
+        {
+          "service": "Amazon Relational Database Service",
+          "cost": 69.22,
+          "category": "Database",
+          "code": "RDS",
+          "status": "Needs Review",
+          "change": "+4.2%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "264 hrs Multi-AZ"
+        },
+        {
+          "service": "Amazon Simple Storage Service",
+          "cost": 51.05,
+          "category": "Storage",
+          "code": "S3",
+          "status": "Healthy",
+          "change": "-2.1%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "us-east-1",
+          "usage": "8.4 TB Standard"
+        },
+        {
+          "service": "Amazon CloudFront & Data Transfer",
+          "cost": 52.3,
+          "category": "Data Transfer",
+          "code": "CF",
+          "status": "Healthy",
+          "change": "+3.3%",
+          "trendUp": true,
+          "color": "#eff6ff",
+          "textColor": "#2563eb",
+          "region": "Global",
+          "usage": "14.6 TB Out"
+        },
+        {
+          "service": "Amazon DynamoDB",
+          "cost": 25.62,
+          "category": "Database",
+          "code": "DB",
+          "status": "Healthy",
+          "change": "+1.0%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "On-Demand PayPerReq"
+        },
+        {
+          "service": "Amazon CloudWatch",
+          "cost": 16.63,
+          "category": "Analytics",
+          "code": "CW",
+          "status": "Healthy",
+          "change": "+0.6%",
+          "trendUp": true,
+          "color": "#f5f5f4",
+          "textColor": "#57534e",
+          "region": "us-east-1",
+          "usage": "Logs & Alarms"
+        },
+        {
+          "service": "AWS Lambda",
+          "cost": 14.5,
+          "category": "Compute",
+          "code": "\u03bb",
+          "status": "Healthy",
+          "change": "-1.0%",
+          "trendUp": false,
+          "color": "#fff7ed",
+          "textColor": "#ea580c",
+          "region": "us-east-1",
+          "usage": "4.7M reqs"
+        },
+        {
+          "service": "Amazon Route 53",
+          "cost": 4.59,
+          "category": "Networking",
+          "code": "R53",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "Global",
+          "usage": "Hosted Zones"
+        },
+        {
+          "service": "AWS Cost Explorer API",
+          "cost": 0.81,
+          "category": "Other",
+          "code": "CE",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "Global",
+          "usage": "22 Queries"
+        }
+      ],
+      "services_count": 10,
+      "daily": {
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/09",
+          "09/10"
+        ],
+        "current_costs": [
+          15.47,
+          16.14,
+          17.24,
+          19.1,
+          19.71,
+          20.76,
+          22.98,
+          23.92
+        ],
+        "costs": [
+          15.47,
+          16.14,
+          17.24,
+          19.1,
+          19.71,
+          20.76,
+          22.98,
+          23.92
+        ],
+        "prev_costs": [
+          103.8,
+          111.69,
+          121.07,
+          125.8,
+          134.32,
+          147.09,
+          147.7,
+          160.75
+        ]
+      },
+      "regions": [
+        {
+          "region": "us-east-1 (Primary)",
+          "cost": 317.98,
+          "share": 67.0
+        },
+        {
+          "region": "us-west-2 (Oregon)",
+          "cost": 85.43,
+          "share": 18.0
+        },
+        {
+          "region": "eu-west-1 (Ireland)",
+          "cost": 42.71,
+          "share": 9.0
+        },
+        {
+          "region": "Global / Edge",
+          "cost": 28.48,
+          "share": 6.0
+        }
+      ],
+      "period": {
+        "start": "2026-09-01",
+        "end": "2026-09-11",
+        "days": 11,
+        "previous_start": "2026-08-01",
+        "previous_end": "2026-08-31"
+      },
+      "categories": [
+        {
+          "name": "Compute",
+          "cost": 254.37,
+          "pct": 53.6,
+          "color": "#c85a32"
+        },
+        {
+          "name": "Database",
+          "cost": 94.84,
+          "pct": 20.0,
+          "color": "#22c55e"
+        },
+        {
+          "name": "Data Transfer",
+          "cost": 52.3,
+          "pct": 11.0,
+          "color": "#3b82f6"
+        },
+        {
+          "name": "Storage",
+          "cost": 51.05,
+          "pct": 10.8,
+          "color": "#f59e0b"
+        },
+        {
+          "name": "Analytics",
+          "cost": 16.63,
+          "pct": 3.5,
+          "color": "#06b6d4"
+        },
+        {
+          "name": "Networking",
+          "cost": 4.59,
+          "pct": 1.0,
+          "color": "#8b5cf6"
+        },
+        {
+          "name": "Other",
+          "cost": 0.81,
+          "pct": 0.2,
+          "color": "#64748b"
+        }
+      ],
+      "account_alias": "Production AWS",
+      "region": "us-east-1",
+      "synced_at": "11:43 UTC",
+      "is_live_aws": false
+    }
+  },
+  "default_current_month": {
+    "account_id": "default",
+    "account_name": "Production AWS",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-11",
+    "is_current_month": true,
+    "data": {
+      "current_cost": 474.59,
+      "previous_cost": 1282.4,
+      "forecast": null,
+      "show_forecast": false,
+      "services": [
+        {
+          "service": "Amazon Elastic Compute Cloud",
+          "cost": 160.82,
+          "category": "Compute",
+          "code": "EC2",
+          "status": "Needs Review",
+          "change": "+7.4%",
+          "trendUp": true,
+          "color": "#fdf0ea",
+          "textColor": "#c85a32",
+          "region": "us-east-1",
+          "usage": "273 hrs"
+        },
+        {
+          "service": "Amazon Elastic Kubernetes Service",
+          "cost": 79.05,
+          "category": "Compute",
+          "code": "EKS",
+          "status": "Critical",
+          "change": "+14.8%",
+          "trendUp": true,
+          "color": "#fef2f2",
+          "textColor": "#dc2626",
+          "region": "us-east-1",
+          "usage": "Cluster Core"
+        },
+        {
+          "service": "Amazon Relational Database Service",
+          "cost": 69.22,
+          "category": "Database",
+          "code": "RDS",
+          "status": "Needs Review",
+          "change": "+4.2%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "264 hrs Multi-AZ"
+        },
+        {
+          "service": "Amazon Simple Storage Service",
+          "cost": 51.05,
+          "category": "Storage",
+          "code": "S3",
+          "status": "Healthy",
+          "change": "-2.1%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "us-east-1",
+          "usage": "8.4 TB Standard"
+        },
+        {
+          "service": "Amazon CloudFront & Data Transfer",
+          "cost": 52.3,
+          "category": "Data Transfer",
+          "code": "CF",
+          "status": "Healthy",
+          "change": "+3.3%",
+          "trendUp": true,
+          "color": "#eff6ff",
+          "textColor": "#2563eb",
+          "region": "Global",
+          "usage": "14.6 TB Out"
+        },
+        {
+          "service": "Amazon DynamoDB",
+          "cost": 25.62,
+          "category": "Database",
+          "code": "DB",
+          "status": "Healthy",
+          "change": "+1.0%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "On-Demand PayPerReq"
+        },
+        {
+          "service": "Amazon CloudWatch",
+          "cost": 16.63,
+          "category": "Analytics",
+          "code": "CW",
+          "status": "Healthy",
+          "change": "+0.6%",
+          "trendUp": true,
+          "color": "#f5f5f4",
+          "textColor": "#57534e",
+          "region": "us-east-1",
+          "usage": "Logs & Alarms"
+        },
+        {
+          "service": "AWS Lambda",
+          "cost": 14.5,
+          "category": "Compute",
+          "code": "\u03bb",
+          "status": "Healthy",
+          "change": "-1.0%",
+          "trendUp": false,
+          "color": "#fff7ed",
+          "textColor": "#ea580c",
+          "region": "us-east-1",
+          "usage": "4.7M reqs"
+        },
+        {
+          "service": "Amazon Route 53",
+          "cost": 4.59,
+          "category": "Networking",
+          "code": "R53",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "Global",
+          "usage": "Hosted Zones"
+        },
+        {
+          "service": "AWS Cost Explorer API",
+          "cost": 0.81,
+          "category": "Other",
+          "code": "CE",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "Global",
+          "usage": "22 Queries"
+        }
+      ],
+      "services_count": 10,
+      "daily": {
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/09",
+          "09/10"
+        ],
+        "current_costs": [
+          15.47,
+          16.14,
+          17.24,
+          19.1,
+          19.71,
+          20.76,
+          22.98,
+          23.92
+        ],
+        "costs": [
+          15.47,
+          16.14,
+          17.24,
+          19.1,
+          19.71,
+          20.76,
+          22.98,
+          23.92
+        ],
+        "prev_costs": [
+          103.8,
+          111.69,
+          121.07,
+          125.8,
+          134.32,
+          147.09,
+          147.7,
+          160.75
+        ]
+      },
+      "regions": [
+        {
+          "region": "us-east-1 (Primary)",
+          "cost": 317.98,
+          "share": 67.0
+        },
+        {
+          "region": "us-west-2 (Oregon)",
+          "cost": 85.43,
+          "share": 18.0
+        },
+        {
+          "region": "eu-west-1 (Ireland)",
+          "cost": 42.71,
+          "share": 9.0
+        },
+        {
+          "region": "Global / Edge",
+          "cost": 28.48,
+          "share": 6.0
+        }
+      ],
+      "period": {
+        "start": "2026-09-01",
+        "end": "2026-09-11",
+        "days": 11,
+        "previous_start": "2026-08-01",
+        "previous_end": "2026-08-31"
+      },
+      "categories": [
+        {
+          "name": "Compute",
+          "cost": 254.37,
+          "pct": 53.6,
+          "color": "#c85a32"
+        },
+        {
+          "name": "Database",
+          "cost": 94.84,
+          "pct": 20.0,
+          "color": "#22c55e"
+        },
+        {
+          "name": "Data Transfer",
+          "cost": 52.3,
+          "pct": 11.0,
+          "color": "#3b82f6"
+        },
+        {
+          "name": "Storage",
+          "cost": 51.05,
+          "pct": 10.8,
+          "color": "#f59e0b"
+        },
+        {
+          "name": "Analytics",
+          "cost": 16.63,
+          "pct": 3.5,
+          "color": "#06b6d4"
+        },
+        {
+          "name": "Networking",
+          "cost": 4.59,
+          "pct": 1.0,
+          "color": "#8b5cf6"
+        },
+        {
+          "name": "Other",
+          "cost": 0.81,
+          "pct": 0.2,
+          "color": "#64748b"
+        }
+      ],
+      "account_alias": "Production AWS",
+      "region": "us-east-1",
+      "synced_at": "11:43 UTC",
+      "is_live_aws": false
+    }
+  },
+  "name_production_aws_current_month": {
+    "account_id": "default",
+    "account_name": "Production AWS",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-11",
+    "is_current_month": true,
+    "data": {
+      "current_cost": 474.59,
+      "previous_cost": 1282.4,
+      "forecast": null,
+      "show_forecast": false,
+      "services": [
+        {
+          "service": "Amazon Elastic Compute Cloud",
+          "cost": 160.82,
+          "category": "Compute",
+          "code": "EC2",
+          "status": "Needs Review",
+          "change": "+7.4%",
+          "trendUp": true,
+          "color": "#fdf0ea",
+          "textColor": "#c85a32",
+          "region": "us-east-1",
+          "usage": "273 hrs"
+        },
+        {
+          "service": "Amazon Elastic Kubernetes Service",
+          "cost": 79.05,
+          "category": "Compute",
+          "code": "EKS",
+          "status": "Critical",
+          "change": "+14.8%",
+          "trendUp": true,
+          "color": "#fef2f2",
+          "textColor": "#dc2626",
+          "region": "us-east-1",
+          "usage": "Cluster Core"
+        },
+        {
+          "service": "Amazon Relational Database Service",
+          "cost": 69.22,
+          "category": "Database",
+          "code": "RDS",
+          "status": "Needs Review",
+          "change": "+4.2%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "264 hrs Multi-AZ"
+        },
+        {
+          "service": "Amazon Simple Storage Service",
+          "cost": 51.05,
+          "category": "Storage",
+          "code": "S3",
+          "status": "Healthy",
+          "change": "-2.1%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "us-east-1",
+          "usage": "8.4 TB Standard"
+        },
+        {
+          "service": "Amazon CloudFront & Data Transfer",
+          "cost": 52.3,
+          "category": "Data Transfer",
+          "code": "CF",
+          "status": "Healthy",
+          "change": "+3.3%",
+          "trendUp": true,
+          "color": "#eff6ff",
+          "textColor": "#2563eb",
+          "region": "Global",
+          "usage": "14.6 TB Out"
+        },
+        {
+          "service": "Amazon DynamoDB",
+          "cost": 25.62,
+          "category": "Database",
+          "code": "DB",
+          "status": "Healthy",
+          "change": "+1.0%",
+          "trendUp": true,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "us-east-1",
+          "usage": "On-Demand PayPerReq"
+        },
+        {
+          "service": "Amazon CloudWatch",
+          "cost": 16.63,
+          "category": "Analytics",
+          "code": "CW",
+          "status": "Healthy",
+          "change": "+0.6%",
+          "trendUp": true,
+          "color": "#f5f5f4",
+          "textColor": "#57534e",
+          "region": "us-east-1",
+          "usage": "Logs & Alarms"
+        },
+        {
+          "service": "AWS Lambda",
+          "cost": 14.5,
+          "category": "Compute",
+          "code": "\u03bb",
+          "status": "Healthy",
+          "change": "-1.0%",
+          "trendUp": false,
+          "color": "#fff7ed",
+          "textColor": "#ea580c",
+          "region": "us-east-1",
+          "usage": "4.7M reqs"
+        },
+        {
+          "service": "Amazon Route 53",
+          "cost": 4.59,
+          "category": "Networking",
+          "code": "R53",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#fffbeb",
+          "textColor": "#d97706",
+          "region": "Global",
+          "usage": "Hosted Zones"
+        },
+        {
+          "service": "AWS Cost Explorer API",
+          "cost": 0.81,
+          "category": "Other",
+          "code": "CE",
+          "status": "Healthy",
+          "change": "0.0%",
+          "trendUp": false,
+          "color": "#f0fdf4",
+          "textColor": "#16a34a",
+          "region": "Global",
+          "usage": "22 Queries"
+        }
+      ],
+      "services_count": 10,
+      "daily": {
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/09",
+          "09/10"
+        ],
+        "current_costs": [
+          15.47,
+          16.14,
+          17.24,
+          19.1,
+          19.71,
+          20.76,
+          22.98,
+          23.92
+        ],
+        "costs": [
+          15.47,
+          16.14,
+          17.24,
+          19.1,
+          19.71,
+          20.76,
+          22.98,
+          23.92
+        ],
+        "prev_costs": [
+          103.8,
+          111.69,
+          121.07,
+          125.8,
+          134.32,
+          147.09,
+          147.7,
+          160.75
+        ]
+      },
+      "regions": [
+        {
+          "region": "us-east-1 (Primary)",
+          "cost": 317.98,
+          "share": 67.0
+        },
+        {
+          "region": "us-west-2 (Oregon)",
+          "cost": 85.43,
+          "share": 18.0
+        },
+        {
+          "region": "eu-west-1 (Ireland)",
+          "cost": 42.71,
+          "share": 9.0
+        },
+        {
+          "region": "Global / Edge",
+          "cost": 28.48,
+          "share": 6.0
+        }
+      ],
+      "period": {
+        "start": "2026-09-01",
+        "end": "2026-09-11",
+        "days": 11,
+        "previous_start": "2026-08-01",
+        "previous_end": "2026-08-31"
+      },
+      "categories": [
+        {
+          "name": "Compute",
+          "cost": 254.37,
+          "pct": 53.6,
+          "color": "#c85a32"
+        },
+        {
+          "name": "Database",
+          "cost": 94.84,
+          "pct": 20.0,
+          "color": "#22c55e"
+        },
+        {
+          "name": "Data Transfer",
+          "cost": 52.3,
+          "pct": 11.0,
+          "color": "#3b82f6"
+        },
+        {
+          "name": "Storage",
+          "cost": 51.05,
+          "pct": 10.8,
+          "color": "#f59e0b"
+        },
+        {
+          "name": "Analytics",
+          "cost": 16.63,
+          "pct": 3.5,
+          "color": "#06b6d4"
+        },
+        {
+          "name": "Networking",
+          "cost": 4.59,
+          "pct": 1.0,
+          "color": "#8b5cf6"
+        },
+        {
+          "name": "Other",
+          "cost": 0.81,
+          "pct": 0.2,
+          "color": "#64748b"
+        }
+      ],
+      "account_alias": "Production AWS",
+      "region": "us-east-1",
+      "synced_at": "11:43 UTC",
+      "is_live_aws": false
+    }
+  },
+  "acc_1789539346095_288": {
+    "account_id": "acc_1789539346095_288",
+    "account_name": "BhaveshSir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "BhaveshSir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789539346095_288",
+        "account_name": "BhaveshSir",
+        "calls_remaining": 8,
+        "calls_today": 1,
+        "daily_limit": 9
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "11:45 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "acc_1789539346095_288_current_month": {
+    "account_id": "acc_1789539346095_288",
+    "account_name": "BhaveshSir",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "BhaveshSir",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 319.96,
+          "name": "Compute",
+          "pct": 69.8
+        },
+        {
+          "color": "#64748b",
+          "cost": 112.02,
+          "name": "Other",
+          "pct": 24.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 24.07,
+          "name": "Storage",
+          "pct": 5.3
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 1.88,
+          "name": "Networking",
+          "pct": 0.4
+        },
+        {
+          "color": "#06b6d4",
+          "cost": 0.26,
+          "name": "Analytics",
+          "pct": 0.1
+        }
+      ],
+      "current_cost": 458.19,
+      "daily": {
+        "costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "current_costs": [
+          29.11,
+          28.64,
+          28.63,
+          28.62,
+          29.45,
+          30.78,
+          30.68,
+          30.35,
+          32.26,
+          32.41,
+          33.71,
+          32.51,
+          32.36,
+          32.03,
+          26.64,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          26.78,
+          26.35,
+          26.34,
+          26.33,
+          27.09,
+          28.32,
+          28.23,
+          27.92,
+          29.68,
+          29.82,
+          31.01,
+          29.91,
+          29.77,
+          29.47,
+          24.51,
+          0
+        ]
+      },
+      "forecast": 859.11,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 930.59,
+      "quota": {
+        "account_id": "acc_1789539346095_288",
+        "account_name": "BhaveshSir",
+        "calls_remaining": 8,
+        "calls_today": 1,
+        "daily_limit": 9
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 333.57,
+          "region": "us-east-1"
+        },
+        {
+          "cost": 87.8,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 28.82,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 5.66,
+          "region": "us-west-1"
+        },
+        {
+          "cost": 1.88,
+          "region": "global"
+        },
+        {
+          "cost": 0.46,
+          "region": "NoRegion"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 176.02,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 143.94,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 66.22,
+          "region": "us-east-1",
+          "service": "Amazon OpenSearch Service",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 24.07,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "SAV",
+          "color": "#f4ede6",
+          "cost": 22.51,
+          "region": "us-east-1",
+          "service": "Savings Plans for AWS Compute usage",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 17.9,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 4.93,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 1.88,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 0.46,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Analytics",
+          "change": "-1.2%",
+          "code": "CW",
+          "color": "#f5f5f4",
+          "cost": 0.26,
+          "region": "us-east-1",
+          "service": "AmazonCloudWatch",
+          "status": "Healthy",
+          "textColor": "#57534e",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 10,
+      "show_forecast": true,
+      "synced_at": "11:45 UTC",
+      "tax": 0.46,
+      "_fromLiveApi": true
+    }
+  },
+  "acc_1789540220686_153": {
+    "account_id": "acc_1789540220686_153",
+    "account_name": "catrion",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "catrion",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 511.28,
+          "name": "Compute",
+          "pct": 84.1
+        },
+        {
+          "color": "#64748b",
+          "cost": 87.85,
+          "name": "Other",
+          "pct": 14.4
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 8.75,
+          "name": "Networking",
+          "pct": 1.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 0.15,
+          "name": "Storage",
+          "pct": 0
+        }
+      ],
+      "current_cost": 608.03,
+      "daily": {
+        "costs": [
+          103.49,
+          36.28,
+          36.25,
+          36.1,
+          36.39,
+          36.27,
+          36.27,
+          36.28,
+          36.48,
+          36.92,
+          36.32,
+          36.26,
+          36.25,
+          36.25,
+          32.21,
+          0
+        ],
+        "current_costs": [
+          103.49,
+          36.28,
+          36.25,
+          36.1,
+          36.39,
+          36.27,
+          36.27,
+          36.28,
+          36.48,
+          36.92,
+          36.32,
+          36.26,
+          36.25,
+          36.25,
+          32.21,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          95.21,
+          33.38,
+          33.35,
+          33.21,
+          33.48,
+          33.37,
+          33.37,
+          33.38,
+          33.56,
+          33.97,
+          33.41,
+          33.36,
+          33.35,
+          33.35,
+          29.63,
+          0
+        ]
+      },
+      "forecast": 1140.06,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 1204.21,
+      "quota": {
+        "account_id": "acc_1789540220686_153",
+        "account_name": "catrion",
+        "calls_remaining": 4,
+        "calls_today": 1,
+        "daily_limit": 5
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 519.81,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 67.22,
+          "region": "NoRegion"
+        },
+        {
+          "cost": 11.42,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 8.75,
+          "region": "global"
+        },
+        {
+          "cost": 0.83,
+          "region": "us-east-1"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "+4.5%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 438.05,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Needs Review",
+          "textColor": "#c85a32",
+          "trendUp": true,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 73.23,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 38.22,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AWS",
+          "color": "#f4ede6",
+          "cost": 29,
+          "region": "us-east-1",
+          "service": "AWS Support (Developer)",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 19.8,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 8.75,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 0.83,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 0.15,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 8,
+      "show_forecast": true,
+      "synced_at": "12:00 UTC",
+      "tax": 38.22,
+      "_fromLiveApi": true
+    }
+  },
+  "name_catrion": {
+    "account_id": "acc_1789540220686_153",
+    "account_name": "catrion",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "catrion",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 511.28,
+          "name": "Compute",
+          "pct": 84.1
+        },
+        {
+          "color": "#64748b",
+          "cost": 87.85,
+          "name": "Other",
+          "pct": 14.4
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 8.75,
+          "name": "Networking",
+          "pct": 1.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 0.15,
+          "name": "Storage",
+          "pct": 0
+        }
+      ],
+      "current_cost": 608.03,
+      "daily": {
+        "costs": [
+          103.49,
+          36.28,
+          36.25,
+          36.1,
+          36.39,
+          36.27,
+          36.27,
+          36.28,
+          36.48,
+          36.92,
+          36.32,
+          36.26,
+          36.25,
+          36.25,
+          32.21,
+          0
+        ],
+        "current_costs": [
+          103.49,
+          36.28,
+          36.25,
+          36.1,
+          36.39,
+          36.27,
+          36.27,
+          36.28,
+          36.48,
+          36.92,
+          36.32,
+          36.26,
+          36.25,
+          36.25,
+          32.21,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          95.21,
+          33.38,
+          33.35,
+          33.21,
+          33.48,
+          33.37,
+          33.37,
+          33.38,
+          33.56,
+          33.97,
+          33.41,
+          33.36,
+          33.35,
+          33.35,
+          29.63,
+          0
+        ]
+      },
+      "forecast": 1140.06,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 1204.21,
+      "quota": {
+        "account_id": "acc_1789540220686_153",
+        "account_name": "catrion",
+        "calls_remaining": 4,
+        "calls_today": 1,
+        "daily_limit": 5
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 519.81,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 67.22,
+          "region": "NoRegion"
+        },
+        {
+          "cost": 11.42,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 8.75,
+          "region": "global"
+        },
+        {
+          "cost": 0.83,
+          "region": "us-east-1"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "+4.5%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 438.05,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Needs Review",
+          "textColor": "#c85a32",
+          "trendUp": true,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 73.23,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 38.22,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AWS",
+          "color": "#f4ede6",
+          "cost": 29,
+          "region": "us-east-1",
+          "service": "AWS Support (Developer)",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 19.8,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 8.75,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 0.83,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 0.15,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 8,
+      "show_forecast": true,
+      "synced_at": "12:00 UTC",
+      "tax": 38.22,
+      "_fromLiveApi": true
+    }
+  },
+  "acc_1789540220686_153_current_month": {
+    "account_id": "acc_1789540220686_153",
+    "account_name": "catrion",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "catrion",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 511.28,
+          "name": "Compute",
+          "pct": 84.1
+        },
+        {
+          "color": "#64748b",
+          "cost": 87.85,
+          "name": "Other",
+          "pct": 14.4
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 8.75,
+          "name": "Networking",
+          "pct": 1.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 0.15,
+          "name": "Storage",
+          "pct": 0
+        }
+      ],
+      "current_cost": 608.03,
+      "daily": {
+        "costs": [
+          103.49,
+          36.28,
+          36.25,
+          36.1,
+          36.39,
+          36.27,
+          36.27,
+          36.28,
+          36.48,
+          36.92,
+          36.32,
+          36.26,
+          36.25,
+          36.25,
+          32.21,
+          0
+        ],
+        "current_costs": [
+          103.49,
+          36.28,
+          36.25,
+          36.1,
+          36.39,
+          36.27,
+          36.27,
+          36.28,
+          36.48,
+          36.92,
+          36.32,
+          36.26,
+          36.25,
+          36.25,
+          32.21,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          95.21,
+          33.38,
+          33.35,
+          33.21,
+          33.48,
+          33.37,
+          33.37,
+          33.38,
+          33.56,
+          33.97,
+          33.41,
+          33.36,
+          33.35,
+          33.35,
+          29.63,
+          0
+        ]
+      },
+      "forecast": 1140.06,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 1204.21,
+      "quota": {
+        "account_id": "acc_1789540220686_153",
+        "account_name": "catrion",
+        "calls_remaining": 4,
+        "calls_today": 1,
+        "daily_limit": 5
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 519.81,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 67.22,
+          "region": "NoRegion"
+        },
+        {
+          "cost": 11.42,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 8.75,
+          "region": "global"
+        },
+        {
+          "cost": 0.83,
+          "region": "us-east-1"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "+4.5%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 438.05,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Needs Review",
+          "textColor": "#c85a32",
+          "trendUp": true,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 73.23,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 38.22,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AWS",
+          "color": "#f4ede6",
+          "cost": 29,
+          "region": "us-east-1",
+          "service": "AWS Support (Developer)",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 19.8,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 8.75,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 0.83,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 0.15,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 8,
+      "show_forecast": true,
+      "synced_at": "12:00 UTC",
+      "tax": 38.22,
+      "_fromLiveApi": true
+    }
+  },
+  "name_catrion_current_month": {
+    "account_id": "acc_1789540220686_153",
+    "account_name": "catrion",
+    "date": "2026-09-16",
+    "period_start": "2026-09-01",
+    "period_end": "2026-09-16",
+    "is_current_month": true,
+    "data": {
+      "account_alias": "catrion",
+      "categories": [
+        {
+          "color": "#c85a32",
+          "cost": 511.28,
+          "name": "Compute",
+          "pct": 84.1
+        },
+        {
+          "color": "#64748b",
+          "cost": 87.85,
+          "name": "Other",
+          "pct": 14.4
+        },
+        {
+          "color": "#8b5cf6",
+          "cost": 8.75,
+          "name": "Networking",
+          "pct": 1.4
+        },
+        {
+          "color": "#f59e0b",
+          "cost": 0.15,
+          "name": "Storage",
+          "pct": 0
+        }
+      ],
+      "current_cost": 608.03,
+      "daily": {
+        "costs": [
+          103.49,
+          36.28,
+          36.25,
+          36.1,
+          36.39,
+          36.27,
+          36.27,
+          36.28,
+          36.48,
+          36.92,
+          36.32,
+          36.26,
+          36.25,
+          36.25,
+          32.21,
+          0
+        ],
+        "current_costs": [
+          103.49,
+          36.28,
+          36.25,
+          36.1,
+          36.39,
+          36.27,
+          36.27,
+          36.28,
+          36.48,
+          36.92,
+          36.32,
+          36.26,
+          36.25,
+          36.25,
+          32.21,
+          0
+        ],
+        "dates": [
+          "09/01",
+          "09/02",
+          "09/03",
+          "09/04",
+          "09/05",
+          "09/06",
+          "09/07",
+          "09/08",
+          "09/09",
+          "09/10",
+          "09/11",
+          "09/12",
+          "09/13",
+          "09/14",
+          "09/15",
+          "09/16"
+        ],
+        "prev_costs": [
+          95.21,
+          33.38,
+          33.35,
+          33.21,
+          33.48,
+          33.37,
+          33.37,
+          33.38,
+          33.56,
+          33.97,
+          33.41,
+          33.36,
+          33.35,
+          33.35,
+          29.63,
+          0
+        ]
+      },
+      "forecast": 1140.06,
+      "is_live_aws": true,
+      "limit_reached": false,
+      "period": {
+        "days": 16,
+        "end": "2026-09-16",
+        "previous_end": "2026-08-31",
+        "previous_start": "2026-08-01",
+        "start": "2026-09-01"
+      },
+      "previous_cost": 1204.21,
+      "quota": {
+        "account_id": "acc_1789540220686_153",
+        "account_name": "catrion",
+        "calls_remaining": 4,
+        "calls_today": 1,
+        "daily_limit": 5
+      },
+      "region": "us-east-1",
+      "regions": [
+        {
+          "cost": 519.81,
+          "region": "eu-central-1"
+        },
+        {
+          "cost": 67.22,
+          "region": "NoRegion"
+        },
+        {
+          "cost": 11.42,
+          "region": "ap-south-1"
+        },
+        {
+          "cost": 8.75,
+          "region": "global"
+        },
+        {
+          "cost": 0.83,
+          "region": "us-east-1"
+        }
+      ],
+      "services": [
+        {
+          "category": "Compute",
+          "change": "+4.5%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 438.05,
+          "region": "us-east-1",
+          "service": "Amazon Elastic Compute Cloud - Compute",
+          "status": "Needs Review",
+          "textColor": "#c85a32",
+          "trendUp": true,
+          "usage": "Active"
+        },
+        {
+          "category": "Compute",
+          "change": "-1.2%",
+          "code": "EC2",
+          "color": "#fdf0ea",
+          "cost": 73.23,
+          "region": "us-east-1",
+          "service": "EC2 - Other",
+          "status": "Healthy",
+          "textColor": "#c85a32",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "TAX",
+          "color": "#f4ede6",
+          "cost": 38.22,
+          "region": "us-east-1",
+          "service": "Tax",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AWS",
+          "color": "#f4ede6",
+          "cost": 29,
+          "region": "us-east-1",
+          "service": "AWS Support (Developer)",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "AMA",
+          "color": "#f4ede6",
+          "cost": 19.8,
+          "region": "us-east-1",
+          "service": "Amazon Virtual Private Cloud",
+          "status": "Healthy",
+          "textColor": "#1a1512",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Networking",
+          "change": "-1.2%",
+          "code": "R53",
+          "color": "#fffbeb",
+          "cost": 8.75,
+          "region": "us-east-1",
+          "service": "Amazon Route 53",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Other",
+          "change": "-1.2%",
+          "code": "CE",
+          "color": "#f0fdf4",
+          "cost": 0.83,
+          "region": "us-east-1",
+          "service": "AWS Cost Explorer",
+          "status": "Healthy",
+          "textColor": "#16a34a",
+          "trendUp": false,
+          "usage": "Active"
+        },
+        {
+          "category": "Storage",
+          "change": "-1.2%",
+          "code": "S3",
+          "color": "#fffbeb",
+          "cost": 0.15,
+          "region": "us-east-1",
+          "service": "Amazon Simple Storage Service",
+          "status": "Healthy",
+          "textColor": "#d97706",
+          "trendUp": false,
+          "usage": "Active"
+        }
+      ],
+      "services_count": 8,
+      "show_forecast": true,
+      "synced_at": "12:00 UTC",
+      "tax": 38.22,
+      "_fromLiveApi": true
+    }
+  }
+}
